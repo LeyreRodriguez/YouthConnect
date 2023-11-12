@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "47949273585",
+    "project_id": "youthconnect-eb4a6",
+    "storage_bucket": "youthconnect-eb4a6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:47949273585:android:ca4b28e9bba19e95e78c50",
+        "android_client_info": {
+          "package_name": "com.example.youthconnect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAi7LPSrCF19Bo_j_l_DtSDuQpoWpS_Ulw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
