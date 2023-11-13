@@ -341,9 +341,6 @@ fun FirstSignupFormScreen() {
             dataBase.addChild(child)
             dataBase.addChildAccount(child)
 
-
-
-            //Log.d(MainActivity::class.java.simpleName, "")
             mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
         }else{
             Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT)
