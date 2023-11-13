@@ -3,11 +3,15 @@ package com.example.youthconnect
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.util.Patterns
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,19 +20,32 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.PermIdentity
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -38,15 +55,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextStyle
@@ -54,7 +76,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -90,45 +115,10 @@ class SignUp : ComponentActivity() {
 fun SignupScreenPreview(){
     YouthconnectTheme {
 
-        var parentFullName by remember { mutableStateOf("") }
-        var parentID  by remember { mutableStateOf("") }
-        var parentPhoneNumber  by remember { mutableStateOf("") }
-        var password  by remember { mutableStateOf("") }
 
-        var childFullName  by remember { mutableStateOf("") }
-        var childID  by remember { mutableStateOf("")}
-        var childCourse  by remember { mutableStateOf("") }
-        var childPassword  by remember { mutableStateOf("") }
-        var belongsToSchool  by remember { mutableStateOf(false) }
-        var faithGroups  by remember { mutableStateOf(false) }
-        var goOutAlone  by remember { mutableStateOf(false) }
-        var observations  by remember { mutableStateOf("") }
 
         FirstSignupFormScreen(
-            parentFullName = parentFullName,
-            parentID = parentID,
-            parentPhoneNumber = parentPhoneNumber,
-            password = password,
-            childFullName = childFullName,
-            childID = childID,
-            childCourse = childCourse,
-            childPassword = childPassword,
-            belongsToSchool = belongsToSchool,
-            faithGroups = faithGroups,
-            goOutAlone  = goOutAlone,
-            observations = observations,
-            onParentFullNameChange = { parentFullName = it },
-            onParentIDChange = { parentID = it },
-            onParentPhoneNumberChange = { parentPhoneNumber = it },
-            onPasswordChange = { password = it },
-            onChildFullNameChange = { childFullName = it },
-            onChildIDChange = { childID = it },
-            onChildCourseChange = { childCourse = it.name },
-            onChildPasswordChange = { childPassword = it },
-            onBelongsToSchool = {belongsToSchool = it},
-            onFaithGroups = { faithGroups = it },
-            onGoOutAlone = { goOutAlone = it},
-            onObservations = { observations = it}
+
         )
 
     }
@@ -151,19 +141,7 @@ fun SignUpScreen(
 
 
 
-    var parentFullName by remember { mutableStateOf("") }
-    var parentID  by remember { mutableStateOf("") }
-    var parentPhoneNumber  by remember { mutableStateOf("") }
-    var password  by remember { mutableStateOf("") }
 
-    var childFullName  by remember { mutableStateOf("") }
-    var childID  by remember { mutableStateOf("")}
-    var childCourse  by remember { mutableStateOf("") }
-    var childPassword  by remember { mutableStateOf("") }
-    var belongsToSchool  by remember { mutableStateOf(false) }
-    var faithGroups  by remember { mutableStateOf(false) }
-    var goOutAlone  by remember { mutableStateOf(false) }
-    var observations  by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.TopCenter,
@@ -204,32 +182,7 @@ fun SignUpScreen(
                         modifier = Modifier.padding(bottom = 15.dp)
                     )
 
-                    FirstSignupFormScreen(
-                        parentFullName = parentFullName,
-                        parentID = parentID,
-                        parentPhoneNumber = parentPhoneNumber,
-                        password = password,
-                        childFullName = childFullName,
-                        childID = childID,
-                        childCourse = childCourse,
-                        childPassword = childPassword,
-                        belongsToSchool = belongsToSchool,
-                        faithGroups = faithGroups,
-                        goOutAlone  = goOutAlone,
-                        observations = observations,
-                        onParentFullNameChange = { parentFullName = it },
-                        onParentIDChange = { parentID = it },
-                        onParentPhoneNumberChange = { parentPhoneNumber = it },
-                        onPasswordChange = { password = it },
-                        onChildFullNameChange = { childFullName = it },
-                        onChildIDChange = { childID = it },
-                        onChildCourseChange = { childCourse = it.name },
-                        onChildPasswordChange = { childPassword = it },
-                        onBelongsToSchool = {belongsToSchool = it},
-                        onFaithGroups = { faithGroups = it },
-                        onGoOutAlone = { goOutAlone = it},
-                        onObservations = { observations = it}
-                    )
+                    FirstSignupFormScreen()
 
 
                 }
@@ -238,7 +191,7 @@ fun SignUpScreen(
 
 
 
-            val mcontext = LocalContext.current
+
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomEnd,
@@ -246,56 +199,7 @@ fun SignUpScreen(
 
                 Column {
 
-                    Button(
-                        onClick = {
-                            val parentsID : List<String>  = listOf(parentID)
-                            val parent = Parent(parentFullName,
-                                parentID,
-                                parentPhoneNumber.toInt(),
-                                password)
 
-                            val child = Child(childFullName,
-                                childID,
-                                childCourse,
-                                childPassword,
-                                belongsToSchool,
-                                faithGroups,
-                                goOutAlone,
-                                observations,
-                                parentsID,
-                                "745896H")
-                            val dataBase = DataBase()
-
-                            dataBase.addParents(parent)
-                            dataBase.addParentAccount(parent)
-
-                            dataBase.addChild(child)
-                            dataBase.addChildAccount(child)
-
-
-
-
-                            mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
-                            .shadow(elevation = 14.dp)
-                    ) {
-                        Text(
-                            text = "Next",
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontFamily = FontFamily.Default,
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFFFFFFFF),
-                                letterSpacing = 0.3.sp,
-                            ),
-                            color = Color(0xFF000000),
-                            textAlign = TextAlign.Center
-                        )
-                    }
 
                     Box(modifier = Modifier.wrapContentSize(),
                         contentAlignment = Alignment.BottomCenter ) {
@@ -326,150 +230,348 @@ fun SignUpScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FirstSignupFormScreen(
-    parentFullName: String,
-    parentID: String,
-    parentPhoneNumber : String,
-    password: String,
-    childFullName: String,
-    childID: String,
-    childCourse: String,
-    childPassword: String,
-    belongsToSchool : Boolean,
-    faithGroups : Boolean,
-    goOutAlone : Boolean,
-    observations : String,
-    onParentFullNameChange: (String) -> Unit,
-    onParentIDChange: (String) -> Unit,
-    onParentPhoneNumberChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onChildFullNameChange: (String) -> Unit,
-    onChildIDChange: (String) -> Unit,
-    onChildCourseChange: (Course) -> Unit,
-    onChildPasswordChange: (String) -> Unit,
-    onBelongsToSchool : (Boolean) -> Unit,
-    onFaithGroups : (Boolean) -> Unit,
-    onGoOutAlone : (Boolean) -> Unit,
-    onObservations : (String) -> Unit
-) {
+fun FirstSignupFormScreen() {
+    var validateParentFullName by rememberSaveable { mutableStateOf(true) }
+    var validateParentID by rememberSaveable { mutableStateOf(true) }
+    var validateParentPhoneNumber by rememberSaveable { mutableStateOf(true) }
+    var validateParentPassword by rememberSaveable { mutableStateOf(true) }
+    var validateChildFullName by rememberSaveable { mutableStateOf(true) }
+    var validateChildID by rememberSaveable { mutableStateOf(true) }
+    var validateChildCourse by rememberSaveable { mutableStateOf(true) }
+    var validateChildPassword by rememberSaveable { mutableStateOf(true) }
+
+    var isChildPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    var isParentPasswordVisible by rememberSaveable { mutableStateOf(false) }
+  //  var validateChildPassword by rememberSaveable { mutableStateOf(true) }
+
+
+    val validateParentFullNameError = "Please, input a a valid name"
+    val validateParentIDError = "The format of the ID doesn´t seem right"
+    val validateParentPhoneNumberError = "The format of the phone number doesn´t seem right"
+    val validateParentPasswordError = "Must mix capital and non-capital letters, a number, special character and minimun length of 8"
+    val validateChildFullNameError = "Please, input a valid ID"
+    val validateChildIDError = "The format of the ID doesn´t seem right"
+    val validateChildCourseError = "You have to choose one course"
+    val validateChildPasswordError = "Must mix capital and non-capital letters, a number, special character and minimun length of 8"
+
+    var parentFullName by remember { mutableStateOf("") }
+    var parentID  by remember { mutableStateOf("") }
+    var parentPhoneNumber  by remember { mutableStateOf("") }
+    var password  by remember { mutableStateOf("") }
+
+    var childFullName  by remember { mutableStateOf("") }
+    var childID  by remember { mutableStateOf("")}
+    var childCourse  by remember { mutableStateOf("") }
+    var childPassword  by remember { mutableStateOf("") }
+    var belongsToSchool  by remember { mutableStateOf(false) }
+    var faithGroups  by remember { mutableStateOf(false) }
+    var goOutAlone  by remember { mutableStateOf(false) }
+    var observations  by remember { mutableStateOf("") }
+
+    val focusManager = LocalFocusManager.current
     val mcontext = LocalContext.current
 
-    LazyColumn(
-        modifier = Modifier
-            .height(400.dp)
-            .padding(16.dp)
-    ) {
-        item {
-            OutlinedTextField(
-                value = childFullName,
-                onValueChange = { onChildFullNameChange(it) },
-                label = { Text("Child's full name") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            )
+    fun validateData(parentFullName: String,
+                     parentID: String,
+                     parentPhoneNumber: String,
+                     parentPassword : String,
+                     childFullName: String,
+                     childCourse: String,
+                     childID: String,
+                     childPassword : String) : Boolean{
+
+        val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=]).{8,}".toRegex()
+
+        // val phoneNumberRegex = "^(?:\\+34|34)?(?:6\\d{8}|[89]\\d{8})$".toRegex()
+
+        val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
+
+
+
+
+        validateParentFullName = parentFullName.isNotBlank()
+        validateParentID = parentID.matches(IDRegex)
+        validateParentPhoneNumber = Patterns.PHONE.matcher(parentPhoneNumber).matches()
+        validateParentPassword = parentPassword.matches(passwordRegex)
+
+        validateChildFullName = childFullName.isNotBlank()
+        validateChildID = childID.matches(IDRegex)
+        validateChildPassword = childPassword.matches(passwordRegex)
+
+
+
+        return validateParentFullName && validateParentID && validateParentPhoneNumber && validateParentPassword && validateChildFullName && validateChildID && validateChildPassword
+    }
+
+
+    fun register(parentFullName: String,
+                 parentID: String,
+                 parentPhoneNumber: String,
+                 parentPassword : String,
+                 childFullName: String,
+                 childCourse: String,
+                 childID: String,
+                 childPassword : String)
+    {
+
+        if (validateData(parentFullName, parentID, parentPhoneNumber, parentPassword, childFullName, childCourse, childID, childPassword)){
+            Log.i("YAY", "Usuario creado exitosamente")
+
+            val parentsID : List<String>  = listOf(parentID)
+            val parent = Parent(parentFullName,
+                parentID,
+                parentPhoneNumber.toInt(),
+                password)
+
+            val child = Child(childFullName,
+                childID,
+                childCourse,
+                childPassword,
+                belongsToSchool,
+                faithGroups,
+                goOutAlone,
+                observations,
+                parentsID,
+                "745896H")
+            val dataBase = DataBase()
+
+            dataBase.addParents(parent)
+            dataBase.addParentAccount(parent)
+
+            dataBase.addChild(child)
+            dataBase.addChildAccount(child)
+
+
+
+            Log.d(MainActivity::class.java.simpleName, "")
+           // mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
+        }else{
+            Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT)
+        }
+    }
+
+
+    Column {
+        LazyColumn(
+            modifier = Modifier
+                .height(400.dp)
+                .padding(16.dp)
+        ) {
+            item {
+
+                CustomOutlinedTextField(
+                    value = childFullName,
+                    onValueChange = {childFullName = it},
+                    label = "Child's full name",
+                    showError = !validateChildFullName,
+                    errorMessage = validateChildFullNameError,
+                    leadingIconImageVector = Icons.Default.PermIdentity,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {focusManager.moveFocus(FocusDirection.Down)}
+                    )
+
+                )
+
+            }
+
+            item {
+                CoursesSelectionScreen(childCourse, { childCourse = it.name})
+            }
+
+            item {
+                CustomOutlinedTextField(
+                    value = childID,
+                    onValueChange = {childID = it },
+                    label = "Child's ID",
+                    showError = !validateChildID,
+                    errorMessage = validateChildIDError,
+                    leadingIconImageVector = Icons.Default.CreditCard ,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {focusManager.moveFocus(FocusDirection.Down)}
+                    )
+
+                )
+            }
+
+            item {
+
+                CustomOutlinedTextField(
+                    value = childPassword,
+                    onValueChange = {childPassword = it },
+                    label = "Child's Password",
+                    showError = !validateChildPassword,
+                    errorMessage = validateChildPasswordError,
+                    isPasswordField = true,
+                    isPasswordVisible = isChildPasswordVisible,
+                    onVisibilityChange = {isChildPasswordVisible = it},
+                    leadingIconImageVector = Icons.Default.Password ,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {focusManager.moveFocus(FocusDirection.Down)}
+                    )
+
+                )
+
+            }
+
+            item {
+                CustomRadioButton(belongsToSchool, onBelongsToSchool = { belongsToSchool = it }, "Belongs to the school?")
+            }
+
+            item {
+
+                CustomOutlinedTextField(
+                    value = parentFullName,
+                    onValueChange = {parentFullName = it},
+                    label = "Parent's full name",
+                    showError = !validateParentFullName,
+                    errorMessage = validateParentFullNameError,
+                    leadingIconImageVector = Icons.Default.PermIdentity ,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {focusManager.moveFocus(FocusDirection.Down)}
+                    )
+
+                )
+            }
+
+            item {
+
+                CustomOutlinedTextField(
+                    value = parentID,
+                    onValueChange = {parentID = it},
+                    label = "Parent's ID",
+                    showError = !validateParentID,
+                    errorMessage = validateParentIDError,
+                    leadingIconImageVector = Icons.Default.CreditCard ,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {focusManager.moveFocus(FocusDirection.Down)}
+                    )
+
+                )
+
+
+            }
+
+            item {
+
+                CustomOutlinedTextField(
+                    value = parentPhoneNumber,
+                    onValueChange = {parentPhoneNumber = it},
+                    label = "Parent's Phone Number",
+                    showError = !validateParentPhoneNumber,
+                    errorMessage = validateParentPhoneNumberError,
+                    leadingIconImageVector = Icons.Default.Phone ,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {focusManager.moveFocus(FocusDirection.Down)}
+                    )
+
+                )
+            }
+
+
+            item {
+
+
+
+                CustomOutlinedTextField(
+                    value = password,
+                    onValueChange = {password = it},
+                    label = "Password",
+                    showError = !validateParentPassword,
+                    errorMessage = validateParentPasswordError,
+                    isPasswordField = true,
+                    isPasswordVisible = isParentPasswordVisible,
+                    onVisibilityChange = {isParentPasswordVisible = it},
+                    leadingIconImageVector = Icons.Default.Password ,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {focusManager.clearFocus()}
+                    )
+
+                )
+
+            }
+
+
+            item {
+                CustomRadioButton(faithGroups,  { faithGroups = it }, "Do you want to enroll\nyour child in faith groups?")
+            }
+
+            item {
+                CustomRadioButton(goOutAlone, { goOutAlone = it }, "Can the child go out alone?")
+            }
+
+            item {
+                OutlinedTextField(
+                    value = observations ?: "",
+                    onValueChange = {observations = it },
+                    label = { Text("Observations") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                )
+            }
+
+
+
+
         }
 
-        item {
-            CoursesSelectionScreen(childCourse, onChildCourseChange)
-        }
+        Button(
+            onClick = {
 
-        item {
-            OutlinedTextField(
-                value = childID,
-                onValueChange = {onChildIDChange(it)},
-                label = { Text("Child's ID") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            )
-        }
+                     register(parentFullName, parentID, parentPhoneNumber, password, childFullName,childCourse, childID, childPassword)
 
-        item {
-            OutlinedTextField(
-                value = childPassword,
-                onValueChange = {onChildPasswordChange(it)},
-                label = { Text("Password") },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Password
+
+
+
+
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+                .shadow(elevation = 14.dp)
+        ) {
+            Text(
+                text = "Next",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Default,
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFFFFFFFF),
+                    letterSpacing = 0.3.sp,
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
+                color = Color(0xFF000000),
+                textAlign = TextAlign.Center
             )
         }
 
-        item {
-            CustomRadioButton(belongsToSchool, onBelongsToSchool = onBelongsToSchool, "Belongs to the school?")
-        }
-
-        item {
-            OutlinedTextField(
-                value = parentFullName,
-                onValueChange = {onParentFullNameChange(it)},
-                label = { Text("Parent's full name") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            )
-        }
-
-        item {
-            OutlinedTextField(
-                value = parentID,
-                onValueChange = {onParentIDChange(it)},
-                label = { Text("Parent's ID") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            )
-        }
-
-        item {
-            OutlinedTextField(
-                value = parentPhoneNumber,
-                onValueChange = {onParentPhoneNumberChange(it) },
-                label = { Text("Parent's Phone Number") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            )
-        }
-
-
-        item {
-            OutlinedTextField(
-                value = password,
-                onValueChange = {onPasswordChange(it)},
-                label = { Text("Password") },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Password
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            )
-        }
-
-
-        item {
-            CustomRadioButton(faithGroups,  onFaithGroups, "Do you want to enroll\nyour child in faith groups?")
-        }
-
-        item {
-            CustomRadioButton(goOutAlone,  onGoOutAlone, "Can the child go out alone?")
-        }
-
-        item {
-            OutlinedTextField(
-                value = observations,
-                onValueChange = {onObservations(it) },
-                label = { Text("Observations") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            )
-        }
 
 
 
@@ -538,6 +640,8 @@ fun CoursesSelectionScreen(childCourse: String, onChildCourseChange : (Course) -
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf(Course.values()[0]) }
 
+
+
             // Dropdown menu
             OutlinedTextField(
                 value = selectedText.name,
@@ -556,8 +660,9 @@ fun CoursesSelectionScreen(childCourse: String, onChildCourseChange : (Course) -
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth()
-                   .clip(RoundedCornerShape(20.dp)) // Asegura que el DropdownMenu ocupe el ancho máximo disponible
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp)) // Asegura que el DropdownMenu ocupe el ancho máximo disponible
             ) {
                 Course.values().forEach { course ->
                     DropdownMenuItem(
@@ -573,5 +678,82 @@ fun CoursesSelectionScreen(childCourse: String, onChildCourseChange : (Course) -
                 }
             }
 
+
+
 }
 
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+
+fun CustomOutlinedTextField(
+    value : String,
+    onValueChange: (String) -> Unit,
+    label: String = "",
+    leadingIconImageVector: ImageVector,
+    leadingIconDescription: String = "",
+    isPasswordField: Boolean = false,
+    isPasswordVisible: Boolean = false,
+    onVisibilityChange: (Boolean) -> Unit = {},
+    keyboardOptions : KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    showError : Boolean = false,
+    errorMessage : String = ""
+){
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ){
+        OutlinedTextField(
+            value = value,
+            onValueChange = { onValueChange(it)},
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.dp),
+            label = { Text(label)},
+            leadingIcon = {
+                Icon(
+                    imageVector = leadingIconImageVector,
+                    contentDescription = leadingIconDescription,
+                    tint = if (showError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                )
+            },
+            isError = showError,
+            trailingIcon = {
+                if (showError && !isPasswordField ) Icon(imageVector = Icons.Filled.Error, contentDescription = "Show error icon")
+                if (isPasswordField){
+                    IconButton(onClick = { onVisibilityChange(!isPasswordVisible) }) {
+                        Icon(
+                            imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = "Toggle password visibility"
+                        )
+
+                    }
+                }
+            },
+            visualTransformation = when {
+                isPasswordField && isPasswordVisible -> VisualTransformation.None
+                isPasswordField -> PasswordVisualTransformation()
+                else -> VisualTransformation.None
+            },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = true
+        )
+
+        if (showError) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error ,
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .offset(y = (-8).dp)
+                    .fillMaxWidth(0.9f)
+
+            )
+        }
+    }
+}
