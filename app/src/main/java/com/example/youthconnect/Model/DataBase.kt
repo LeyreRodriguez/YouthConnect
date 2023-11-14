@@ -9,11 +9,28 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import java.util.concurrent.CompletableFuture
 
 class DataBase(){
 
     val db = FirebaseFirestore.getInstance()
      val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    val storage = Firebase.storage
+    val storageReference = storage.reference
+
+    // Especifica la carpeta en Firebase Storage
+    val folderReference = storageReference.child("newsImage")
+
+
+
 
     fun addParents(parent: Parent){
 
@@ -97,6 +114,35 @@ class DataBase(){
 
                 }
             }
+    }
+
+    fun getImage(): List<String> = runBlocking {
+        val imageUrls = mutableListOf<String>()
+
+        try {
+            val listResult = folderReference.listAll().await()
+            val deferredUrls = listResult.items.map { item ->
+                async(Dispatchers.IO) {
+                    try {
+                        val uri = item.downloadUrl.await()
+                        val imageUrl = uri.toString()
+                        imageUrls.add(imageUrl)
+                        println("URL de la imagen: $imageUrl")
+                        imageUrl
+                    } catch (e: Exception) {
+                        // Manejar errores al obtener la URL de la imagen
+                        println("Error al obtener la URL de la imagen: $e")
+                        throw e
+                    }
+                }
+            }
+
+            deferredUrls.awaitAll()
+        } catch (e: Exception) {
+            // Manejar errores al listar las imágenes
+            println("Error al recuperar imágenes: $e")
+            emptyList<String>()
+        }
     }
 
 

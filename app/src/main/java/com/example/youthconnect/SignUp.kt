@@ -114,13 +114,8 @@ class SignUp : ComponentActivity() {
 
 fun SignupScreenPreview(){
     YouthconnectTheme {
-
-
-
         FirstSignupFormScreen(
-
         )
-
     }
 }
 
@@ -315,8 +310,6 @@ fun FirstSignupFormScreen() {
     {
 
         if (validateData(parentFullName, parentID, parentPhoneNumber, parentPassword, childFullName, childCourse, childID, childPassword)){
-            Log.i("YAY", "Usuario creado exitosamente")
-
             val parentsID : List<String>  = listOf(parentID)
             val parent = Parent(parentFullName,
                 parentID,

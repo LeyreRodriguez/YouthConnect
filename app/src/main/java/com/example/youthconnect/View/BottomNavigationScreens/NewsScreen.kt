@@ -1,5 +1,6 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,6 +33,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -40,9 +43,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.transform.RoundedCornersTransformation
+import com.example.youthconnect.Model.DataBase
 import com.example.youthconnect.R
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
+import java.util.concurrent.TimeUnit
 
 
 @Composable
@@ -167,7 +175,8 @@ fun NewsScreen(modifier: Modifier = Modifier
                         .padding(start = 15.dp, top = 10.dp )
                 )
 
-                RecyclerView()
+                val dataBase = DataBase()
+                RecyclerView(dataBase.getImage())
             }
 
         }
@@ -182,24 +191,52 @@ fun NewsScreen(modifier: Modifier = Modifier
 
 @Composable
 
-fun ListItem(name : String){
-    Surface(color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)) {
+fun ListItem(imageUrl : String){
 
-        Column(modifier = Modifier
-            .padding(24.dp)
-            .fillMaxWidth()) {
-
-        }
-    }
+    CoilImage(
+        imageUrl = imageUrl,
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        contentScale = ContentScale.Crop
+    )
 }
 
-
 @Composable
-fun RecyclerView(names : List<String> = List(1000){"$it"}){
+fun CoilImage(
+    imageUrl: String,
+    contentDescription: String?,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit
+){
+    val painter = rememberAsyncImagePainter(
+        ImageRequest
+            .Builder(LocalContext.current)
+            .data(imageUrl)
+            .apply(fun ImageRequest.Builder.() {
+                crossfade(true)
+                transformations(RoundedCornersTransformation(20f))
+            })
+            .build()
+    )
+
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,
+        modifier = Modifier
+            .size(50.dp)
+            .padding(15.dp)
+            .clip(CircleShape),
+        contentScale = contentScale
+    )
+}
+@Composable
+fun RecyclerView(names : List<String>){
+    Log.i("UWU", names.toString())
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)){
         items(items = names){ name ->
-            ListItem(name = name)
+            ListItem(name)
         }
     }
 }
