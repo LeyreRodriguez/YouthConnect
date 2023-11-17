@@ -1,11 +1,12 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,13 +17,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,23 +45,36 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
-import com.example.youthconnect.Model.DataBase
+import com.example.youthconnect.Model.News
 import com.example.youthconnect.R
+import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import java.util.concurrent.TimeUnit
 
 
+@SuppressLint("SuspiciousIndentation", "UnrememberedMutableState")
 @Composable
-fun NewsScreen(modifier: Modifier = Modifier
+fun NewsScreen(
+    newsViewModel: NewsViewModel = viewModel(),
+    navController: NavHostController,
+    modifier: Modifier = Modifier
     .background(color = Color.White)
 ) {
+    val newsState by newsViewModel.newsState.collectAsState(emptyList())
+
+    LaunchedEffect(Unit) {
+        newsViewModel.getNews()
+    }
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -175,8 +193,9 @@ fun NewsScreen(modifier: Modifier = Modifier
                         .padding(start = 15.dp, top = 10.dp )
                 )
 
-                val dataBase = DataBase()
-                RecyclerView(dataBase.getImage())
+                RecyclerView(news = newsState, navController = navController)
+
+
             }
 
         }
@@ -190,17 +209,53 @@ fun NewsScreen(modifier: Modifier = Modifier
 
 
 @Composable
+fun ListItem(news: News, navController: NavHostController) {
 
-fun ListItem(imageUrl : String){
-
-    CoilImage(
-        imageUrl = imageUrl,
-        contentDescription = null,
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp),
-        contentScale = ContentScale.Crop
-    )
+            .clickable {
+                navController.navigate("news_details_screen/${news.id}")
+            }
+
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            CoilImage(
+                imageUrl = news.Image,
+                contentDescription = null,
+                modifier = Modifier
+                    .height(100.dp),
+                contentScale = ContentScale.Crop,
+                width = Dp(100.0F),
+                height = Dp(100.0F)
+            )
+
+            Column{
+                Text(
+                    text = news.Title,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = if (news.Description.length > 50) {
+                        "${news.Description.take(50)}..."
+                    } else {
+                        news.Description
+                    }
+                )
+            }
+
+
+        }
+    }
 }
 
 @Composable
@@ -208,7 +263,9 @@ fun CoilImage(
     imageUrl: String,
     contentDescription: String?,
     modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Fit
+    contentScale: ContentScale = ContentScale.Fit,
+    width: Dp,
+    height : Dp
 ){
     val painter = rememberAsyncImagePainter(
         ImageRequest
@@ -221,27 +278,26 @@ fun CoilImage(
             .build()
     )
 
+
     Image(
         painter = painter,
         contentDescription = contentDescription,
         modifier = Modifier
-            .size(50.dp)
-            .padding(15.dp)
-            .clip(CircleShape),
+            .width(width)
+            .height(height)
+            .padding(5.dp),
         contentScale = contentScale
     )
 }
 @Composable
-fun RecyclerView(names : List<String>){
-    Log.i("UWU", names.toString())
+fun RecyclerView(
+    news: List<News>,
+    navController: NavHostController
+){
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)){
-        items(items = names){ name ->
-            ListItem(name)
+        items(items = news){ item ->
+            ListItem(news = item, navController = navController)
         }
     }
 }
-@Preview(showBackground = true)
-@Composable
-fun NewsScreenPreview() {
-    NewsScreen()
-}
+

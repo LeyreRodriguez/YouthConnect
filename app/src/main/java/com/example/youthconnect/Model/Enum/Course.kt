@@ -1,4 +1,4 @@
-package com.example.youthconnect.Model
+package com.example.youthconnect.Model.Enum
 
 enum class Course(s: String) {
     TerceroEP("3º de Primaria"),

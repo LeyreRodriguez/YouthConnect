@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.youthconnect.Model.ItemsBottomBar
+import com.example.youthconnect.Model.Sealed.ItemsBottomBar
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import com.example.youthconnect.ui.theme.Yellow

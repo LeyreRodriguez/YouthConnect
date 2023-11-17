@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.youthconnect.View.Components.BottomNavigation
-import com.example.youthconnect.View.Navigation.NewsNavigation
+import com.example.youthconnect.View.Navigation.HomeNavigation
 
 import com.example.youthconnect.ui.theme.YouthconnectTheme
 
@@ -52,7 +52,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            NewsNavigation(navController = navController)
+            HomeNavigation(navController = navController)
         }
 
 

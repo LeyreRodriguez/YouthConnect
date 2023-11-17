@@ -1,7 +1,5 @@
 package com.example.youthconnect.Model.Users
 
-import com.example.youthconnect.Model.Course
-
 data class Child(
     val FullName: String,
     val ID: String,
