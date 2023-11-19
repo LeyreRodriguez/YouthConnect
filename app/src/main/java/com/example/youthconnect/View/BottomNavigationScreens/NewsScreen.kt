@@ -1,6 +1,7 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -53,8 +54,11 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
+import com.example.youthconnect.Model.DataBase
 import com.example.youthconnect.Model.News
+import com.example.youthconnect.Model.Users.Child
 import com.example.youthconnect.R
+import com.example.youthconnect.ViewModel.ChildViewModel
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
@@ -65,6 +69,7 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun NewsScreen(
     newsViewModel: NewsViewModel = viewModel(),
+    childViewModel: ChildViewModel = viewModel(),
     navController: NavHostController,
     modifier: Modifier = Modifier
     .background(color = Color.White)
@@ -74,6 +79,9 @@ fun NewsScreen(
     LaunchedEffect(Unit) {
         newsViewModel.getNews()
     }
+
+
+
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -126,25 +134,9 @@ fun NewsScreen(
                         .padding(start = 15.dp, top = 10.dp )
                 )
 
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .border(
-                            BorderStroke(4.dp, remember {
-                                Brush.sweepGradient(
-                                    listOf(
-                                        Green, Red
-                                    )
-                                )
-                            }),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                )
+                val dataBase = DataBase()
+                Log.i("UWU", dataBase.getCurrentUserId())
+               userImage(child = dataBase.getCurrentUserId(), navController = navController )
 
 
             }
@@ -205,6 +197,39 @@ fun NewsScreen(
 
 
 
+}
+
+
+@Composable
+fun userImage(child: String,
+              navController: NavHostController){
+    Box(
+        modifier = Modifier
+            .size(50.dp)
+            .clickable {
+                navController.navigate("child_profile_screen/${child}") // Reemplaza "ruta_destino" con la ruta de la pantalla a la que quieres navegar
+            }
+            .border(
+                BorderStroke(4.dp, remember {
+                    Brush.sweepGradient(
+                        listOf(
+                            Color.Green,
+                            Color.Red // Cambia Green y Red por los colores que prefieras
+                        )
+                    )
+                }),
+                CircleShape
+            )
+            .padding(4.dp)
+            .clip(CircleShape)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.user_icon),
+            contentDescription = "icon",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
 }
 
 

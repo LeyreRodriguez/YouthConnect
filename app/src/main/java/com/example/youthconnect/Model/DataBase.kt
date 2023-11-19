@@ -120,6 +120,29 @@ class DataBase(){
             }
     }
 
+    fun getCurrentUserId() : String{
+        var user = auth.currentUser;
+        if (user != null) {
+            val email = user.email
+
+            Log.i("USER" , email?.substringBefore("@").toString())
+            val numeroConvertido = email?.substringBefore("@").toString().dropLast(1) + email?.substringBefore("@").toString().takeLast(1).uppercase()
+            return  numeroConvertido
+
+        } else {
+            return ""
+        }
+
+    }
+
+
+
+
+
+
+
+
+
 
 
 
