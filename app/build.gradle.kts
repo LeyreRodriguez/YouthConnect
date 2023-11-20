@@ -102,4 +102,9 @@ dependencies {
 
 
     implementation("io.coil-kt:coil-compose:2.4.0") // Asegúrate de usar la versión más reciente de Coil Compose
+
+
+    // QR
+
+    implementation("com.google.zxing:core:3.4.1")
 }

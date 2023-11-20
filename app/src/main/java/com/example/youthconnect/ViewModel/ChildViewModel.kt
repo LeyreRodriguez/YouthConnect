@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.youthconnect.Model.DataBase
 import com.example.youthconnect.Model.News
 import com.example.youthconnect.Model.Users.Child
+import com.example.youthconnect.Model.Users.Parent
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,9 +19,9 @@ class ChildViewModel : ViewModel() {
     private val _childState = MutableStateFlow<List<Child>>(emptyList())
     val childState: Flow<List<Child>> = _childState.asStateFlow()
 
+
     fun getCurrentUserById(childId : String ){
 
-        Log.i("ID", childId)
         viewModelScope.launch {
             firestore.collection("Child")
                 .whereEqualTo("id", childId)
@@ -28,8 +29,6 @@ class ChildViewModel : ViewModel() {
                 .addOnSuccessListener { documents ->
                     var foundChild: Child? = null
                     for (document in documents) {
-
-
                         val childObject = Child(
                             FullName = document.getString("fullName") ?: "",
                             ID = document.getString("id") ?: "",
@@ -49,6 +48,7 @@ class ChildViewModel : ViewModel() {
                     }
 
                     if (foundChild != null) {
+
                         _childState.value = listOf(foundChild!!)
                     } else {
                         // No se encontró ninguna noticia con esa ID
@@ -62,6 +62,7 @@ class ChildViewModel : ViewModel() {
         }
 
         }
+
 
 
 

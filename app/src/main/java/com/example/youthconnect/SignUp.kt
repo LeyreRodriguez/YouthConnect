@@ -306,7 +306,7 @@ fun FirstSignupFormScreen() {
             val parentsID : List<String>  = listOf(parentID)
             val parent = Parent(parentFullName,
                 parentID,
-                parentPhoneNumber.toInt(),
+                parentPhoneNumber,
                 password)
 
             val child = Child(childFullName,

@@ -4,11 +4,14 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import com.example.youthconnect.Model.Users.Child
 import com.example.youthconnect.Model.Users.Parent
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
@@ -125,7 +128,6 @@ class DataBase(){
         if (user != null) {
             val email = user.email
 
-            Log.i("USER" , email?.substringBefore("@").toString())
             val numeroConvertido = email?.substringBefore("@").toString().dropLast(1) + email?.substringBefore("@").toString().takeLast(1).uppercase()
             return  numeroConvertido
 
@@ -134,19 +136,6 @@ class DataBase(){
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
