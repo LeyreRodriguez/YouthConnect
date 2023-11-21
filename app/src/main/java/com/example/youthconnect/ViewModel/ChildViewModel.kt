@@ -63,7 +63,54 @@ class ChildViewModel : ViewModel() {
 
         }
 
+    fun obtenerChildsPorParentID(parentID: String) {
+        val foundChild = mutableListOf<Child>()
+        viewModelScope.launch {
+            firestore.collection("Child")
+                .whereArrayContains("parentID", parentID)
+                .get()
+                .addOnSuccessListener { documents ->
 
+
+                    for (document in documents) {
+                        val childObject = Child(
+                            FullName = document.getString("fullName") ?: "",
+                            ID = document.getString("id") ?: "",
+                            Course = document.getString("course") ?: "",
+                            Password = document.getString("password") ?: "",
+                            BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                            FaithGroups = document.getBoolean("faithGroups") ?: false,
+                            GoOutAlone = document.getBoolean("goOutAlone") ?:false,
+                            Observations = document.getString("observations") ?: "",
+                            ParentID = document.get("parentID") as? List<String> ?: emptyList(),
+                            InstructorID = document.getString("instructorID") ?: ""
+
+                        )
+
+                        foundChild.add(childObject)
+                       // break // Termina el bucle después de encontrar la primera noticia
+                    }
+
+                    if (foundChild != null) {
+
+                        _childState.value = foundChild.toList()
+                    } else {
+                        // No se encontró ninguna noticia con esa ID
+                        // Puedes manejar el caso estableciendo el estado con un valor nulo o un indicador de ausencia
+                        _childState.value =
+                            emptyList() // Por ejemplo, aquí se establece una lista vacía
+                    }
+
+
+                }
+                .addOnFailureListener { exception ->
+                    // Manejar errores en la consulta a Firestore
+                }
+        }
+
+
+
+    }
 
 
 

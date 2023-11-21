@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +63,7 @@ import com.example.youthconnect.ViewModel.ChildViewModel
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
 
@@ -136,7 +138,7 @@ fun NewsScreen(
 
                 val dataBase = DataBase()
                 Log.i("UWU", dataBase.getCurrentUserId())
-               userImage(child = dataBase.getCurrentUserId(), navController = navController )
+               userImage(user = dataBase.getCurrentUserId(), navController = navController )
 
 
             }
@@ -201,13 +203,26 @@ fun NewsScreen(
 
 
 @Composable
-fun userImage(child: String,
+fun userImage(user: String,
               navController: NavHostController){
+    val documentExists = remember { mutableStateOf(false) }
+    val dataBase = DataBase()
+    LaunchedEffect(user) {
+        val result = dataBase.buscarDocumento(user)
+        documentExists.value = result
+    }
+
     Box(
         modifier = Modifier
             .size(50.dp)
             .clickable {
-                navController.navigate("child_profile_screen/${child}") // Reemplaza "ruta_destino" con la ruta de la pantalla a la que quieres navegar
+
+                    if (documentExists.value) {
+                        navController.navigate("child_profile_screen/${user}")
+                    } else {
+                        navController.navigate("parent_profile_screen/${user}")
+                    }
+
             }
             .border(
                 BorderStroke(4.dp, remember {
@@ -240,6 +255,8 @@ fun ListItem(news: News, navController: NavHostController) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
+
+
                 navController.navigate("news_details_screen/${news.id}")
             }
 

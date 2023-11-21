@@ -24,6 +24,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.resume
@@ -126,7 +127,18 @@ class DataBase(){
                 }
             }
     }
-
+    suspend fun buscarDocumento(userId: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val docRef = db.collection("Child").document(userId).get().await()
+                docRef.exists()
+            } catch (e: Exception) {
+                // Manejar cualquier error que pueda ocurrir al buscar el documento
+                e.printStackTrace()
+                false
+            }
+        }
+    }
     fun getCurrentUserId() : String{
         var user = auth.currentUser;
         if (user != null) {

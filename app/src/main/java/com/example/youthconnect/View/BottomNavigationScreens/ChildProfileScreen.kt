@@ -97,9 +97,6 @@ fun ChildProfileScreen(childId : String,
 
         }
 
-
-
-        Log.i("OWO", parentState.toString())
         Box(
             modifier = modifier.fillMaxSize(),
         ) {
