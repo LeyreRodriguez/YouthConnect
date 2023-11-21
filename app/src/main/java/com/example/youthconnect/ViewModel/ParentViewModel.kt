@@ -15,46 +15,36 @@ class ParentViewModel : ViewModel(){
     private val firestore = FirebaseFirestore.getInstance()
     private val _parentState = MutableStateFlow<List<Parent>>(emptyList())
     val parentState: Flow<List<Parent>> = _parentState.asStateFlow()
-    fun getParentByParentsID(parentsID : List<String>) {
-       // val numeroConvertido = parentsID.dropLast(1) + parentsID.takeLast(1).uppercase()
+    fun getParentByParentsID(parentsID: List<String>) {
+        val foundParents = mutableListOf<Parent>() // Lista para almacenar todos los padres encontrados
 
         viewModelScope.launch {
-            for (id in parentsID){
+            for (id in parentsID) {
                 firestore.collection("Parents")
                     .whereEqualTo("id", id)
                     .get()
                     .addOnSuccessListener { documents ->
-                        var foundParent: Parent? = null
                         for (document in documents) {
                             val parent = Parent(
                                 FullName = document.getString("fullName") ?: "",
                                 ID = document.getString("id") ?: "",
                                 Password = document.getString("password") ?: "",
                                 PhoneNumber = document.getString("phoneNumber") ?: ""
-
                             )
-                            Log.i("AJA", parent.FullName)
-                            foundParent = parent
-                            break // Termina el bucle después de encontrar la primera noticia
+                            foundParents.add(parent) // Agregar el padre encontrado a la lista
                         }
 
-                        if (foundParent != null) {
-
-                            _parentState.value = listOf(foundParent!!)
+                        if (foundParents.isNotEmpty()) {
+                            _parentState.value = foundParents.toList() // Actualizar el estado con la lista acumulada de padres
                         } else {
-                            // No se encontró ninguna noticia con esa ID
-                            // Puedes manejar el caso estableciendo el estado con un valor nulo o un indicador de ausencia
-                            _parentState.value = emptyList() // Por ejemplo, aquí se establece una lista vacía
+                            _parentState.value = emptyList() // No se encontraron padres, actualizar con una lista vacía
                         }
                     }
                     .addOnFailureListener { exception ->
-                        Log.i("AJA", parentsID.toString())
                         // Manejar errores aquí
                     }
             }
-
         }
-
     }
 
 

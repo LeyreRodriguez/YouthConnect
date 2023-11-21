@@ -39,8 +39,7 @@ class ChildViewModel : ViewModel() {
                             GoOutAlone = document.getBoolean("goOutAlone") ?:false,
                             Observations = document.getString("observations") ?: "",
                             ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                            InstructorID = document.getString("instructorID") ?: "",
-                            QrPath = document.getString("QrPath") ?: ""
+                            InstructorID = document.getString("instructorID") ?: ""
 
                         )
 

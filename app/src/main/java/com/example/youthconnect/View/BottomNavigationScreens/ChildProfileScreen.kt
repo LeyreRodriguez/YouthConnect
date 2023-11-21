@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -35,6 +36,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
@@ -96,6 +98,8 @@ fun ChildProfileScreen(childId : String,
         }
 
 
+
+        Log.i("OWO", parentState.toString())
         Box(
             modifier = modifier.fillMaxSize(),
         ) {
@@ -130,7 +134,7 @@ fun ChildProfileScreen(childId : String,
                 modifier = Modifier
                     .padding(15.dp)
                     .fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceEvenly
+                verticalArrangement = Arrangement.Center
             ) {
 
 
@@ -180,6 +184,8 @@ fun ChildProfileScreen(childId : String,
                         .padding(start = 15.dp, top = 10.dp)
                 )
 
+                Spacer(modifier = Modifier.size(40.dp))
+
 
                 Row() {
 
@@ -203,6 +209,8 @@ fun ChildProfileScreen(childId : String,
                                 Text(text = item.FullName)
                             }
                         }
+
+
                     }
                     Spacer(modifier = Modifier.size(20.dp))
 
@@ -219,6 +227,7 @@ fun ChildProfileScreen(childId : String,
                             )
                         )
                         // val numbers = listOf<String>("680806622", "635556961")
+
                         LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
                             items(items = parentState) { item ->
                                 Text(text = item.PhoneNumber)
@@ -229,9 +238,9 @@ fun ChildProfileScreen(childId : String,
 
                 }
 
+                Spacer(modifier = Modifier.size(40.dp))
 
-                DisplayImageFromFirebaseStorage(child.QrPath)
-
+                DisplayQRCode(child.ID)
 
             }
         }
@@ -242,27 +251,176 @@ fun ChildProfileScreen(childId : String,
 
 }
 
-@SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
+
+@SuppressLint("NotConstructor")
 @Composable
-fun DisplayImageFromFirebaseStorage(imagePath: String) {
-    val imageState: MutableState<ImageBitmap?> = mutableStateOf(null)
-
-    // Descargar la imagen desde Firebase Storage en un hilo separado
-    GlobalScope.launch(Dispatchers.IO) {
-        val dataBase = DataBase()
-        val image = dataBase.getImageFromFirebaseStorage(imagePath)
-        // Actualizar el estado de la imagen una vez descargada
-        imageState.value = image
+fun DisplayQRCode(qrText : String) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        QRCodeGenerator(text = qrText)
     }
+}
 
-    // Mostrar la imagen descargada
-    imageState.value?.let { image ->
+
+@Composable
+fun QRCodeGenerator(text: String, modifier: Modifier = Modifier) {
+    val qr = DisplayQRCode()
+    val generatedBitmap = qr.generateQRCode(text)
+    generatedBitmap?.let {
         Image(
-            bitmap = image,
-            contentDescription = "Imagen desde Firebase Storage"
+            bitmap = it.asImageBitmap(),
+            contentDescription = null,
+            modifier = Modifier
+                .size(200.dp)
         )
     }
 }
 
+
+@Preview(showBackground = true)
+@Composable
+
+fun ChildProfileView() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Canvas(
+            modifier = Modifier.fillMaxSize(),
+            onDraw = {
+                // Dibuja un rectángulo blanco como fondo
+                drawRect(Color.White)
+
+                // Define el pincel para el borde con el gradiente del Brush
+                val borderBrush = Brush.horizontalGradient(
+                    listOf(
+                        Color(0xFFE15554),
+                        Color(0xFF3BB273),
+                        Color(0xFFE1BC29),
+                        Color(0xFF4D9DE0)
+                    )
+                )
+
+                // Dibuja el borde con el pincel definido
+                drawRect(
+                    brush = borderBrush,
+                    topLeft = Offset(0f, 0f),
+                    size = Size(size.width, size.height),
+                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
+                )
+            }
+        )
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(15.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center
+        ) {
+
+
+            val configuration = LocalConfiguration.current
+            val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
+            Image(
+                painter = painterResource(id = R.drawable.user_icon),
+                contentDescription = "icon",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(150.dp)
+                    .border(
+                        BorderStroke(4.dp, remember {
+                            Brush.sweepGradient(
+                                listOf(
+                                    Green, Red
+                                )
+                            )
+                        }),
+                        CircleShape
+                    )
+                    .padding(4.dp)
+                    .clip(CircleShape)
+            )
+
+            Text(
+                text = "Leyre Rodriguez Quintana",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFF000000),
+                    letterSpacing = 0.9.sp,
+                ), modifier = Modifier
+                    .padding(start = 15.dp, top = 10.dp)
+            )
+
+            Text(
+                text = "4ºESO",
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFF000000),
+                    letterSpacing = 0.9.sp,
+                ), modifier = Modifier
+                    .padding(start = 15.dp, top = 10.dp)
+            )
+
+            Spacer(modifier = Modifier.size(40.dp))
+
+            Row() {
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                    Text(
+                        text = "Parents",
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF000000),
+                            letterSpacing = 0.9.sp,
+                        )
+                    )
+
+
+                    val parentState =
+                        listOf<String>("Florencio Rodriguez Rodriguez", "Juani Quintana Monroy")
+                    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
+                        items(items = parentState) { item ->
+                            Text(text = item)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.size(20.dp))
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                    Text(
+                        text = "Telephone",
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF000000),
+                            letterSpacing = 0.9.sp,
+                        )
+                    )
+                    val numbers = listOf<String>("680806622", "635556961")
+                    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
+                        items(items = numbers) { item ->
+                            Text(text = item)
+                        }
+                    }
+                }
+
+
+            }
+
+            DisplayQRCode("54148418R")
+        }
+    }
+}
 
 

@@ -1,5 +1,4 @@
 package com.example.youthconnect
-
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -84,10 +83,6 @@ import com.example.youthconnect.Model.Users.Child
 import com.example.youthconnect.Model.Users.Parent
 import com.example.youthconnect.View.QR.DisplayQRCode
 import com.example.youthconnect.ui.theme.YouthconnectTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
 class SignUp : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,18 +99,14 @@ class SignUp : ComponentActivity() {
         }
     }
 }
-
-
 @Preview(showBackground = true)
 @Composable
-
 fun SignupScreenPreview(){
     YouthconnectTheme {
         FirstSignupFormScreen(
         )
     }
 }
-
 @SuppressLint("RememberReturnType")
 @Composable
 fun SignUpScreen(
@@ -130,16 +121,9 @@ fun SignUpScreen(
             Color(0xFFE1BC29),
             Color(0xFF4D9DE0)
         ))
-
-
-
-
-
     Box(modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.TopCenter,
     ) {
-
-
         Canvas(
             modifier = Modifier.fillMaxSize(), // Llena todo el espacio del Box
             onDraw = {
@@ -147,7 +131,6 @@ fun SignUpScreen(
             }
         )
         Column(modifier = Modifier.fillMaxSize()){
-
             Box(modifier = Modifier.wrapContentSize(),
                 contentAlignment = Alignment.TopCenter ){
                 Image(
@@ -157,11 +140,9 @@ fun SignUpScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                 )
-
                 Column (horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.padding(vertical = 20.dp)){
-
                     Text(
                         text = "Signup",
                         style = TextStyle(
@@ -173,33 +154,17 @@ fun SignUpScreen(
                         ),
                         modifier = Modifier.padding(bottom = 15.dp)
                     )
-
                     FirstSignupFormScreen()
-
-
                 }
             }
-
-
-
-
-
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomEnd,
             ) {
-
                 Column {
-
-
-
                     Box(modifier = Modifier.wrapContentSize(),
                         contentAlignment = Alignment.BottomCenter ) {
-
                     }
-
-
-
                     Image(
                         painter = painterResource(id = R.drawable.kids_signup),
                         contentDescription = "image description",
@@ -208,18 +173,10 @@ fun SignUpScreen(
                             .fillMaxWidth()
                     )
                 }
-
             }
         }
-
-
-
-
     }
 }
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FirstSignupFormScreen() {
@@ -231,12 +188,9 @@ fun FirstSignupFormScreen() {
     var validateChildID by rememberSaveable { mutableStateOf(true) }
     var validateChildCourse by rememberSaveable { mutableStateOf(true) }
     var validateChildPassword by rememberSaveable { mutableStateOf(true) }
-
     var isChildPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var isParentPasswordVisible by rememberSaveable { mutableStateOf(false) }
-  //  var validateChildPassword by rememberSaveable { mutableStateOf(true) }
-
-
+    //  var validateChildPassword by rememberSaveable { mutableStateOf(true) }
     val validateParentFullNameError = "Please, input a a valid name"
     val validateParentIDError = "The format of the ID doesn´t seem right"
     val validateParentPhoneNumberError = "The format of the phone number doesn´t seem right"
@@ -245,12 +199,10 @@ fun FirstSignupFormScreen() {
     val validateChildIDError = "The format of the ID doesn´t seem right"
     val validateChildCourseError = "You have to choose one course"
     val validateChildPasswordError = "Must mix capital and non-capital letters, a number, special character and minimun length of 8"
-
     var parentFullName by remember { mutableStateOf("") }
     var parentID  by remember { mutableStateOf("") }
     var parentPhoneNumber  by remember { mutableStateOf("") }
     var password  by remember { mutableStateOf("") }
-
     var childFullName  by remember { mutableStateOf("") }
     var childID  by remember { mutableStateOf("")}
     var childCourse  by remember { mutableStateOf("") }
@@ -259,11 +211,8 @@ fun FirstSignupFormScreen() {
     var faithGroups  by remember { mutableStateOf(false) }
     var goOutAlone  by remember { mutableStateOf(false) }
     var observations  by remember { mutableStateOf("") }
-
-
     val focusManager = LocalFocusManager.current
     val mcontext = LocalContext.current
-
     fun validateData(parentFullName: String,
                      parentID: String,
                      parentPhoneNumber: String,
@@ -272,41 +221,27 @@ fun FirstSignupFormScreen() {
                      childCourse: String,
                      childID: String,
                      childPassword : String) : Boolean{
-
         val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=]).{8,}".toRegex()
-
         // val phoneNumberRegex = "^(?:\\+34|34)?(?:6\\d{8}|[89]\\d{8})$".toRegex()
-
         val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
-
-
-
-
         validateParentFullName = parentFullName.isNotBlank()
         validateParentID = parentID.matches(IDRegex)
         validateParentPhoneNumber = Patterns.PHONE.matcher(parentPhoneNumber).matches()
         validateParentPassword = parentPassword.matches(passwordRegex)
-
         validateChildFullName = childFullName.isNotBlank()
         validateChildID = childID.matches(IDRegex)
         validateChildPassword = childPassword.matches(passwordRegex)
-
-
-
         return validateParentFullName && validateParentID && validateParentPhoneNumber && validateParentPassword && validateChildFullName && validateChildID && validateChildPassword
     }
-
-
-    suspend fun register(parentFullName: String,
-                         parentID: String,
-                         parentPhoneNumber: String,
-                         parentPassword : String,
-                         childFullName: String,
-                         childCourse: String,
-                         childID: String,
-                         childPassword : String)
+    fun register(parentFullName: String,
+                 parentID: String,
+                 parentPhoneNumber: String,
+                 parentPassword : String,
+                 childFullName: String,
+                 childCourse: String,
+                 childID: String,
+                 childPassword : String)
     {
-
         if (validateData(parentFullName, parentID, parentPhoneNumber, parentPassword, childFullName, childCourse, childID, childPassword)){
             val parentsID : List<String>  = listOf(parentID)
             val parent = Parent(parentFullName,
@@ -314,50 +249,31 @@ fun FirstSignupFormScreen() {
                 parentPhoneNumber,
                 password)
 
-
+            val child = Child(childFullName,
+                childID,
+                childCourse,
+                childPassword,
+                belongsToSchool,
+                faithGroups,
+                goOutAlone,
+                observations,
+                parentsID,
+                "745896H")
 
             val qr = DisplayQRCode()
-
             qr.generateQRCodeAndUpload(childID)
-            val qrPath = qr.getDownloadUrl(childID)
 
 
-            qrPath?.let {
-                val child = Child(
-                    childFullName,
-                    childID,
-                    childCourse,
-                    childPassword,
-                    belongsToSchool,
-                    faithGroups,
-                    goOutAlone,
-                    observations,
-                    parentsID,
-                    "745896H",
-                    qrPath
-                )
-
-                val dataBase = DataBase()
-
-
-                dataBase.addParents(parent)
-                dataBase.addParentAccount(parent)
-
-                dataBase.addChild(child)
-                dataBase.addChildAccount(child)
-                // Haz algo con el objeto Child
-
-
-            }
-
+            val dataBase = DataBase()
+            dataBase.addParents(parent)
+            dataBase.addParentAccount(parent)
+            dataBase.addChild(child)
+            dataBase.addChildAccount(child)
             mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
-
         }else{
             Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT)
         }
     }
-
-
     Column {
         LazyColumn(
             modifier = Modifier
@@ -365,7 +281,6 @@ fun FirstSignupFormScreen() {
                 .padding(16.dp)
         ) {
             item {
-
                 CustomOutlinedTextField(
                     value = childFullName,
                     onValueChange = {childFullName = it},
@@ -380,15 +295,11 @@ fun FirstSignupFormScreen() {
                     keyboardActions = KeyboardActions(
                         onNext = {focusManager.moveFocus(FocusDirection.Down)}
                     )
-
                 )
-
             }
-
             item {
                 CoursesSelectionScreen(childCourse, { childCourse = it.name})
             }
-
             item {
                 CustomOutlinedTextField(
                     value = childID,
@@ -404,12 +315,9 @@ fun FirstSignupFormScreen() {
                     keyboardActions = KeyboardActions(
                         onNext = {focusManager.moveFocus(FocusDirection.Down)}
                     )
-
                 )
             }
-
             item {
-
                 CustomOutlinedTextField(
                     value = childPassword,
                     onValueChange = {childPassword = it },
@@ -427,17 +335,12 @@ fun FirstSignupFormScreen() {
                     keyboardActions = KeyboardActions(
                         onNext = {focusManager.moveFocus(FocusDirection.Down)}
                     )
-
                 )
-
             }
-
             item {
                 CustomRadioButton(belongsToSchool, onBelongsToSchool = { belongsToSchool = it }, "Belongs to the school?")
             }
-
             item {
-
                 CustomOutlinedTextField(
                     value = parentFullName,
                     onValueChange = {parentFullName = it},
@@ -452,12 +355,9 @@ fun FirstSignupFormScreen() {
                     keyboardActions = KeyboardActions(
                         onNext = {focusManager.moveFocus(FocusDirection.Down)}
                     )
-
                 )
             }
-
             item {
-
                 CustomOutlinedTextField(
                     value = parentID,
                     onValueChange = {parentID = it},
@@ -472,14 +372,9 @@ fun FirstSignupFormScreen() {
                     keyboardActions = KeyboardActions(
                         onNext = {focusManager.moveFocus(FocusDirection.Down)}
                     )
-
                 )
-
-
             }
-
             item {
-
                 CustomOutlinedTextField(
                     value = parentPhoneNumber,
                     onValueChange = {parentPhoneNumber = it},
@@ -494,15 +389,9 @@ fun FirstSignupFormScreen() {
                     keyboardActions = KeyboardActions(
                         onNext = {focusManager.moveFocus(FocusDirection.Down)}
                     )
-
                 )
             }
-
-
             item {
-
-
-
                 CustomOutlinedTextField(
                     value = password,
                     onValueChange = {password = it},
@@ -520,20 +409,14 @@ fun FirstSignupFormScreen() {
                     keyboardActions = KeyboardActions(
                         onNext = {focusManager.clearFocus()}
                     )
-
                 )
-
             }
-
-
             item {
                 CustomRadioButton(faithGroups,  { faithGroups = it }, "Do you want to enroll\nyour child in faith groups?")
             }
-
             item {
                 CustomRadioButton(goOutAlone, { goOutAlone = it }, "Can the child go out alone?")
             }
-
             item {
                 OutlinedTextField(
                     value = observations ?: "",
@@ -544,23 +427,10 @@ fun FirstSignupFormScreen() {
                         .padding(bottom = 10.dp)
                 )
             }
-
-
-
-
         }
-
         Button(
             onClick = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    register(parentFullName, parentID, parentPhoneNumber, password, childFullName,childCourse, childID, childPassword)
-                }
-
-
-
-
-
-
+                register(parentFullName, parentID, parentPhoneNumber, password, childFullName,childCourse, childID, childPassword)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -580,22 +450,11 @@ fun FirstSignupFormScreen() {
                 textAlign = TextAlign.Center
             )
         }
-
-
-
-
-
     }
 }
-
-
-
-
-
 @Composable
 fun CustomRadioButton(belongsToSchool: Boolean,
-                onBelongsToSchool : (Boolean) -> Unit, question : String){
-
+                      onBelongsToSchool : (Boolean) -> Unit, question : String){
     val yes = remember { mutableStateOf(belongsToSchool) }
     val no = remember { mutableStateOf(!belongsToSchool) }
     Row(
@@ -613,7 +472,6 @@ fun CustomRadioButton(belongsToSchool: Boolean,
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
         )
-
         Column(
             modifier = Modifier.wrapContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -626,7 +484,6 @@ fun CustomRadioButton(belongsToSchool: Boolean,
                 })
             Text(text = "Yes", fontSize = 18.sp)
         }
-
         Column(
             modifier = Modifier.wrapContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -641,61 +498,48 @@ fun CustomRadioButton(belongsToSchool: Boolean,
         }
     }
 }
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoursesSelectionScreen(childCourse: String, onChildCourseChange : (Course) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember { mutableStateOf(Course.values()[0]) }
-
-
-
-            // Dropdown menu
-            OutlinedTextField(
-                value = selectedText.name,
-                onValueChange = {},
+    // Dropdown menu
+    OutlinedTextField(
+        value = selectedText.name,
+        onValueChange = {},
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = true },
+        label = { Text("Select a course") },
+        readOnly = true,
+        trailingIcon = {
+            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,
+                modifier = Modifier.clickable { expanded = true })
+        }
+    )
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp)) // Asegura que el DropdownMenu ocupe el ancho máximo disponible
+    ) {
+        Course.values().forEach { course ->
+            DropdownMenuItem(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = true },
-                label = { Text("Select a course") },
-                readOnly = true,
-                trailingIcon = {
-                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,
-                        modifier = Modifier.clickable { expanded = true })
+                    .fillMaxWidth(), // Hace que el DropdownMenuItem ocupe el ancho máximo disponible
+                text = { Text(text = course.name) },
+                onClick = {
+                    selectedText = course
+                    expanded = false
+                    onChildCourseChange(course)
                 }
             )
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(20.dp)) // Asegura que el DropdownMenu ocupe el ancho máximo disponible
-            ) {
-                Course.values().forEach { course ->
-                    DropdownMenuItem(
-                        modifier = Modifier
-                            .fillMaxWidth(), // Hace que el DropdownMenuItem ocupe el ancho máximo disponible
-                        text = { Text(text = course.name) },
-                        onClick = {
-                            selectedText = course
-                            expanded = false
-                            onChildCourseChange(course)
-                        }
-                    )
-                }
-            }
-
-
-
+        }
+    }
 }
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun CustomOutlinedTextField(
     value : String,
     onValueChange: (String) -> Unit,
@@ -738,7 +582,6 @@ fun CustomOutlinedTextField(
                             imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                             contentDescription = "Toggle password visibility"
                         )
-
                     }
                 }
             },
@@ -751,7 +594,6 @@ fun CustomOutlinedTextField(
             keyboardActions = keyboardActions,
             singleLine = true
         )
-
         if (showError) {
             Text(
                 text = errorMessage,
@@ -761,7 +603,6 @@ fun CustomOutlinedTextField(
                     .padding(start = 8.dp)
                     .offset(y = (-8).dp)
                     .fillMaxWidth(0.9f)
-
             )
         }
     }

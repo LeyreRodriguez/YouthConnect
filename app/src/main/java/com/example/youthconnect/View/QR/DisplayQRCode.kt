@@ -31,21 +31,9 @@ import java.io.ByteArrayOutputStream
 
 class DisplayQRCode {
 
-    @Composable
-    fun QRCodeGenerator(text: String, modifier: Modifier = Modifier) {
-        val generatedBitmap = generateQRCode(text)
-        generatedBitmap?.let {
-            Image(
-                bitmap = it.asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(200.dp)
-                    .wrapContentSize(Alignment.Center)
-            )
-        }
-    }
 
-    private fun generateQRCode(text: String): Bitmap? {
+
+     fun generateQRCode(text: String): Bitmap? {
         val width = 400
         val height = 400
         val multiFormatWriter = MultiFormatWriter()
@@ -67,16 +55,7 @@ class DisplayQRCode {
     }
 
 
-    suspend fun getDownloadUrl(imagePath: String): String? {
-        val storageRef = FirebaseStorage.getInstance().reference.child(imagePath)
 
-        return try {
-            storageRef.downloadUrl.await().toString()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
 
     fun generateQRCodeAndUpload(text: String) {
         val qrBitmap = generateQRCode(text)
@@ -115,24 +94,8 @@ class DisplayQRCode {
     }
 
 
-    @SuppressLint("NotConstructor")
-    @Composable
-    fun DisplayQRCode(qrText : String) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            QRCodeGenerator(text = qrText)
-        }
-    }
 
 
-    @Preview(showBackground = true)
-    @Composable
-    fun ShowQR(){
-        DisplayQRCode(qrText = "54148418R")
-    }
+
+
 }
