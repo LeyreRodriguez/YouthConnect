@@ -1,7 +1,10 @@
 package com.example.youthconnect.Model
 
 import android.content.ContentValues.TAG
+import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import com.example.youthconnect.Model.Users.Child
 import com.example.youthconnect.Model.Users.Parent
 import com.google.android.gms.tasks.Task
@@ -21,6 +24,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import java.io.IOException
 import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -135,6 +139,25 @@ class DataBase(){
             return ""
         }
 
+    }
+
+
+    suspend fun getImageFromFirebaseStorage(imagePath: String): ImageBitmap? {
+        return try {
+            val storage = Firebase.storage
+            val storageRef = storage.reference.child(imagePath)
+
+            val maxDownloadSizeBytes: Long = 1024 * 1024 // Tamaño máximo de descarga (1 MB en este ejemplo)
+            val imageBytes = storageRef.getBytes(maxDownloadSizeBytes).await()
+
+            val bitmap = imageBytes.inputStream().use {
+                BitmapFactory.decodeStream(it)
+            }
+            bitmap.asImageBitmap()
+        } catch (e: IOException) {
+            Log.e("FirebaseStorage", "Error al descargar la imagen: ${e.message}")
+            null
+        }
     }
 
 

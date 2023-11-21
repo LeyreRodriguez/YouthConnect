@@ -10,6 +10,7 @@ data class Child(
     val GoOutAlone: Boolean,
     val Observations: String? = null,
     val ParentID: List<String>,
-    val InstructorID: String
+    val InstructorID: String,
+    val QrPath : String
 )
 

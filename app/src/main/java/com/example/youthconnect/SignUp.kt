@@ -82,7 +82,11 @@ import com.example.youthconnect.Model.Enum.Course
 import com.example.youthconnect.Model.DataBase
 import com.example.youthconnect.Model.Users.Child
 import com.example.youthconnect.Model.Users.Parent
+import com.example.youthconnect.View.QR.DisplayQRCode
 import com.example.youthconnect.ui.theme.YouthconnectTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SignUp : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -256,6 +260,7 @@ fun FirstSignupFormScreen() {
     var goOutAlone  by remember { mutableStateOf(false) }
     var observations  by remember { mutableStateOf("") }
 
+
     val focusManager = LocalFocusManager.current
     val mcontext = LocalContext.current
 
@@ -292,14 +297,14 @@ fun FirstSignupFormScreen() {
     }
 
 
-    fun register(parentFullName: String,
-                 parentID: String,
-                 parentPhoneNumber: String,
-                 parentPassword : String,
-                 childFullName: String,
-                 childCourse: String,
-                 childID: String,
-                 childPassword : String)
+    suspend fun register(parentFullName: String,
+                         parentID: String,
+                         parentPhoneNumber: String,
+                         parentPassword : String,
+                         childFullName: String,
+                         childCourse: String,
+                         childID: String,
+                         childPassword : String)
     {
 
         if (validateData(parentFullName, parentID, parentPhoneNumber, parentPassword, childFullName, childCourse, childID, childPassword)){
@@ -309,25 +314,44 @@ fun FirstSignupFormScreen() {
                 parentPhoneNumber,
                 password)
 
-            val child = Child(childFullName,
-                childID,
-                childCourse,
-                childPassword,
-                belongsToSchool,
-                faithGroups,
-                goOutAlone,
-                observations,
-                parentsID,
-                "745896H")
-            val dataBase = DataBase()
 
-            dataBase.addParents(parent)
-            dataBase.addParentAccount(parent)
 
-            dataBase.addChild(child)
-            dataBase.addChildAccount(child)
+            val qr = DisplayQRCode()
+
+            qr.generateQRCodeAndUpload(childID)
+            val qrPath = qr.getDownloadUrl(childID)
+
+
+            qrPath?.let {
+                val child = Child(
+                    childFullName,
+                    childID,
+                    childCourse,
+                    childPassword,
+                    belongsToSchool,
+                    faithGroups,
+                    goOutAlone,
+                    observations,
+                    parentsID,
+                    "745896H",
+                    qrPath
+                )
+
+                val dataBase = DataBase()
+
+
+                dataBase.addParents(parent)
+                dataBase.addParentAccount(parent)
+
+                dataBase.addChild(child)
+                dataBase.addChildAccount(child)
+                // Haz algo con el objeto Child
+
+
+            }
 
             mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
+
         }else{
             Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT)
         }
@@ -528,8 +552,10 @@ fun FirstSignupFormScreen() {
 
         Button(
             onClick = {
+                CoroutineScope(Dispatchers.Main).launch {
+                    register(parentFullName, parentID, parentPhoneNumber, password, childFullName,childCourse, childID, childPassword)
+                }
 
-                     register(parentFullName, parentID, parentPhoneNumber, password, childFullName,childCourse, childID, childPassword)
 
 
 
