@@ -2,6 +2,7 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -70,11 +71,11 @@ fun InstructorProfileScreen(instructorId : String,
 
     }
 
-    if (instructorId.isNotEmpty()) {
-        val parent = instructorState.first()
+    if (instructorState.isNotEmpty()) {
+        val instructor = instructorState.first()
 
         LaunchedEffect(Unit) {
-            childViewModel.obtenerChildsPorInstructorID(parent.ID)
+            childViewModel.getChildByInstructorId(instructor.ID)
         }
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -137,7 +138,7 @@ fun InstructorProfileScreen(instructorId : String,
                     )
 
                     Text(
-                        text = parent.FullName,
+                        text = instructor.FullName,
                         style = TextStyle(
                             fontSize = 20.sp,
                             fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -170,7 +171,7 @@ fun InstructorProfileScreen(instructorId : String,
                     )
 
 
-
+                    Log.i("OWO", childState.toString())
                     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
                         items(items = childState) { item ->
                             user(navController = navController, item)

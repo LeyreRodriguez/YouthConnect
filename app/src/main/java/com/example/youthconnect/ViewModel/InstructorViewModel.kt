@@ -22,7 +22,7 @@ class InstructorViewModel : ViewModel(){
 
         viewModelScope.launch {
             firestore.collection("Instructor")
-                .whereEqualTo("id", instructorId)
+                .whereEqualTo("ID", instructorId)
                 .get()
                 .addOnSuccessListener { documents ->
                     var foundInstructor: Instructor? = null
@@ -55,44 +55,11 @@ class InstructorViewModel : ViewModel(){
     }
 
 
-    fun buscarChildsPorInstructor(instructorID: String) {
-        viewModelScope.launch {
-            try {
-                val childs = obtenerChildsPorInstructorID(instructorID)
-                childsPorInstructor.value = childs
-            } catch (e: Exception) {
-                // Manejar cualquier error que pueda ocurrir al buscar los Childs por InstructorID
-                e.printStackTrace()
-            }
-        }
-    }
 
-    private suspend fun obtenerChildsPorInstructorID(instructorID: String): List<Child> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val querySnapshot = db.collection("Child")
-                    .whereEqualTo("InstructorID", instructorID)
-                    .get()
-                    .await()
-
-                val childsList: MutableList<Child> = mutableListOf()
-                for (document in querySnapshot.documents) {
-                    val child = document.toObject(Child::class.java)
-                    child?.let {
-                        childsList.add(it)
-                    }
-                }
-
-                return@withContext childsList
-            } catch (e: Exception) {
-                // Manejar cualquier error que pueda ocurrir al buscar los Childs por InstructorID
-                e.printStackTrace()
-                return@withContext emptyList()
-            }
-        }
-    }
-}
 
 
 }
+
+
+
 

@@ -108,8 +108,42 @@ class ChildViewModel : ViewModel() {
                 }
         }
 
+    }
 
+    fun getChildByInstructorId(instructorId: String) {
+        viewModelScope.launch {
+            firestore.collection("Child")
+                .whereEqualTo("instructorID", instructorId)
+                .get()
+                .addOnSuccessListener { documents ->
+                    val foundChildren = mutableListOf<Child>()
 
+                    for (document in documents) {
+                        val childObject = Child(
+                            FullName = document.getString("fullName") ?: "",
+                            ID = document.getString("id") ?: "",
+                            Course = document.getString("course") ?: "",
+                            Password = document.getString("password") ?: "",
+                            BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                            FaithGroups = document.getBoolean("faithGroups") ?: false,
+                            GoOutAlone = document.getBoolean("goOutAlone") ?: false,
+                            Observations = document.getString("observations") ?: "",
+                            ParentID = document.get("parentID") as? List<String> ?: emptyList(),
+                            InstructorID = document.getString("instructorID") ?: ""
+                        )
+                        foundChildren.add(childObject)
+                    }
+
+                    if (foundChildren.isNotEmpty()) {
+                        _childState.value = foundChildren
+                    } else {
+                        _childState.value = emptyList()
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    // Manejar errores aquí
+                }
+        }
     }
 
 
