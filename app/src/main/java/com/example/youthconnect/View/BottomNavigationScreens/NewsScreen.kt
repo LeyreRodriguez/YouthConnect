@@ -205,7 +205,7 @@ fun NewsScreen(
 @Composable
 fun userImage(user: String,
               navController: NavHostController){
-    val documentExists = remember { mutableStateOf(false) }
+    val documentExists = remember { mutableStateOf("-1") }
     val dataBase = DataBase()
     LaunchedEffect(user) {
         val result = dataBase.buscarDocumento(user)
@@ -217,10 +217,12 @@ fun userImage(user: String,
             .size(50.dp)
             .clickable {
 
-                    if (documentExists.value) {
-                        navController.navigate("child_profile_screen/${user}")
-                    } else {
+                    if (documentExists.value == "0") {
+                        navController.navigate("instructor_profile_screen/${user}")
+                    } else if (documentExists.value == "1") {
                         navController.navigate("parent_profile_screen/${user}")
+                    } else {
+                        navController.navigate("child_profile_screen/${user}")
                     }
 
             }

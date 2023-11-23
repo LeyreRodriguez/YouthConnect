@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildProfileScreen
+import com.example.youthconnect.View.BottomNavigationScreens.InstructorProfileScreen
 import com.example.youthconnect.View.BottomNavigationScreens.NewsDetails
 import com.example.youthconnect.View.BottomNavigationScreens.NewsScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ParentsProfileScreen
@@ -59,6 +60,15 @@ fun HomeNavigation(
         ) { backStackEntry ->
             val parentId = backStackEntry.arguments?.getString("parentId") ?: ""
             ParentsProfileScreen(parentId = parentId, navController = navController)
+        }
+
+
+        composable(
+            route = "instructor_profile_screen/{instructorId}",
+            arguments = listOf(navArgument("instructorId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val instructorId = backStackEntry.arguments?.getString("instructorId") ?: ""
+            InstructorProfileScreen(instructorId = instructorId, navController = navController)
         }
 
 

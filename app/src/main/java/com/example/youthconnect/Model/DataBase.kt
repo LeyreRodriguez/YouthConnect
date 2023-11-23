@@ -127,18 +127,34 @@ class DataBase(){
                 }
             }
     }
-    suspend fun buscarDocumento(userId: String): Boolean {
+    suspend fun buscarDocumento(userId: String): String {
         return withContext(Dispatchers.IO) {
             try {
-                val docRef = db.collection("Child").document(userId).get().await()
-                docRef.exists()
+                val childDocRef = db.collection("Child").document(userId).get().await()
+                if (childDocRef.exists()) {
+                    return@withContext "2"
+                }
+
+                val parentDocRef = db.collection("Parents").document(userId).get().await()
+                if (parentDocRef.exists()) {
+                    return@withContext "1"
+                }
+
+                val instructorDocRef = db.collection("Instructor").document(userId).get().await()
+                if (instructorDocRef.exists()) {
+                    return@withContext "0"
+                }
+
+                // Si no se encuentra en ninguna colección
+                return@withContext "-1" // Puedes usar otro valor representativo si prefieres
             } catch (e: Exception) {
                 // Manejar cualquier error que pueda ocurrir al buscar el documento
                 e.printStackTrace()
-                false
+                return@withContext "-1" // Puedes usar otro valor representativo si prefieres
             }
         }
     }
+
     fun getCurrentUserId() : String{
         var user = auth.currentUser;
         if (user != null) {
