@@ -8,6 +8,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -112,6 +113,30 @@ fun InstructorProfileScreen(instructorId : String,
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center
             ) {
+                Image(
+                    painter = painterResource(id = R.drawable.baseline_person_add_24 ),
+                    contentDescription = "icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable {
+                            navController.navigate("instructor_profile_screen/${instructorId}")
+                        }
+                        .border(
+                            BorderStroke(4.dp, remember {
+                                Brush.sweepGradient(
+                                    listOf(
+                                        Green, Red
+                                    )
+                                )
+                            }),
+                            CircleShape
+                        )
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.Start)
+                )
+
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()) {

@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.example.youthconnect.Model.Users.Child
+import com.example.youthconnect.Model.Users.Instructor
 import com.example.youthconnect.Model.Users.Parent
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -109,8 +110,15 @@ class DataBase(){
 
     }
 
-    fun addChildAccount(child: Child) {
+    fun addInstructor(instructor: Instructor){
 
+        db.collection("Instructor")
+            .document(instructor.ID)
+            .set(instructor)
+
+    }
+
+    fun addChildAccount(child: Child) {
 
         val documentRef: DocumentReference = db.collection("Child").document(child.ID)
 
@@ -121,6 +129,24 @@ class DataBase(){
                     auth.createUserWithEmailAndPassword(
                         child.ID + "@youthconnect.com",
                         child.Password
+                    )
+
+
+                }
+            }
+    }
+
+    fun addInstructorAccount(instructor: Instructor) {
+
+        val documentRef: DocumentReference = db.collection("Instructor").document(instructor.ID)
+
+        // Realiza la consulta para obtener el documento
+        documentRef.get()
+            .addOnSuccessListener { document ->
+                if (!document.exists()) {
+                    auth.createUserWithEmailAndPassword(
+                        instructor.ID + "@youthconnect.com",
+                        instructor.Password
                     )
 
 

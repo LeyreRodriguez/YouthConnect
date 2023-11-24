@@ -438,7 +438,7 @@ fun FirstSignupFormScreen() {
                 .shadow(elevation = 14.dp)
         ) {
             Text(
-                text = "Next",
+                text = "Sign up",
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Default,
