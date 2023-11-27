@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.youthconnect.Model.Enum.NavScreen
+import com.example.youthconnect.QrScan
 import com.example.youthconnect.View.BottomNavigationScreens.AddInstructorScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildListScreen
@@ -74,6 +75,10 @@ fun HomeNavigation(
         ) { backStackEntry ->
             val instructorId = backStackEntry.arguments?.getString("instructorId") ?: ""
             InstructorProfileScreen(instructorId = instructorId, navController = navController)
+        }
+
+        composable("qrScanActivity") {
+            QrScan() // Esto iniciará la actividad QrScan
         }
 
 

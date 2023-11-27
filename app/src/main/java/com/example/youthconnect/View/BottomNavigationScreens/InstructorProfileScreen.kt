@@ -2,10 +2,7 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 
 
-import android.app.Activity
 import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -24,17 +21,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,7 +39,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -60,16 +53,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.youthconnect.MainActivity
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Users.Child
 import com.example.youthconnect.QrScan
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.ChildViewModel
 import com.example.youthconnect.ViewModel.InstructorViewModel
-import com.example.youthconnect.ViewModel.ParentViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
+import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+
 
 
 
@@ -445,9 +440,8 @@ fun InstructorProfileScreen(instructorId : String,
                             .size(120.dp)
                             .padding(10.dp)
                             .clickable {
-                                //navController.navigate(NavScreen.AddInstructor.name)
-                                context.startActivity(Intent(context,QrScan::class.java))
 
+                                context.startActivity(Intent(context,QrScan::class.java))
 
                             }
                             .background(Color(0xFFD9D9D9), CircleShape)
