@@ -52,7 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.youthconnect.Model.Enum.NavScreen
+import com.example.youthconnect.Model.Users.Child
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.ChildViewModel
 import com.example.youthconnect.ViewModel.InstructorViewModel
@@ -60,7 +62,198 @@ import com.example.youthconnect.ViewModel.ParentViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 
+@Preview(showBackground = true)
+@Composable
+fun InstructorPreview(){
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Canvas(
+            modifier = Modifier.fillMaxSize(),
+            onDraw = {
+                // Dibuja un rectángulo blanco como fondo
+                drawRect(Color.White)
 
+                // Define el pincel para el borde con el gradiente del Brush
+                val borderBrush = Brush.horizontalGradient(
+                    listOf(
+                        Color(0xFFE15554),
+                        Color(0xFF3BB273),
+                        Color(0xFFE1BC29),
+                        Color(0xFF4D9DE0)
+                    )
+                )
+
+                // Dibuja el borde con el pincel definido
+                drawRect(
+                    brush = borderBrush,
+                    topLeft = Offset(0f, 0f),
+                    size = Size(size.width, size.height),
+                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
+                )
+            }
+        )
+
+        Image(
+            painter = painterResource(id = R.drawable.baseline_person_add_24 ),
+            contentDescription = "icon",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(80.dp)
+                .padding(15.dp)
+                .clickable {
+                   // navController.navigate(NavScreen.AddInstructor.name)
+                }
+                .border(
+                    BorderStroke(4.dp, remember {
+                        Brush.sweepGradient(
+                            listOf(
+                                Green, Red
+                            )
+                        )
+                    }),
+                    CircleShape
+                )
+                .padding(4.dp)
+                .clip(CircleShape)
+
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(15.dp)
+                .fillMaxSize()
+            ,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                //modifier = Modifier.wrapContentSize()
+            ) {
+                val configuration = LocalConfiguration.current
+                Image(
+                    painter = painterResource(id = R.drawable.user_icon),
+                    contentDescription = "icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(150.dp)
+                        .border(
+                            BorderStroke(4.dp, remember {
+                                Brush.sweepGradient(
+                                    listOf(
+                                        Green, Red
+                                    )
+                                )
+                            }),
+                            CircleShape
+                        )
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                )
+
+                Text(
+                    text ="Irina Gonzalez Rodriguez",
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF000000),
+                        letterSpacing = 0.9.sp,
+                    ), modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp)
+                )
+
+
+
+                Spacer(modifier = Modifier.size(40.dp))
+            }
+
+
+
+            Column (
+            ){
+                Text(
+                    text = "My kids",
+                    style = TextStyle(
+                        fontSize = 30.sp,
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF000000),
+                        letterSpacing = 0.9.sp,
+                    ), modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp)
+                )
+
+
+                val childState = listOf<String>("Leyre", "Juanjo", "Carmen")
+                val child = Child("Leyre Rodriguez Quintana",
+                    "54148418R",
+                    "4ºESO",
+                    "Lr#575098",
+                    false,
+                    false,
+                    false,
+                    null,
+                    listOf("45534729L", "45854715D"),
+                    "45854785H")
+                LazyColumn(modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .height(200.dp)
+                ) {
+                    items(items = childState) { item ->
+                        user(navController = rememberNavController(), child)                    }
+                }
+
+
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly, // Distribuye las imágenes equitativamente
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Image(
+                    painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24 ),
+                    contentDescription = "icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(10.dp)
+                        .clickable {
+                            //navController.navigate(NavScreen.AddInstructor.name)
+                        }
+                        .background(Color(0xFFD9D9D9), CircleShape)
+
+                        .padding(4.dp)
+                        .clip(CircleShape)
+
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.baseline_format_list_bulleted_24 ),
+                    contentDescription = "icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .padding(10.dp)
+                        .clickable {
+                            //navController.navigate(NavScreen.AddInstructor.name)
+                        }
+                        .background(Color(0xFFD9D9D9), CircleShape)
+                        .padding(4.dp)
+                        .clip(CircleShape)
+
+                )
+            }
+
+        }
+
+
+    }
+
+
+}
 
 
 @Composable
@@ -238,7 +431,7 @@ fun InstructorProfileScreen(instructorId : String,
                             .clickable {
                                 //navController.navigate(NavScreen.AddInstructor.name)
                             }
-                            .background(Color(0xFFD9D9D9) , CircleShape)
+                            .background(Color(0xFFD9D9D9), CircleShape)
 
                             .padding(4.dp)
                             .clip(CircleShape)
@@ -253,9 +446,9 @@ fun InstructorProfileScreen(instructorId : String,
                             .size(120.dp)
                             .padding(10.dp)
                             .clickable {
-                                //navController.navigate(NavScreen.AddInstructor.name)
+                                navController.navigate(NavScreen.ChildList.name)
                             }
-                            .background(Color(0xFFD9D9D9) , CircleShape)
+                            .background(Color(0xFFD9D9D9), CircleShape)
                             .padding(4.dp)
                             .clip(CircleShape)
 

@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.View.BottomNavigationScreens.AddInstructorScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
+import com.example.youthconnect.View.BottomNavigationScreens.ChildListScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildProfileScreen
 import com.example.youthconnect.View.BottomNavigationScreens.InstructorProfileScreen
 import com.example.youthconnect.View.BottomNavigationScreens.NewsDetails
@@ -37,6 +38,9 @@ fun HomeNavigation(
         composable(NavScreen.ChatScreen.name){ ChatScreen() }
 
         composable(NavScreen.AddInstructor.name){ AddInstructorScreen() }
+
+        composable(NavScreen.ChildList.name){ ChildListScreen(navController = navController) }
+
         composable(
             route = "news_details_screen/{newsId}",
             arguments = listOf(navArgument("newsId") { type = NavType.StringType })
