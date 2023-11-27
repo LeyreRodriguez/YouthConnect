@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Youthconnect</string>
-    <string name="title_activity_login">Login</string>
     <string name="title_activity_sign_up">SignUp</string>
+    <string name="title_activity_qr_scanner">QrScanner</string>
+    <string name="title_activity_qr_scan">QrScan</string>
 </resources>

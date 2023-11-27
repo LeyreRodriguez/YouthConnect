@@ -129,7 +129,7 @@ fun Preview(){
             listOf("45534729L", "45854715D"),
             "45854785H")
 
-        val child3 = Child("Leyre Rodriguez Quintana",
+        val child3 = Child("Ari",
             "54148418R",
             "4ºESO",
             "Lr#575098",
@@ -163,7 +163,7 @@ fun Preview(){
 
                 LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
                     items(items = childState) { item ->
-                        user(navController = rememberNavController(), item)
+                        list(navController = rememberNavController(), item)
                     }
                 }
             }
@@ -322,60 +322,62 @@ fun ChildListScreen(navController : NavHostController
 
 
 @Composable
-fun list(navController : NavHostController, child : Child){
-
+fun list(navController: NavHostController, child: Child) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-
                 navController.navigate("child_profile_screen/${child.ID}")
             }
             .padding(4.dp)
-
     ) {
         Row(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.user_icon),
-                contentDescription = "icon",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(50.dp)
-                    .border(
-                        BorderStroke(4.dp, remember {
-                            Brush.sweepGradient(
-                                listOf(
-                                    Green, Red
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.user_icon),
+                    contentDescription = "icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .border(
+                            BorderStroke(4.dp, remember {
+                                Brush.sweepGradient(
+                                    listOf(
+                                        Green, Red
+                                    )
                                 )
-                            )
-                        }),
-                        CircleShape
-                    )
-                    .padding(4.dp)
-                    .clip(CircleShape)
-            )
+                            }),
+                            CircleShape
+                        )
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                )
 
-            Text(
-                text = child.FullName,
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-                modifier = Modifier.padding(start = 10.dp),
-                textAlign = TextAlign.Center
+                Text(
+                    text = child.FullName,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    ),
+                    modifier = Modifier.padding(start = 10.dp),
+                    textAlign = TextAlign.End
+                )
+            }
 
-            )
             val checked = remember { mutableStateOf(true) }
-            Checkbox(checked = checked.value, onCheckedChange ={ checked.value = it })
-
-
-
-
+            Checkbox(
+                checked = checked.value,
+                onCheckedChange = { checked.value = it }
+            )
         }
     }
 }
+

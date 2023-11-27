@@ -2,7 +2,12 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 
 
+import android.app.Activity
+import android.content.Intent
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -29,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +47,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -53,14 +60,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.youthconnect.MainActivity
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Users.Child
+import com.example.youthconnect.QrScan
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.ChildViewModel
 import com.example.youthconnect.ViewModel.InstructorViewModel
 import com.example.youthconnect.ViewModel.ParentViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
+
+
 
 @Preview(showBackground = true)
 @Composable
@@ -421,6 +432,11 @@ fun InstructorProfileScreen(instructorId : String,
                     horizontalArrangement = Arrangement.SpaceEvenly, // Distribuye las imágenes equitativamente
                     verticalAlignment = Alignment.CenterVertically
                 ){
+
+
+                    val context = LocalContext.current
+
+
                     Image(
                         painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24 ),
                         contentDescription = "icon",
@@ -430,6 +446,9 @@ fun InstructorProfileScreen(instructorId : String,
                             .padding(10.dp)
                             .clickable {
                                 //navController.navigate(NavScreen.AddInstructor.name)
+                                context.startActivity(Intent(context,QrScan::class.java))
+
+
                             }
                             .background(Color(0xFFD9D9D9), CircleShape)
 
