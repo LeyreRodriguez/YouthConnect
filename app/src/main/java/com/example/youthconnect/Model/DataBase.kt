@@ -53,18 +53,7 @@ class DataBase(){
 
     }
 
-    fun addParentAccount(parent: Parent){
-        auth.createUserWithEmailAndPassword(parent.ID + "@youthconnect.com", parent.Password)
-            .addOnCompleteListener {task ->
-            if (task.isSuccessful){
-                Log.i("YAY", "Usuario creado exitosamente")
-            }else{
-                Log.i("NON", "Error al crear el usuario: ${task.exception?.message}")
-            }
-        }
 
-
-    }
 
 
     fun addChild(child: Child){
@@ -118,38 +107,41 @@ class DataBase(){
 
     }
 
-    fun addChildAccount(child: Child) {
 
-        val documentRef: DocumentReference = db.collection("Child").document(child.ID)
-
-        // Realiza la consulta para obtener el documento
-        documentRef.get()
-            .addOnSuccessListener { document ->
-                if (!document.exists()) {
-                    auth.createUserWithEmailAndPassword(
-                        child.ID + "@youthconnect.com",
-                        child.Password
-                    )
-
-
+    fun addParentAccount(parent: Parent){
+        auth.createUserWithEmailAndPassword(parent.ID + "@youthconnect.com", parent.Password)
+            .addOnCompleteListener {task ->
+                if (task.isSuccessful){
+                    Log.i("YAY", "Usuario creado exitosamente")
+                }else{
+                    Log.i("NON", "Error al crear el usuario: ${task.exception?.message}")
                 }
             }
+
+
+    }
+
+    fun addChildAccount(child: Child) {
+
+        auth.createUserWithEmailAndPassword(child.ID + "@youthconnect.com", child.Password)
+            .addOnCompleteListener {task ->
+                if (task.isSuccessful){
+                    Log.i("YAY", "Usuario creado exitosamente")
+                }else{
+                    Log.i("NON", "Error al crear el usuario: ${task.exception?.message}")
+                }
+            }
+
     }
 
     fun addInstructorAccount(instructor: Instructor) {
 
-        val documentRef: DocumentReference = db.collection("Instructor").document(instructor.ID)
-
-        // Realiza la consulta para obtener el documento
-        documentRef.get()
-            .addOnSuccessListener { document ->
-                if (!document.exists()) {
-                    auth.createUserWithEmailAndPassword(
-                        instructor.ID + "@youthconnect.com",
-                        instructor.Password
-                    )
-
-
+        auth.createUserWithEmailAndPassword(instructor.ID + "@youthconnect.com", instructor.Password)
+            .addOnCompleteListener {task ->
+                if (task.isSuccessful){
+                    Log.i("YAY", "Usuario creado exitosamente")
+                }else{
+                    Log.i("NON", "Error al crear el usuario: ${task.exception?.message}")
                 }
             }
     }

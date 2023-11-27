@@ -281,6 +281,7 @@ fun FirstSignupFormScreen() {
                 .padding(16.dp)
         ) {
             item {
+
                 CustomOutlinedTextField(
                     value = childFullName,
                     onValueChange = {childFullName = it},

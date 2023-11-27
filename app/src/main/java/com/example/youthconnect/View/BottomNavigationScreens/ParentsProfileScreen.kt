@@ -373,4 +373,3 @@ fun user(navController : NavHostController, child : Child){
         }
     }
 }
-

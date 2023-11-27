@@ -1,8 +1,10 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
+import android.content.Context
 import android.content.Intent
 import android.util.Patterns
 import android.widget.Toast
+import androidx.activity.compose.LocalActivityResultRegistryOwner.current
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -25,12 +27,16 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -66,6 +72,9 @@ import com.example.youthconnect.Model.Users.Child
 import com.example.youthconnect.Model.Users.Instructor
 import com.example.youthconnect.Model.Users.Parent
 import com.example.youthconnect.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +85,9 @@ fun AddInstructorScreen(){
     var InstructorPassword  by remember { mutableStateOf("") }
 
     var isChildPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    var showMessage by remember { mutableStateOf(false) }
 
+    val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -108,7 +119,12 @@ fun AddInstructorScreen(){
         )
 
 
-        Column(modifier = Modifier.align(Alignment.Center).padding(15.dp)) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
 
             Text(
                 text = "Signup",
@@ -119,7 +135,8 @@ fun AddInstructorScreen(){
                     color = Color(0xFF000000),
                     letterSpacing = 0.9.sp,
                 ),
-                modifier = Modifier.padding(bottom = 15.dp)
+                modifier = Modifier.padding(bottom = 15.dp),
+                textAlign = TextAlign.Center
             )
             CustomOutlinedTextField(
                 value = InstructorFullName,
@@ -164,6 +181,20 @@ fun AddInstructorScreen(){
                     val dataBase = DataBase()
                     dataBase.addInstructor(instructor)
                     dataBase.addInstructorAccount(instructor)
+
+                    InstructorFullName = ""
+                    InstructorID = ""
+                    InstructorPassword = ""
+
+                    showMessage = true
+
+                    coroutineScope.launch {
+                        if (showMessage) {
+                            delay(3000)
+                            showMessage = false
+                        }
+                    }
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -182,16 +213,21 @@ fun AddInstructorScreen(){
                     color = Color(0xFF000000),
                     textAlign = TextAlign.Center
                 )
+
+
+            }
+
+            if (showMessage) {
+                Snackbar(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("El usuario se ha creado correctamente")
+                }
             }
         }
 
     }
 }
-
-
-
-
-
 
 @Preview(showBackground = true)
 @Composable

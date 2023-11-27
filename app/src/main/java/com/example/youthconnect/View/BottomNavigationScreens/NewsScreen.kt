@@ -137,7 +137,6 @@ fun NewsScreen(
                 )
 
                 val dataBase = DataBase()
-                Log.i("UWU", dataBase.getCurrentUserId())
                userImage(user = dataBase.getCurrentUserId(), navController = navController )
 
 
