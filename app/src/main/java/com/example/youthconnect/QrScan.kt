@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.TextStyle
@@ -43,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.MaterialTheme.colors
 import com.example.youthconnect.ui.theme.YouthconnectTheme
 import com.google.rpc.context.AttributeContext.Resource
@@ -107,122 +109,127 @@ class QrScan : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             YouthconnectTheme {
-                Loading()
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Card(
+                        colors = CardDefaults.cardColors(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                        //  .background(Color(0xFFFFFFFF))
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Scan QR Code",
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.Black,
+                                    letterSpacing = 0.3.sp,
+                                ),
+                                textAlign = TextAlign.Center
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = "Pulsa el botón situado en la\nparte inferior de la pantalla para\nescanear un código QR",
+                                style = TextStyle(
+                                    fontSize = 15.sp,
+                                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.Black,
+                                    letterSpacing = 0.3.sp,
+                                ),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.qr_scan),
+                        contentDescription = "image description",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                  //  val navController = rememberNavController()
+
+                    val context = LocalContext.current
+
+                    if ( textResult.value != "") {
+                        Button(
+                            onClick = {
+                                //navController.navigate("child_profile_screen/${textResult.value}")
+                                context.startActivity(Intent(context,MainActivity::class.java))
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                            //   .background(Color(0xFF00FF00))
+                        ) {
+                            Text(
+                                text = textResult.value,
+                                style = TextStyle(
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color.White,
+                                    letterSpacing = 0.3.sp,
+                                )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+
+
+                    Button(
+                        onClick = {
+                             checkCameraPermission(this@QrScan )
+
+                          //  navController.navigate("child_profile_screen/${textResult.value}")
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                        //   .background(Color(0xFF00FF00))
+                    ) {
+                        Text(
+                            text = "Escanear QR",
+                            style = TextStyle(
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = Color.White,
+                                letterSpacing = 0.3.sp,
+                            )
+                        )
+                    }
+
+
+
+                }
+
 
             }
         }
     }
-}
-
-@Composable
-fun Loading(){
-
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Card(
-            colors = CardDefaults.cardColors(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .clip(RoundedCornerShape(8.dp))
-              //  .background(Color(0xFFFFFFFF))
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Scan QR Code",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black,
-                        letterSpacing = 0.3.sp,
-                    ),
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Pulsa el botón situado en la\nparte inferior de la pantalla para\nescanear un código QR",
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight.Normal,
-                        color = Color.Black,
-                        letterSpacing = 0.3.sp,
-                    ),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Image(
-            painter = painterResource(id = R.drawable.qr_scan),
-            contentDescription = "image description",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                /* checkCameraPermission(this@QrScan ) */
-            },
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth()
-                .height(56.dp)
-                .clip(RoundedCornerShape(8.dp))
-             //   .background(Color(0xFF00FF00))
-        ) {
-            Text(
-                text = "Escanear QR",
-                style = TextStyle(
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.White,
-                    letterSpacing = 0.3.sp,
-                )
-            )
-        }
-    }
-
-
-    /*
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Text(
-                text = "HELLO", //textResult.value,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-        }
-        */
-
-}
-
-
-@Preview(showBackground = true)
-@Composable
-
-fun LoadingPreview(){
-    Loading()
 }

@@ -441,7 +441,7 @@ fun InstructorProfileScreen(instructorId : String,
                             .padding(10.dp)
                             .clickable {
 
-                                context.startActivity(Intent(context,QrScan::class.java))
+                                //context.startActivity(Intent(context,QrScan::class.java))
 
                             }
                             .background(Color(0xFFD9D9D9), CircleShape)
