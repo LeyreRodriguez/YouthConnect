@@ -3,8 +3,7 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 
 import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -27,9 +26,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,22 +50,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.youthconnect.Model.Enum.NavScreen
-import com.example.youthconnect.Model.Users.Child
-import com.example.youthconnect.QrScan
+import com.example.youthconnect.Model.Object.Child
+import com.example.youthconnect.Model.Object.Instructor
+
 import com.example.youthconnect.R
-import com.example.youthconnect.ViewModel.ChildViewModel
-import com.example.youthconnect.ViewModel.InstructorViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
-import androidx.compose.runtime.*
-import kotlinx.coroutines.launch
-import androidx.compose.ui.platform.LocalContext
-
-
+import com.example.youthconnect.QrScan
+import com.example.youthconnect.ViewModel.UserViewModel
 
 
 @Preview(showBackground = true)
@@ -264,29 +260,24 @@ fun InstructorPreview(){
 
 @Composable
 fun InstructorProfileScreen(instructorId : String,
-                              childViewModel: ChildViewModel = viewModel(),
-                              instructorViewModel: InstructorViewModel = viewModel(),
                               modifier : Modifier = Modifier.background(color = Color.White),
                               navController: NavHostController
 ) {
 
-
-
-
-    val childState by childViewModel.childState.collectAsState(initial = emptyList())
-    val instructorState by instructorViewModel.instructorState.collectAsState(initial = emptyList())
-
-    LaunchedEffect(Unit) {
-        instructorViewModel.getCurrentUserById(instructorId)
-
+    val UserViewModel : UserViewModel = hiltViewModel()
+    var instructor by remember { mutableStateOf<Instructor?>(null) }
+    var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
+    Log.i("AWA", instructorId)
+    LaunchedEffect(UserViewModel) {
+        try {
+            instructor = UserViewModel.getCurrentInstructorById(instructorId)
+            children = UserViewModel.getChildByInstructorId(instructorId)
+            Log.i("InstructorProfileScreen", "Instructor: $instructor, Children: $children")
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error fetching data", e)
+        }
     }
 
-    if (instructorState.isNotEmpty()) {
-        val instructor = instructorState.first()
-
-        LaunchedEffect(Unit) {
-            childViewModel.getChildByInstructorId(instructor.ID)
-        }
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -374,18 +365,21 @@ fun InstructorProfileScreen(instructorId : String,
                             .padding(4.dp)
                             .clip(CircleShape)
                     )
+//                    Log.i("UWU", instructor!!.fullName)
+                    instructor?.FullName?.let {
 
-                    Text(
-                        text = instructor.FullName,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                        ), modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                    )
+                        Text(
+                            text = it,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFF000000),
+                                letterSpacing = 0.9.sp,
+                            ), modifier = Modifier
+                                .padding(start = 15.dp, top = 10.dp)
+                        )
+                    }
 
 
 
@@ -414,8 +408,10 @@ fun InstructorProfileScreen(instructorId : String,
                         .padding(vertical = 4.dp)
                         .height(200.dp)
                     ) {
-                        items(items = childState) { item ->
-                            user(navController = navController, item)
+                        items(items = children) { item ->
+                            if (item != null) {
+                                user(navController = navController, item)
+                            }
                         }
                     }
 
@@ -441,7 +437,8 @@ fun InstructorProfileScreen(instructorId : String,
                             .padding(10.dp)
                             .clickable {
 
-                                //context.startActivity(Intent(context,QrScan::class.java))
+                                context.startActivity(Intent(context,QrScan::class.java))
+
 
                             }
                             .background(Color(0xFFD9D9D9), CircleShape)
@@ -459,6 +456,8 @@ fun InstructorProfileScreen(instructorId : String,
                             .size(120.dp)
                             .padding(10.dp)
                             .clickable {
+
+
                                 navController.navigate(NavScreen.ChildList.name)
                             }
                             .background(Color(0xFFD9D9D9), CircleShape)
@@ -474,4 +473,5 @@ fun InstructorProfileScreen(instructorId : String,
         }
 
     }
-}
+
+

@@ -1,4 +1,4 @@
-package com.example.youthconnect.Model
+package com.example.youthconnect.Model.Object
 
 data class News(
     val id : String = "",

@@ -1,4 +1,4 @@
-package com.example.youthconnect.Model.Users
+package com.example.youthconnect.Model.Object
 
 data class Parent(
     val FullName : String,

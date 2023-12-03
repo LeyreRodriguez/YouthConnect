@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -44,6 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.MaterialTheme.colors
 import com.example.youthconnect.ui.theme.YouthconnectTheme
@@ -87,7 +90,7 @@ class QrScan : ComponentActivity() {
         }
     }
 
-    private fun checkCameraPermission(context: Context) {
+    fun checkCameraPermission(context: Context) {
         if(ContextCompat.checkSelfPermission(
             context,
             android.Manifest.permission.CAMERA
@@ -101,135 +104,52 @@ class QrScan : ComponentActivity() {
         }
     }
 
-
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-            YouthconnectTheme {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Card(
-                        colors = CardDefaults.cardColors(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                        //  .background(Color(0xFFFFFFFF))
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "Scan QR Code",
-                                style = TextStyle(
-                                    fontSize = 20.sp,
-                                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                    fontWeight = FontWeight.Normal,
-                                    color = Color.Black,
-                                    letterSpacing = 0.3.sp,
-                                ),
-                                textAlign = TextAlign.Center
-                            )
+            val navController = rememberNavController()
+            checkCameraPermission(this@QrScan )
+            val mcontext = LocalContext.current
+            if ( textResult.value.isNotEmpty()) {
+              //  QrScannerScreen(navController,textResult.value)
 
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            Text(
-                                text = "Pulsa el botón situado en la\nparte inferior de la pantalla para\nescanear un código QR",
-                                style = TextStyle(
-                                    fontSize = 15.sp,
-                                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                    fontWeight = FontWeight.Normal,
-                                    color = Color.Black,
-                                    letterSpacing = 0.3.sp,
-                                ),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Image(
-                        painter = painterResource(id = R.drawable.qr_scan),
-                        contentDescription = "image description",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                  //  val navController = rememberNavController()
-
-                    val context = LocalContext.current
-
-                    if ( textResult.value != "") {
-                        Button(
-                            onClick = {
-                                //navController.navigate("child_profile_screen/${textResult.value}")
-                                context.startActivity(Intent(context,MainActivity::class.java))
-                            },
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                            //   .background(Color(0xFF00FF00))
-                        ) {
-                            Text(
-                                text = textResult.value,
-                                style = TextStyle(
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    color = Color.White,
-                                    letterSpacing = 0.3.sp,
-                                )
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-
-
-
-                    Button(
-                        onClick = {
-                             checkCameraPermission(this@QrScan )
-
-                          //  navController.navigate("child_profile_screen/${textResult.value}")
-                        },
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                        //   .background(Color(0xFF00FF00))
-                    ) {
-                        Text(
-                            text = "Escanear QR",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Normal,
-                                color = Color.White,
-                                letterSpacing = 0.3.sp,
-                            )
-                        )
-                    }
-
-
-
-                }
-
-
+                QrScannerScreen(textResult.value, navController)
             }
+
         }
+    }
+}
+
+
+@Composable
+fun QrScannerScreen( textResult : String, navController: NavController){
+    val mcontext = LocalContext.current
+    Log.i("OWO", textResult)
+    Button(
+        onClick = {
+
+            val intent = Intent(mcontext, MainActivity::class.java)
+            intent.putExtra("TEXT_RESULT", textResult)
+            mcontext.startActivity(intent)
+
+
+        },
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(RoundedCornerShape(8.dp))
+        //   .background(Color(0xFF00FF00))
+    ) {
+        Text(
+            text = textResult,
+            style = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Normal,
+                color = Color.White,
+                letterSpacing = 0.3.sp,
+            )
+        )
     }
 }

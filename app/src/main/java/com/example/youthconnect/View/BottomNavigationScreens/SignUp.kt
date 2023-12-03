@@ -1,11 +1,7 @@
-package com.example.youthconnect
+package com.example.youthconnect.View.BottomNavigationScreens
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -42,7 +38,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -74,45 +69,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.youthconnect.Model.Enum.Course
 import com.example.youthconnect.Model.DataBase
-import com.example.youthconnect.Model.Users.Child
-import com.example.youthconnect.Model.Users.Parent
+import com.example.youthconnect.Model.Enum.NavScreen
+import com.example.youthconnect.Model.Object.Child
+import com.example.youthconnect.Model.Object.Parent
+import com.example.youthconnect.R
 import com.example.youthconnect.View.QR.DisplayQRCode
-import com.example.youthconnect.ui.theme.YouthconnectTheme
-class SignUp : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            YouthconnectTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    SignUpScreen()
-                }
-            }
-        }
-    }
-}
-@Preview(showBackground = true)
-@Composable
-fun SignupScreenPreview(){
-    YouthconnectTheme {
-        FirstSignupFormScreen(
-        )
-    }
-}
+
 @SuppressLint("RememberReturnType")
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier
         .width(320.dp)
-        .height(568.dp)
+        .height(568.dp),
+    navController: NavController
 ) {
     val brush = Brush.horizontalGradient(
         listOf(
@@ -154,7 +128,7 @@ fun SignUpScreen(
                         ),
                         modifier = Modifier.padding(bottom = 15.dp)
                     )
-                    FirstSignupFormScreen()
+                    FirstSignupFormScreen(navController)
                 }
             }
             Box(
@@ -179,18 +153,16 @@ fun SignUpScreen(
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FirstSignupFormScreen() {
+fun FirstSignupFormScreen(navController : NavController) {
     var validateParentFullName by rememberSaveable { mutableStateOf(true) }
     var validateParentID by rememberSaveable { mutableStateOf(true) }
     var validateParentPhoneNumber by rememberSaveable { mutableStateOf(true) }
     var validateParentPassword by rememberSaveable { mutableStateOf(true) }
     var validateChildFullName by rememberSaveable { mutableStateOf(true) }
     var validateChildID by rememberSaveable { mutableStateOf(true) }
-    var validateChildCourse by rememberSaveable { mutableStateOf(true) }
     var validateChildPassword by rememberSaveable { mutableStateOf(true) }
     var isChildPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var isParentPasswordVisible by rememberSaveable { mutableStateOf(false) }
-    //  var validateChildPassword by rememberSaveable { mutableStateOf(true) }
     val validateParentFullNameError = "Please, input a a valid name"
     val validateParentIDError = "The format of the ID doesn´t seem right"
     val validateParentPhoneNumberError = "The format of the phone number doesn´t seem right"
@@ -269,9 +241,13 @@ fun FirstSignupFormScreen() {
             dataBase.addParentAccount(parent)
             dataBase.addChild(child)
             dataBase.addChildAccount(child)
-            mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
+
+
+           // mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
+
+            navController.navigate(NavScreen.NewsScreen.name)
         }else{
-            Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT)
+            Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT).show()
         }
     }
     Column {

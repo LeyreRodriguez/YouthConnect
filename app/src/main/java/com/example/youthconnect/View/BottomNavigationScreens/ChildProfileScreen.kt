@@ -13,21 +13,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,11 +32,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -48,54 +43,35 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.youthconnect.Model.DataBase
-import com.example.youthconnect.Model.Users.Parent
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.youthconnect.Model.Object.Child
+import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.R
 import com.example.youthconnect.View.QR.DisplayQRCode
-import com.example.youthconnect.ViewModel.ChildViewModel
-import com.example.youthconnect.ViewModel.NewsViewModel
-import com.example.youthconnect.ViewModel.ParentViewModel
+import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun ChildProfileScreen(childId : String,
-                       viewModel: ChildViewModel = viewModel(),
-                       parentViewModel: ParentViewModel = viewModel(),
                        modifier : Modifier = Modifier.background(color = Color.White)
 ){
 
+    var child by remember { mutableStateOf<Child?>(null) }
+    var parents by remember { mutableStateOf<List<Parent?>>(emptyList()) }
 
-    val childViewModel: ChildViewModel = viewModel()
-    val parentViewModel: ParentViewModel = viewModel()
+    val UserViewModel : UserViewModel = hiltViewModel()
 
-    val childState by childViewModel.childState.collectAsState(initial = emptyList())
-    val parentState by parentViewModel.parentState.collectAsState(initial = emptyList())
-
-    LaunchedEffect(Unit) {
-        // Tu lógica para obtener datos del niño...
-
-        childViewModel.getCurrentUserById(childId)
-
-    }
-
-
-
-
-    if (childState.isNotEmpty() ) {
-        val child = childState.first()
-
-        LaunchedEffect(Unit) {
-            parentViewModel.getParentByParentsID(child.ParentID)
-
+    LaunchedEffect(UserViewModel) {
+        try {
+            child = UserViewModel.getCurrentChildById(childId)
+            parents = child?.ParentID?.let { UserViewModel.getParentsByParentsID(it) }!!
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
         }
+    }
 
         Box(
             modifier = modifier.fillMaxSize(),
@@ -157,29 +133,33 @@ fun ChildProfileScreen(childId : String,
                         .clip(CircleShape)
                 )
 
-                Text(
-                    text = child.FullName,
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF000000),
-                        letterSpacing = 0.9.sp,
-                    ), modifier = Modifier
-                        .padding(start = 15.dp, top = 10.dp)
-                )
+                child?.FullName?.let {
+                    Text(
+                        text = it,
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF000000),
+                            letterSpacing = 0.9.sp,
+                        ), modifier = Modifier
+                            .padding(start = 15.dp, top = 10.dp)
+                    )
+                }
 
-                Text(
-                    text = child.Course,
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF000000),
-                        letterSpacing = 0.9.sp,
-                    ), modifier = Modifier
-                        .padding(start = 15.dp, top = 10.dp)
-                )
+                child?.Course?.let {
+                    Text(
+                        text = it,
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF000000),
+                            letterSpacing = 0.9.sp,
+                        ), modifier = Modifier
+                            .padding(start = 15.dp, top = 10.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.size(40.dp))
 
@@ -202,8 +182,8 @@ fun ChildProfileScreen(childId : String,
 
                         //val parentState = listOf<String>("Florencio Rodriguez Rodriguez", "Juani Quintana Monroy")
                         LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-                            items(items = parentState) { item ->
-                                Text(text = item.FullName)
+                            items(items = parents) { item ->
+                                item?.FullName?.let { Text(text = it) }
                             }
                         }
 
@@ -226,8 +206,8 @@ fun ChildProfileScreen(childId : String,
                         // val numbers = listOf<String>("680806622", "635556961")
 
                         LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-                            items(items = parentState) { item ->
-                                Text(text = item.PhoneNumber)
+                            items(items = parents) { item ->
+                                item?.PhoneNumber?.let { Text(text = it) }
                             }
                         }
                     }
@@ -237,7 +217,7 @@ fun ChildProfileScreen(childId : String,
 
                 Spacer(modifier = Modifier.size(40.dp))
 
-                DisplayQRCode(child.ID)
+                child?.ID?.let { DisplayQRCode(it) }
 
             }
         }
@@ -246,7 +226,7 @@ fun ChildProfileScreen(childId : String,
     }
 
 
-}
+
 
 
 @SuppressLint("NotConstructor")

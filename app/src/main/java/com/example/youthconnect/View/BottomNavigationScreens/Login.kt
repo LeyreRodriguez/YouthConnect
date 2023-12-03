@@ -1,10 +1,6 @@
-package com.example.youthconnect
+package com.example.youthconnect.View.BottomNavigationScreens
 
-import android.content.Intent
-import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,17 +12,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,34 +46,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.example.youthconnect.Model.Enum.NavScreen
+import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.LoginScreenViewModel
 import com.example.youthconnect.ui.theme.YouthconnectTheme
 
-class Login : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            YouthconnectTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    LogInScreen()
-                }
-            }
-        }
-    }
-}
 
 @Composable
-fun LogInScreen(modifier: Modifier = Modifier
-    .width(320.dp)
-    .height(568.dp)
+fun LogInScreen(modifier: Modifier = Modifier, navController: NavController
 ) {
-    val navController : NavHostController = rememberNavController()
+    //val navController : NavHostController = rememberNavController()
     val brush = Brush.horizontalGradient(
         listOf(
             Color(0xFFE15554),
@@ -205,7 +179,8 @@ fun FormLogIn(navController : NavController,
         Button(
             onClick = {
                 viewModel.signIn(ID.text + "@youthconnect.com", password.text){
-                    mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
+                    //mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
+                    navController.navigate(NavScreen.NewsScreen.name)
                 }
             },
             modifier = Modifier
@@ -245,7 +220,9 @@ fun FormLogIn(navController : NavController,
 
             ClickableText(
                 text = AnnotatedString("Sign up"),
-                onClick = { mcontext.startActivity(Intent(mcontext,SignUp::class.java))
+                onClick = {
+                    //mcontext.startActivity(Intent(mcontext,SignUp::class.java))
+                    navController.navigate("signup")
                 },
                 style = TextStyle(
                     fontSize = 15.sp,
@@ -268,6 +245,6 @@ fun FormLogIn(navController : NavController,
 @Composable
 fun GreetingPreview() {
     YouthconnectTheme {
-        LogInScreen()
+      //  LogInScreen()
     }
 }

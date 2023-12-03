@@ -34,6 +34,4 @@ sealed class ItemsBottomBar(
         NavScreen.ChatScreen.name
     )
 
-    object NewsDetailsScreen : NewsNavScreen("news_details_screen")
-    // Agrega más pantallas si es necesario
 }

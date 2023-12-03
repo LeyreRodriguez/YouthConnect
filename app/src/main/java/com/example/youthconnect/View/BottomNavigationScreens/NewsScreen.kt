@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -27,10 +26,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,39 +49,38 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.youthconnect.Model.DataBase
-import com.example.youthconnect.Model.News
-import com.example.youthconnect.Model.Users.Child
+import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
-import com.example.youthconnect.ViewModel.ChildViewModel
 import com.example.youthconnect.ViewModel.NewsViewModel
-import com.example.youthconnect.ui.theme.Green
-import com.example.youthconnect.ui.theme.Red
-import kotlinx.coroutines.runBlocking
-import java.util.concurrent.TimeUnit
+import com.example.youthconnect.ViewModel.UserViewModel
 
 
 @SuppressLint("SuspiciousIndentation", "UnrememberedMutableState")
 @Composable
 fun NewsScreen(
-    newsViewModel: NewsViewModel = viewModel(),
-    childViewModel: ChildViewModel = viewModel(),
     navController: NavHostController,
     modifier: Modifier = Modifier
     .background(color = Color.White)
 ) {
-    val newsState by newsViewModel.newsState.collectAsState(emptyList())
 
-    LaunchedEffect(Unit) {
-        newsViewModel.getNews()
+    var news by remember { mutableStateOf<List<News?>>(emptyList()) }
+
+
+    val NewsViewModel : NewsViewModel = hiltViewModel()
+
+    LaunchedEffect(NewsViewModel) {
+        try {
+            news = NewsViewModel.getAllNews()
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
+        }
     }
-
-
 
 
     Box(
@@ -186,7 +184,7 @@ fun NewsScreen(
                         .padding(start = 15.dp, top = 10.dp )
                 )
 
-                RecyclerView(news = newsState, navController = navController)
+                RecyclerView(news = news, navController = navController)
 
 
             }
@@ -205,24 +203,27 @@ fun NewsScreen(
 fun userImage(user: String,
               navController: NavHostController){
     val documentExists = remember { mutableStateOf("-1") }
-    val dataBase = DataBase()
-    LaunchedEffect(user) {
-        val result = dataBase.buscarDocumento(user)
-        documentExists.value = result
+    val UserViewModel : UserViewModel = hiltViewModel()
+    LaunchedEffect(UserViewModel) {
+        val result = UserViewModel.findDocument(user)
+        if (result != null) {
+            documentExists.value = result
+        }
     }
+
 
     Box(
         modifier = Modifier
             .size(50.dp)
             .clickable {
 
-                    if (documentExists.value == "0") {
-                        navController.navigate("instructor_profile_screen/${user}")
-                    } else if (documentExists.value == "1") {
-                        navController.navigate("parent_profile_screen/${user}")
-                    } else {
-                        navController.navigate("child_profile_screen/${user}")
-                    }
+                if (documentExists.value == "0") {
+                    navController.navigate("instructor_profile_screen/${user}")
+                } else if (documentExists.value == "1") {
+                    navController.navigate("parent_profile_screen/${user}")
+                } else {
+                    navController.navigate("child_profile_screen/${user}")
+                }
 
             }
             .border(
@@ -334,12 +335,14 @@ fun CoilImage(
 }
 @Composable
 fun RecyclerView(
-    news: List<News>,
+    news: List<News?>,
     navController: NavHostController
 ){
     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)){
         items(items = news){ item ->
-            ListItem(news = item, navController = navController)
+            if (item != null) {
+                ListItem(news = item, navController = navController)
+            }
         }
     }
 }

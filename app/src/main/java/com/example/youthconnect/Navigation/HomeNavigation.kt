@@ -1,4 +1,5 @@
-package com.example.youthconnect.View.Navigation
+package com.example.youthconnect.Navigation
+
 
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -26,11 +27,17 @@ import com.example.youthconnect.ViewModel.NewsViewModel
 
 @Composable
 fun HomeNavigation(
-    navController: NavHostController
+    navController: NavHostController,
+    startRoute : String? = null
 ){
+    val startDestination = if (startRoute != null) {
+        "SpecificChild"
+    } else {
+        NavScreen.NewsScreen.name
+    }
 
     NavHost(navController = navController,
-        startDestination = NavScreen.NewsScreen.name
+        startDestination = startDestination
     ){
         composable(NavScreen.NewsScreen.name){ NewsScreen(navController = navController) }
 
@@ -42,6 +49,7 @@ fun HomeNavigation(
 
         composable(NavScreen.ChildList.name){ ChildListScreen(navController = navController) }
 
+        composable(route = "SpecificChild") { if (startRoute != null) { ChildProfileScreen(childId = startRoute) } }
         composable(
             route = "news_details_screen/{newsId}",
             arguments = listOf(navArgument("newsId") { type = NavType.StringType })
@@ -55,9 +63,11 @@ fun HomeNavigation(
             route = "child_profile_screen/{childId}",
             arguments = listOf(navArgument("childId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val childId = backStackEntry.arguments?.getString("childId") ?: ""
+            val childId = startRoute ?: backStackEntry.arguments?.getString("childId") ?: ""
             ChildProfileScreen(childId = childId)
         }
+
+
 
 
         composable(
@@ -77,12 +87,12 @@ fun HomeNavigation(
             InstructorProfileScreen(instructorId = instructorId, navController = navController)
         }
 
-        composable("qrScanActivity") {
-            QrScan() // Esto iniciará la actividad QrScan
-        }
+
 
 
     }
+
+
 }
 
 

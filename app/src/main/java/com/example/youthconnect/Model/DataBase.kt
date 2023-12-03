@@ -1,35 +1,21 @@
 package com.example.youthconnect.Model
 
-import android.content.ContentValues.TAG
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import com.example.youthconnect.Model.Users.Child
-import com.example.youthconnect.Model.Users.Instructor
-import com.example.youthconnect.Model.Users.Parent
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
+import com.example.youthconnect.Model.Object.Child
+import com.example.youthconnect.Model.Object.Instructor
+import com.example.youthconnect.Model.Object.Parent
 import com.google.firebase.Firebase
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.util.concurrent.CompletableFuture
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class DataBase(){
 
