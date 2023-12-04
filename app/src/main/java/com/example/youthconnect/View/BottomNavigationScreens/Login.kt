@@ -178,10 +178,13 @@ fun FormLogIn(navController : NavController,
 
         Button(
             onClick = {
+
                 viewModel.signIn(ID.text + "@youthconnect.com", password.text){
                     //mcontext.startActivity(Intent(mcontext,MainActivity::class.java))
                     navController.navigate(NavScreen.NewsScreen.name)
                 }
+
+
             },
             modifier = Modifier
                 .fillMaxWidth()

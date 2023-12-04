@@ -1,4 +1,4 @@
-package com.example.youthconnect.Model
+package com.example.youthconnect.Model.Firebase.Firestore
 
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
@@ -28,6 +28,10 @@ interface FirestoreRepository {
     suspend fun getParentsByParentsID(parentsID : List<String>) : List<Parent?>
 
     suspend fun getCurrentInstructorById( instructorID : String) : Instructor?
+
+    suspend fun addChild(child: Child)
+    suspend fun addParent(parent: Parent)
+    suspend fun addInstructor(instructor: Instructor)
 
 
 }

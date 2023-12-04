@@ -1,7 +1,7 @@
 package com.example.youthconnect.Model.di
 
-import com.example.youthconnect.Model.FirestoreRepository
-import com.example.youthconnect.Model.FirestoreRepositoryImpl
+import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
+import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepositoryImpl
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides

@@ -1,12 +1,7 @@
 package com.example.youthconnect.Navigation
 
 
-import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -49,7 +44,7 @@ fun HomeNavigation(
 
         composable(NavScreen.ChildList.name){ ChildListScreen(navController = navController) }
 
-        composable(route = "SpecificChild") { if (startRoute != null) { ChildProfileScreen(childId = startRoute) } }
+        composable(route = "SpecificChild") { if (startRoute != null) { ChildProfileScreen(childId = startRoute, navController = navController) } }
         composable(
             route = "news_details_screen/{newsId}",
             arguments = listOf(navArgument("newsId") { type = NavType.StringType })
@@ -64,7 +59,7 @@ fun HomeNavigation(
             arguments = listOf(navArgument("childId") { type = NavType.StringType })
         ) { backStackEntry ->
             val childId = startRoute ?: backStackEntry.arguments?.getString("childId") ?: ""
-            ChildProfileScreen(childId = childId)
+            ChildProfileScreen(childId = childId, navController = navController)
         }
 
 

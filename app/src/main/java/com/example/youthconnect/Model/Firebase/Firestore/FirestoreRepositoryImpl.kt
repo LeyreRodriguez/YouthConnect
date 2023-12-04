@@ -1,10 +1,12 @@
-package com.example.youthconnect.Model
+package com.example.youthconnect.Model.Firebase.Firestore
 
 import android.util.Log
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -12,9 +14,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
-class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore: FirebaseFirestore): FirestoreRepository {
+class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore: FirebaseFirestore):
+    FirestoreRepository {
     override val dataBase: FirebaseFirestore?
         get() = firebaseFirestore
+
 
     override suspend fun getChild(childId: String): Child? {
         return try {
@@ -251,6 +255,60 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
             Log.e("FirestoreRepository", "getChild failed with $e")
             null
         }
+    }
+
+    override suspend fun addChild(child: Child) {
+        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.ID)
+
+        // Realiza la consulta para obtener el documento
+        documentRef.get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val currentParentIds = document.get("parentID") as? List<String> ?: emptyList()
+                    val newParentsId = currentParentIds + child.ParentID
+
+                    val updates = hashMapOf<String, Any>(
+                        "parentID" to newParentsId
+                        // Puedes agregar más campos según sea necesario
+                    )
+
+                    // Realiza la actualización del documento
+                    documentRef.update(updates)
+                        .addOnSuccessListener {
+                            // La actualización fue exitosa
+                            Log.i("Actualizacion", "completada")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.i("Actualizacion", "no completada")
+                        }
+
+                    val data = document.data
+                    // Haz algo con los datos obtenidos
+                } else {
+                    // El documento no existe
+
+                    firebaseFirestore.collection("Child")
+                        .document(child.ID)
+                        .set(child)
+
+                }
+            }
+
+    }
+
+    override suspend fun addParent(parent: Parent) {
+        firebaseFirestore.collection("Parents")
+            .document(parent.ID)
+            .set(parent)
+
+
+    }
+
+    override suspend fun addInstructor( instructor: Instructor) {
+        firebaseFirestore.collection("Instructor")
+            .document(instructor.ID)
+            .set(instructor)
+
     }
 
 

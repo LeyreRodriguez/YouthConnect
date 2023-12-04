@@ -2,7 +2,7 @@ package com.example.youthconnect.ViewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.youthconnect.Model.FirestoreRepository
+import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent

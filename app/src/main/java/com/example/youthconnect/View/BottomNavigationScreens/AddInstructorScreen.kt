@@ -40,15 +40,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.youthconnect.Model.DataBase
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
+import com.example.youthconnect.ViewModel.signUpViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddInstructorScreen(){
+fun AddInstructorScreen(signUpViewModel: signUpViewModel = viewModel()){
 
     var InstructorFullName by remember { mutableStateOf("") }
     var InstructorID  by remember { mutableStateOf("") }
@@ -148,9 +149,7 @@ fun AddInstructorScreen(){
                         InstructorPassword
                     )
 
-                    val dataBase = DataBase()
-                    dataBase.addInstructor(instructor)
-                    dataBase.addInstructorAccount(instructor)
+                    signUpViewModel.addInstructor(instructor)
 
                     InstructorFullName = ""
                     InstructorID = ""

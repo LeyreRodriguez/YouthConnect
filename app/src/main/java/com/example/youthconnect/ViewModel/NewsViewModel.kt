@@ -2,7 +2,7 @@ package com.example.youthconnect.ViewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.youthconnect.Model.FirestoreRepository
+import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Object.News
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -11,7 +11,7 @@ import javax.inject.Inject
 class NewsViewModel @Inject constructor(
     private val firestoreRepository: FirestoreRepository,
 
-): ViewModel(){
+    ): ViewModel(){
 
     private var allNews: List<News?> = emptyList()
     private var searchedNews : List<News?> = emptyList()

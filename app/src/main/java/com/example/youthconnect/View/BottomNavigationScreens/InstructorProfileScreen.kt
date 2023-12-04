@@ -51,8 +51,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
@@ -104,7 +106,7 @@ fun InstructorPreview(){
                 .size(80.dp)
                 .padding(15.dp)
                 .clickable {
-                   // navController.navigate(NavScreen.AddInstructor.name)
+                    // navController.navigate(NavScreen.AddInstructor.name)
                 }
                 .border(
                     BorderStroke(4.dp, remember {
@@ -261,7 +263,8 @@ fun InstructorPreview(){
 @Composable
 fun InstructorProfileScreen(instructorId : String,
                               modifier : Modifier = Modifier.background(color = Color.White),
-                              navController: NavHostController
+                              navController: NavHostController,
+                            loginViewModel : LoginViewModel = viewModel()
 ) {
 
     val UserViewModel : UserViewModel = hiltViewModel()
@@ -390,6 +393,22 @@ fun InstructorProfileScreen(instructorId : String,
 
                 Column (
                 ){
+
+                    Text(
+                        text = "LogOut",
+                        style = TextStyle(
+                            fontSize = 30.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF000000),
+                            letterSpacing = 0.9.sp,
+                        ), modifier = Modifier
+                            .padding(start = 15.dp, top = 10.dp)
+                            .clickable { loginViewModel.signOut()
+                                navController.navigate("login")}
+                    )
+
+
                     Text(
                         text = "My kids",
                         style = TextStyle(
@@ -437,7 +456,7 @@ fun InstructorProfileScreen(instructorId : String,
                             .padding(10.dp)
                             .clickable {
 
-                                context.startActivity(Intent(context,QrScan::class.java))
+                                context.startActivity(Intent(context, QrScan::class.java))
 
 
                             }

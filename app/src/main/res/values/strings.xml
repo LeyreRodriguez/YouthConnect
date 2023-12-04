@@ -3,4 +3,14 @@
     <string name="title_activity_sign_up">SignUp</string>
     <string name="title_activity_qr_scanner">QrScanner</string>
     <string name="title_activity_qr_scan">QrScan</string>
+    <string name="validateParentFullNameError">Please, input a a valid name</string>
+    <string name="validateParentIDError">The format of the ID doesn´t seem right</string>
+    <string name="validateParentPhoneNumberError">The format of the phone number doesn´t seem right</string>
+    <string name="validateParentPasswordError">Must mix capital and non-capital letters, a number, special character and minimun length of 8</string>
+    <string name="validateChildFullNameError">Please, input a valid ID</string>
+    <string name="validateChildIDError">The format of the ID doesn´t seem right</string>
+    <string name="validateChildPasswordError">Must mix capital and non-capital letters, a number, special character and minimun length of 8</string>
+
+
+
 </resources>

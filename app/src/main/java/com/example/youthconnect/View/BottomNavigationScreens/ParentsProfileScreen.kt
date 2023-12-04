@@ -47,13 +47,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.UserViewModel
+import com.example.youthconnect.ViewModel.signUpViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 
@@ -61,7 +64,8 @@ import com.example.youthconnect.ui.theme.Red
 @Composable
 fun ParentsProfileScreen(parentId : String,
                          modifier : Modifier = Modifier.background(color = Color.White),
-                         navController: NavHostController
+                         navController: NavHostController,
+                         loginViewModel: LoginViewModel = viewModel()
 ) {
 
     var parent by remember { mutableStateOf<Parent?>(null) }
@@ -161,6 +165,19 @@ fun ParentsProfileScreen(parentId : String,
 
                 Column ( modifier = Modifier.fillMaxWidth()
                 ){
+                    Text(
+                        text = "LogOut",
+                        style = TextStyle(
+                            fontSize = 30.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF000000),
+                            letterSpacing = 0.9.sp,
+                        ), modifier = Modifier
+                            .padding(start = 15.dp, top = 10.dp)
+                            .clickable { loginViewModel.signOut()
+                            navController.navigate("firstScreens")}
+                    )
                     Text(
                         text = "My kids",
                         style = TextStyle(

@@ -1,37 +1,60 @@
 package com.example.youthconnect
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
+import com.example.youthconnect.Model.Firebase.Authentication.GoogleAuthUiClient
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildListScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildProfileScreen
 import com.example.youthconnect.View.BottomNavigationScreens.InstructorProfileScreen
-import com.example.youthconnect.View.BottomNavigationScreens.LogInScreen
+import com.example.youthconnect.View.BottomNavigationScreens.LoginView
 import com.example.youthconnect.View.BottomNavigationScreens.NewsDetails
 import com.example.youthconnect.View.BottomNavigationScreens.NewsScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ParentsProfileScreen
 import com.example.youthconnect.View.BottomNavigationScreens.QuizScreen
-import com.example.youthconnect.View.BottomNavigationScreens.SignUpScreen
+import com.example.youthconnect.View.BottomNavigationScreens.SignUpView
 import com.example.youthconnect.View.Components.BottomNavigation
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    val db = Firebase.firestore
+
+    public val googleAuthUiClient by lazy {
+        GoogleAuthUiClient(
+            context = applicationContext,
+            oneTapClient = Identity.getSignInClient(applicationContext)
+        )
+    }
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -45,8 +68,60 @@ class MainActivity : ComponentActivity() {
                     startDestination = "login",
                     route = "firstScreens"
                 ) {
-                    composable("login") { LogInScreen(navController = navController) }
-                    composable("signup") { SignUpScreen(navController = navController) }
+                    composable("login") {
+                        val viewModel = viewModel<LoginViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        LaunchedEffect(key1 = Unit){
+                            if(googleAuthUiClient.getSignedInUser() != null){
+                                navController.navigate("secondScreens")
+                            }
+                        }
+
+                        val launcher = rememberLauncherForActivityResult(
+                            contract = ActivityResultContracts.StartIntentSenderForResult(),
+                            onResult = {result ->
+                                if(result.resultCode == RESULT_OK) {
+                                    lifecycleScope.launch {
+                                        val signInResult = googleAuthUiClient.signInWithIntent(
+                                            intent = result.data ?: return@launch
+                                        )
+                                        viewModel.onSignInResult(signInResult)
+                                    }
+                                }
+                            }
+                        )
+
+                        LaunchedEffect(key1 = state.isSignInSuccessful) {
+                            if(state.isSignInSuccessful) {
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Sesión Iniciada",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                navController.navigate("secondScreens")
+                                viewModel.resetState()
+                            }
+                        }
+
+                        LoginView(
+                            navController = navController,
+                            state = state,
+                            onSignInClick = {
+                                lifecycleScope.launch {
+                                    val signInIntentSender = googleAuthUiClient.signIn()
+                                    launcher.launch(
+                                        IntentSenderRequest.Builder(
+                                            signInIntentSender ?: return@launch
+                                        ).build()
+                                    )
+                                }
+                            }
+
+                        )
+                    }
+                    composable("signup") { SignUpView(navController = navController) }
                 }
                 navigation(
                     startDestination = NavScreen.NewsScreen.name,
@@ -172,7 +247,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(padding)
                                     .fillMaxSize()
                             ) {
-                                ChildProfileScreen(childId = childId)
+                                ChildProfileScreen(childId = childId, navController = navController)
                             }
 
 
