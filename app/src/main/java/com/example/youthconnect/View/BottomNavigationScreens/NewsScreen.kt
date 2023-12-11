@@ -59,6 +59,7 @@ import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
+import com.example.youthconnect.ViewModel.signUpViewModel
 
 
 @SuppressLint("SuspiciousIndentation", "UnrememberedMutableState")
@@ -70,13 +71,31 @@ fun NewsScreen(
 ) {
 
     var news by remember { mutableStateOf<List<News?>>(emptyList()) }
-
+    var user by remember { mutableStateOf<String?>("") }
 
     val NewsViewModel : NewsViewModel = hiltViewModel()
+    val UserViewModel : UserViewModel = hiltViewModel()
+
+    val documentExists = remember { mutableStateOf("-1") }
+    var result by remember { mutableStateOf<String?>("") }
+
 
     LaunchedEffect(NewsViewModel) {
         try {
             news = NewsViewModel.getAllNews()
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
+        }
+    }
+
+    LaunchedEffect(UserViewModel) {
+        try {
+            user = UserViewModel.getCurrentUser()
+            result = user?.let { UserViewModel.findDocument(it) }
+
+            if (result != null) {
+                documentExists.value = result.toString()
+            }
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -134,8 +153,10 @@ fun NewsScreen(
                         .padding(start = 15.dp, top = 10.dp )
                 )
 
-                val dataBase = DataBase()
-               userImage(user = dataBase.getCurrentUserId(), navController = navController )
+
+
+
+                userImage(user = user.toString(), navController = navController , documentExists.value)
 
 
             }
@@ -201,25 +222,17 @@ fun NewsScreen(
 
 @Composable
 fun userImage(user: String,
-              navController: NavHostController){
-    val documentExists = remember { mutableStateOf("-1") }
-    val UserViewModel : UserViewModel = hiltViewModel()
-    LaunchedEffect(UserViewModel) {
-        val result = UserViewModel.findDocument(user)
-        if (result != null) {
-            documentExists.value = result
-        }
-    }
-
+              navController: NavHostController,
+              documentExists : String){
 
     Box(
         modifier = Modifier
             .size(50.dp)
             .clickable {
 
-                if (documentExists.value == "0") {
+                if (documentExists == "0") {
                     navController.navigate("instructor_profile_screen/${user}")
-                } else if (documentExists.value == "1") {
+                } else if (documentExists == "1") {
                     navController.navigate("parent_profile_screen/${user}")
                 } else {
                     navController.navigate("child_profile_screen/${user}")

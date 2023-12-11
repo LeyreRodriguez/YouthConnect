@@ -1,5 +1,6 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +33,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,10 +41,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -57,8 +62,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.youthconnect.Model.Object.Child
+import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.UserViewModel
+import com.example.youthconnect.ViewModel.signUpViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 
@@ -124,7 +131,7 @@ fun SearchView(
 }
 
 @Composable
-fun ChildListScreen(navController : NavController){
+fun ChildListScreen(navController : NavController, instructorID: String){
 
 /*
     val childViewModel: ChildViewModel = viewModel()
@@ -132,6 +139,8 @@ fun ChildListScreen(navController : NavController){
 */
     val UserViewModel : UserViewModel = hiltViewModel()
     var childs by remember { mutableStateOf<List<Child?>>(emptyList()) }
+    var instructor by remember { mutableStateOf<Instructor?>(null) }
+    var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
 
 /*
     LaunchedEffect(Unit) {
@@ -142,6 +151,10 @@ fun ChildListScreen(navController : NavController){
     LaunchedEffect(UserViewModel) {
         try {
             childs = UserViewModel.getAllChildren()
+            instructor = UserViewModel.getCurrentInstructorById(instructorID)
+            myKids = UserViewModel.getChildByInstructorId(instructorID)
+            println("holaaaa")
+            println(myKids)
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -202,27 +215,17 @@ fun ChildListScreen(navController : NavController){
 
                     val searchedText = textState.value.text
 
-                    /*
+
                     LazyColumn(modifier = Modifier.padding(10.dp)) {
-                        items(items = childState.filter {
-                            it.FullName.contains(searchedText, ignoreCase = true)
-                        }, key = { it.ID }) { item ->
-                            list(navController = navController, item)
-                        }
-                    }
-
-
-                     */
-
-                    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-                        items(items = childs) { item ->
+                        items(items = childs.filter {
+                            it?.FullName?.contains(searchedText, ignoreCase = true) ?: false
+                        }, key = { it?.ID ?: "" }) { item ->
                             if (item != null) {
-                                user(navController = navController, item)
+                                list(navController = navController, item, instructorID, myKids)
                             }
                         }
-
-
                     }
+
                 }
 
             }
@@ -238,8 +241,18 @@ fun ChildListScreen(navController : NavController){
 
 
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
-fun list(navController: NavHostController, child: Child) {
+fun list(navController: NavController, child: Child, instructorID: String, myKids: List<Child?>) {
+
+    val SignUpViewModel: signUpViewModel = hiltViewModel()
+
+    var isChecked by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = child.ID, key2 = myKids) {
+        isChecked = myKids.any { it?.ID == child.ID }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -252,49 +265,42 @@ fun list(navController: NavHostController, child: Child) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .border(
-                            BorderStroke(4.dp, remember {
-                                Brush.sweepGradient(
-                                    listOf(
-                                        Green, Red
-                                    )
-                                )
-                            }),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                )
+            Image(
+                painter = painterResource(id = R.drawable.user_icon),
+                contentDescription = "icon",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(50.dp)
+                    .border(
+                        BorderStroke(4.dp, SolidColor(if (child.GoOutAlone) Green else Red)),
+                        CircleShape
+                    )
+                    .padding(4.dp)
+                    .clip(CircleShape)
+            )
 
-                Text(
-                    text = child.FullName,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    ),
-                    modifier = Modifier.padding(start = 10.dp),
-                    textAlign = TextAlign.End
-                )
-            }
+            Text(
+                text = child.FullName,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                ),
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
+                    .weight(1f),
+                textAlign = TextAlign.Start
+            )
 
-            val checked = remember { mutableStateOf(true) }
             Checkbox(
-                checked = checked.value,
-                onCheckedChange = { checked.value = it }
+                checked = isChecked,
+                onCheckedChange = { newCheckedState ->
+                    isChecked = newCheckedState
+                    SignUpViewModel.selectChild(child, instructorID, newCheckedState)
+                },
+                modifier = Modifier.padding(end = 8.dp)
             )
         }
     }
 }
-

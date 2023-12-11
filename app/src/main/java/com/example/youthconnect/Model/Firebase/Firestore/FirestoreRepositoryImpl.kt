@@ -19,6 +19,20 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
     override val dataBase: FirebaseFirestore?
         get() = firebaseFirestore
 
+    val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    override suspend fun getCurrentUser() : String? {
+        var user = auth.currentUser;
+        if (user != null) {
+            val email = user.email
+
+            val numeroConvertido = email?.substringBefore("@").toString().dropLast(1) + email?.substringBefore("@").toString().takeLast(1).uppercase()
+            return  numeroConvertido
+
+        } else {
+            return ""
+        }
+    }
+
 
     override suspend fun getChild(childId: String): Child? {
         return try {
@@ -33,7 +47,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 GoOutAlone = document.getBoolean("goOutAlone") ?: false,
                 Observations = document.getString("observations") ?: "",
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                InstructorID = document.getString("instructorID") ?: ""
+                InstructorID = document.getString("instructorID") ?: "",
+                State = document.getBoolean("State") ?: false
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -58,7 +73,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         GoOutAlone = document.getBoolean("goOutAlone") ?: false,
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                        InstructorID = document.getString("instructorID") ?: ""
+                        InstructorID = document.getString("instructorID") ?: "",
+                        State = document.getBoolean("State") ?: false
                     )
                 }
         } catch (e: Exception) {
@@ -85,7 +101,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         GoOutAlone = document.getBoolean("goOutAlone") ?: false,
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                        InstructorID = document.getString("instructorID") ?: ""
+                        InstructorID = document.getString("instructorID") ?: "",
+                        State = document.getBoolean("State") ?: false
                     )
                 }
         } catch (e: Exception) {
@@ -112,7 +129,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         GoOutAlone = document.getBoolean("goOutAlone") ?: false,
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                        InstructorID = document.getString("instructorID") ?: ""
+                        InstructorID = document.getString("instructorID") ?: "",
+                        State = document.getBoolean("State") ?: false
                     )
                 }
         } catch (e: Exception) {
@@ -133,7 +151,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 GoOutAlone = document.getBoolean("goOutAlone") ?: false,
                 Observations = document.getString("observations") ?: "",
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                InstructorID = document.getString("instructorID") ?: ""
+                InstructorID = document.getString("instructorID") ?: "",
+                State = document.getBoolean("State") ?: false
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -175,6 +194,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
     }
 
     override suspend fun findDocument(userId: String): String? {
+        Log.e("OWO", userId)
         return withContext(Dispatchers.IO) {
             try {
                 val childDocRef = firebaseFirestore.collection("Child").document(userId).get().await()
@@ -310,6 +330,35 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
             .set(instructor)
 
     }
+
+    override suspend fun changeState(childId: String) {
+        try {
+            val childDocumentRef = firebaseFirestore.collection("Child").document(childId)
+            val childDocument = childDocumentRef.get().await()
+
+            val currentState = childDocument.getBoolean("State") ?: false
+
+            // Cambiar el valor de State al opuesto del estado actual
+            childDocumentRef.update("State", !currentState).await()
+
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "toggleChildState failed with $e")
+        }
+    }
+
+    override suspend fun addInstructorToChild(child: Child, instructorID: String) {
+        val childDocument = firebaseFirestore.collection("Child").document(child.ID)
+        // Actualizar el valor de instructorId en el documento
+        childDocument.update("instructorID", instructorID)
+
+    }
+
+    override suspend fun removeInstructorFromChild(child: Child, instructorID: String) {
+        val childDocument = firebaseFirestore.collection("Child").document(child.ID)
+        // Actualizar el valor de instructorId en el documento
+        childDocument.update("instructorID", "")
+    }
+
 
 
 }

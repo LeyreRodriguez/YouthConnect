@@ -182,7 +182,8 @@ fun SignUpView( navController: NavController) {
                 goOutAlone,
                 observations,
                 parentsID,
-                "")
+                "",
+                false)
 
             signUpViewModel.registerUser(childID, childPassword)
             signUpViewModel.registerUser(parentID, password)

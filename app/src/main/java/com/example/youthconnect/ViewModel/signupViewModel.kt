@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,6 +40,9 @@ class signUpViewModel @Inject constructor(
     val emailService by lazy {
         EmailAuthUiClient(auth)
     }
+
+    private val _updatedState = MutableStateFlow<Boolean?>(null)
+    val updatedState: StateFlow<Boolean?> = _updatedState.asStateFlow()
 
     fun changeScreen(){
         if(_showFirstScreen2.value){
@@ -91,6 +95,26 @@ class signUpViewModel @Inject constructor(
             firestoreRepository.addInstructor(instructor)
         }
     }
+
+
+    fun selectChild(child :Child, instructorID: String, isChecked:Boolean){
+        viewModelScope.launch {
+            if (isChecked) {
+                // Si el checkbox está marcado, agrega al instructor al niño
+                firestoreRepository.addInstructorToChild(child, instructorID)
+
+           //     _updatedState.value = true
+            } else {
+                // Si el checkbox está desmarcado, elimina al instructor del niño
+                firestoreRepository.removeInstructorFromChild(child, instructorID)
+
+           //     _updatedState.value = false
+            }
+        }
+    }
+
+
+
 
 
 

@@ -34,6 +34,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -195,7 +196,7 @@ fun ParentsProfileScreen(parentId : String,
                     LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
                         items(items = children) { item ->
                             if (item != null) {
-                                user(navController = navController, item)
+                                MyChildren(navController = navController, item)
                             }
                         }
                     }
@@ -211,131 +212,10 @@ fun ParentsProfileScreen(parentId : String,
 
 
 
-@Preview(showBackground = true)
-@Composable
 
-fun ParentsProfileView(){
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-            onDraw = {
-                // Dibuja un rectángulo blanco como fondo
-                drawRect(Color.White)
-
-                // Define el pincel para el borde con el gradiente del Brush
-                val borderBrush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFFE15554),
-                        Color(0xFF3BB273),
-                        Color(0xFFE1BC29),
-                        Color(0xFF4D9DE0)
-                    )
-                )
-
-                // Dibuja el borde con el pincel definido
-                drawRect(
-                    brush = borderBrush,
-                    topLeft = Offset(0f, 0f),
-                    size = Size(size.width, size.height),
-                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                )
-            }
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(15.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center
-        ) {
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()) {
-                val configuration = LocalConfiguration.current
-                val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(150.dp)
-                        .border(
-                            BorderStroke(4.dp, remember {
-                                Brush.sweepGradient(
-                                    listOf(
-                                        Green, Red
-                                    )
-                                )
-                            }),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                )
-
-                Text(
-                    text = "Juana Teresa Quintana Monroy",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF000000),
-                        letterSpacing = 0.9.sp,
-                    ), modifier = Modifier
-                        .padding(start = 15.dp, top = 10.dp)
-                )
-
-
-
-                Spacer(modifier = Modifier.size(40.dp))
-            }
-
-
-
-            Column ( modifier = Modifier.fillMaxWidth()
-            ){
-                Text(
-                    text = "My kids",
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF000000),
-                        letterSpacing = 0.9.sp,
-                    ), modifier = Modifier
-                        .padding(start = 15.dp, top = 10.dp)
-                )
-
-
-                val childState = listOf<String>("Florencio Rodriguez Rodriguez", "Juani Quintana Monroy")
-
-                val child = Child("Leyre Rodriguez Quintana",
-                    "54148418R",
-                    "4ºESO",
-                    "Lr#575098",
-                    false,
-                    false,
-                    false,
-                    null,
-                    listOf("45534729L", "45854715D"),
-                    "45854785H")
-                LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-                    items(items = childState) { item ->
-                        user(navController = rememberNavController(), child)
-                    }
-                }
-            }
-
-        }
-
-
-    }
-}
 
 @Composable
-fun user(navController: NavController, child: Child){
+fun MyChildren(navController: NavController, child: Child){
 
     Card(
         modifier = Modifier
@@ -352,25 +232,35 @@ fun user(navController: NavController, child: Child){
                 .padding(16.dp)
         ) {
 
-            Image(
-                painter = painterResource(id = R.drawable.user_icon),
-                contentDescription = "icon",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(30.dp)
-                    .border(
-                        BorderStroke(4.dp, remember {
-                            Brush.sweepGradient(
-                                listOf(
-                                    Green, Red
-                                )
-                            )
-                        }),
-                        CircleShape
-                    )
-                    .padding(4.dp)
-                    .clip(CircleShape)
-            )
+            if(child.GoOutAlone) {
+                Image(
+                    painter = painterResource(id = R.drawable.user_icon),
+                    contentDescription = "icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .border(
+                            BorderStroke(4.dp, SolidColor(Green)),
+                            CircleShape
+                        )
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.user_icon),
+                    contentDescription = "icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(30.dp)
+                        .border(
+                            BorderStroke(4.dp, SolidColor(Red)),
+                            CircleShape
+                        )
+                        .padding(4.dp)
+                        .clip(CircleShape)
+                )
+            }
 
             Text(
                 text = child.FullName,
@@ -381,6 +271,30 @@ fun user(navController: NavController, child: Child){
                 modifier = Modifier.padding(start = 10.dp)
 
             )
+
+            if(child.State){
+                Text(
+                    text = "Inside",
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    ),
+                    modifier = Modifier.padding(start = 10.dp)
+
+                )
+            }else{
+
+                Text(
+                    text = "Outside",
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    ),
+                    modifier = Modifier.padding(start = 10.dp)
+
+                )
+
+            }
 
 
 

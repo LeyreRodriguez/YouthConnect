@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 interface FirestoreRepository {
     val dataBase: FirebaseFirestore?
 
+    suspend fun getCurrentUser() : String?
     suspend fun getChild(childId: String): Child?
     suspend fun getAllChildren(): List<Child?>
 
@@ -32,6 +33,11 @@ interface FirestoreRepository {
     suspend fun addChild(child: Child)
     suspend fun addParent(parent: Parent)
     suspend fun addInstructor(instructor: Instructor)
+
+    suspend fun changeState(childId : String)
+
+    suspend fun addInstructorToChild(child: Child, instructorID: String)
+    suspend fun removeInstructorFromChild(child: Child, instructorID: String)
 
 
 }

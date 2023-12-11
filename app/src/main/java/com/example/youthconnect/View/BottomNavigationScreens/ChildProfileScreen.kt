@@ -33,6 +33,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
@@ -121,25 +122,35 @@ fun ChildProfileScreen(
 
                 val configuration = LocalConfiguration.current
                 val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(150.dp)
-                        .border(
-                            BorderStroke(4.dp, remember {
-                                Brush.sweepGradient(
-                                    listOf(
-                                        Green, Red
-                                    )
-                                )
-                            }),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                )
+                if(child?.GoOutAlone == true) {
+                    Image(
+                        painter = painterResource(id = R.drawable.user_icon),
+                        contentDescription = "icon",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(150.dp)
+                            .border(
+                                BorderStroke(4.dp, SolidColor(Green)),
+                                CircleShape
+                            )
+                            .padding(4.dp)
+                            .clip(CircleShape)
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.user_icon),
+                        contentDescription = "icon",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(150.dp)
+                            .border(
+                                BorderStroke(4.dp, SolidColor(Red)),
+                                CircleShape
+                            )
+                            .padding(4.dp)
+                            .clip(CircleShape)
+                    )
+                }
 
                 child?.FullName?.let {
                     Text(
@@ -169,7 +180,20 @@ fun ChildProfileScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.size(40.dp))
+                child?.Observations?.let {
+                    Text(
+                        text = it,
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF000000),
+                            letterSpacing = 0.9.sp,
+                        ), modifier = Modifier
+                            .padding(start = 15.dp, top = 10.dp)
+                    )
+                }
+
 
                 Text(
                     text = "LogOut",
@@ -238,8 +262,8 @@ fun ChildProfileScreen(
                 }
 
                 Spacer(modifier = Modifier.size(40.dp))
-
-                child?.ID?.let { DisplayQRCode(it) }
+               // Log.i("AWA", child.ID)
+                DisplayQRCode(childId)
 
             }
         }

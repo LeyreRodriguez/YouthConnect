@@ -40,16 +40,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
+import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.signUpViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddInstructorScreen(signUpViewModel: signUpViewModel = viewModel()){
+fun AddInstructorScreen(){
+
+    val signUpViewModel : signUpViewModel = hiltViewModel()
 
     var InstructorFullName by remember { mutableStateOf("") }
     var InstructorID  by remember { mutableStateOf("") }
@@ -60,6 +66,8 @@ fun AddInstructorScreen(signUpViewModel: signUpViewModel = viewModel()){
 
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
+
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -149,20 +157,8 @@ fun AddInstructorScreen(signUpViewModel: signUpViewModel = viewModel()){
                         InstructorPassword
                     )
 
+                    signUpViewModel.registerUser(InstructorID, InstructorPassword)
                     signUpViewModel.addInstructor(instructor)
-
-                    InstructorFullName = ""
-                    InstructorID = ""
-                    InstructorPassword = ""
-
-                    showMessage = true
-
-                    coroutineScope.launch {
-                        if (showMessage) {
-                            delay(3000)
-                            showMessage = false
-                        }
-                    }
 
                 },
                 modifier = Modifier

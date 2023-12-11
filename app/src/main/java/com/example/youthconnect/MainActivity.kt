@@ -1,23 +1,47 @@
 package com.example.youthconnect
 
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,6 +51,7 @@ import androidx.navigation.navArgument
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Firebase.Authentication.GoogleAuthUiClient
+import com.example.youthconnect.View.BottomNavigationScreens.AddInstructorScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildListScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildProfileScreen
@@ -38,15 +63,67 @@ import com.example.youthconnect.View.BottomNavigationScreens.ParentsProfileScree
 import com.example.youthconnect.View.BottomNavigationScreens.QuizScreen
 import com.example.youthconnect.View.BottomNavigationScreens.SignUpView
 import com.example.youthconnect.View.Components.BottomNavigation
+import com.example.youthconnect.ViewModel.UserViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+
+    private var textResult = mutableStateOf("")
+
+    private val barCodeLauncher = registerForActivityResult(ScanContract()) { result ->
+        if(result.contents == null){
+            Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
+        } else{
+            textResult.value = result.contents
+        }
+    }
+    private fun showCamera(){
+        val options = ScanOptions()
+        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+        options.setPrompt("Scan a QR code")
+        options.setCameraId(0)
+        options.setBeepEnabled(false)
+        options.setOrientationLocked(false)
+
+        barCodeLauncher.launch(options)
+
+
+
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+            isGranted ->
+        if(isGranted){
+            showCamera()
+        }
+    }
+
+    fun checkCameraPermission(context: Context) {
+        if(ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            showCamera()
+        } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)){
+            Toast.makeText(this@MainActivity, "Camera Required", Toast.LENGTH_SHORT).show()
+        } else {
+            requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+        }
+    }
+
+
     val db = Firebase.firestore
 
     public val googleAuthUiClient by lazy {
@@ -122,6 +199,15 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("signup") { SignUpView(navController = navController) }
+
+                    composable("qr") {
+                        checkCameraPermission(this@MainActivity )
+                        val mcontext = LocalContext.current
+                        if ( textResult.value.isNotEmpty()) {
+                            //  QrScannerScreen(navController,textResult.value)
+
+                            QrScannerScreen(textResult.value, navController)
+                        } }
                 }
                 navigation(
                     startDestination = NavScreen.NewsScreen.name,
@@ -184,9 +270,13 @@ class MainActivity : ComponentActivity() {
 
                     }
 
-              //      composable(NavScreen.AddInstructor.name){ AddInstructorScreen() }
 
-                    composable(NavScreen.ChildList.name){
+
+                    composable(
+                        route = NavScreen.ChildList.name +"/{instructorID}",
+                        arguments = listOf(navArgument("instructorID") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val instructorID = backStackEntry.arguments?.getString("instructorID") ?: ""
                         Scaffold(
                             bottomBar = {
                                 BottomNavigation(navController)
@@ -197,8 +287,28 @@ class MainActivity : ComponentActivity() {
                                     .padding(padding)
                                     .fillMaxSize()
                             ) {
-                               // Log.w("HOLA", "TUS MUERTIS AUN MAS")
-                                ChildListScreen(navController = navController)
+                                ChildListScreen(navController = navController, instructorID = instructorID)
+                            }
+
+
+                        }
+
+
+                    }
+
+                    composable(NavScreen.AddInstructor.name){
+                        Scaffold(
+                            bottomBar = {
+                                BottomNavigation(navController)
+                            }
+                        ) {padding->
+                            Box(
+                                modifier = Modifier
+                                    .padding(padding)
+                                    .fillMaxSize()
+                            ) {
+                                // Log.w("HOLA", "TUS MUERTIS AUN MAS")
+                                AddInstructorScreen()
                             }
 
 
@@ -316,59 +426,71 @@ class MainActivity : ComponentActivity() {
 }
 
 
-/*
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
 
-            YouthconnectTheme {
-                // A surface container using the 'background' color from the theme
-
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-
-                    val extras = intent.extras
-                    var textResult: String? = null
-
-                    if (extras != null) {
-                        textResult = extras.getString("TEXT_RESULT")
-                        Log.d("MainActivity", "Received Text Result: $textResult")
-                    } else {
-                        Log.d("MainActivity", "No extras received")
-                    }
-
-                    MainScreen(textResult)
-
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(textResult : String? = null) {
-    val navController = rememberNavController()
+fun QrScannerScreen( childId : String, navController: NavController){
+    val mcontext = LocalContext.current
+    Log.i("OWO", childId)
 
-    Scaffold(
-        bottomBar = {
-            BottomNavigation(navController)
+
+    val UserViewModel : UserViewModel = hiltViewModel()
+
+    LaunchedEffect(UserViewModel) {
+        try {
+            UserViewModel.changeState(childId)
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
         }
-    ) {padding->
-        Box(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-        ) {
-            HomeNavigation(navController = navController, textResult)
-        }
-
-
     }
+
+    Column(modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center){
+        Button(
+            onClick = {
+                navController.navigate("qr")
+            },
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .height(56.dp)
+                .clip(RoundedCornerShape(8.dp))
+            //   .background(Color(0xFF00FF00))
+        ) {
+            Text(
+                text = "Escanear otro QR",
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.White,
+                    letterSpacing = 0.3.sp,
+                )
+            )
+        }
+
+
+        Button(
+            onClick = {
+                navController.navigate("child_profile_screen/${childId}")
+            },
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .height(56.dp)
+                .clip(RoundedCornerShape(8.dp))
+            //   .background(Color(0xFF00FF00))
+        ) {
+            Text(
+                text = childId,
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.White,
+                    letterSpacing = 0.3.sp,
+                )
+            )
+        }
+    }
+
 }
-
-*/
-
