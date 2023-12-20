@@ -3,6 +3,8 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -22,6 +24,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.SnackbarResult
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,16 +61,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.libraryapp.viewModel.LoginViewModel
+import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 
 import com.example.youthconnect.R
+import com.example.youthconnect.ViewModel.ImageViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import com.example.youthconnect.ViewModel.UserViewModel
-
-
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -76,9 +82,14 @@ fun InstructorProfileScreen(instructorId : String,
 ) {
 
     val UserViewModel : UserViewModel = hiltViewModel()
+    val ImageViewModel : ImageViewModel = hiltViewModel()
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
-    Log.i("AWA", instructorId)
+
+    val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
+
+
     LaunchedEffect(UserViewModel) {
         try {
             instructor = UserViewModel.getCurrentInstructorById(instructorId)
@@ -86,6 +97,14 @@ fun InstructorProfileScreen(instructorId : String,
             Log.i("InstructorProfileScreen", "Instructor: $instructor, Children: $children")
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching data", e)
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ){ imageUri ->
+        imageUri?.let {
+            ImageViewModel.addUserPhotoToStorage(imageUri,instructorId)
         }
     }
 
@@ -160,7 +179,7 @@ fun InstructorProfileScreen(instructorId : String,
                     val configuration = LocalConfiguration.current
                     val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
                     Image(
-                        painter = painterResource(id = R.drawable.user_icon),
+                        painter =   painterResource(id = R.drawable.user_icon),
                         contentDescription = "icon",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -177,7 +196,12 @@ fun InstructorProfileScreen(instructorId : String,
                             )
                             .padding(4.dp)
                             .clip(CircleShape)
+                            .clickable {
+                                galleryLauncher.launch(Constants.ALL_IMAGES)
+                            }
                     )
+
+
 //                    Log.i("UWU", instructor!!.fullName)
                     instructor?.FullName?.let {
 

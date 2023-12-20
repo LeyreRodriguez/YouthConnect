@@ -22,6 +22,8 @@ interface FirestoreRepository {
     suspend fun getAllNews() : List<News?>
     suspend fun getNewsById(newsId: String) : News?
 
+    suspend fun addNews(news : News)
+
     suspend fun findDocument(userId : String) : String?
 
     suspend fun getCurrentUserById(parentID : String) : Parent?

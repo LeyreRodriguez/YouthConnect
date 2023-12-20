@@ -22,7 +22,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,12 +59,10 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
-import com.example.youthconnect.Model.DataBase
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
-import com.example.youthconnect.ViewModel.signUpViewModel
 
 
 @SuppressLint("SuspiciousIndentation", "UnrememberedMutableState")
@@ -105,6 +108,9 @@ fun NewsScreen(
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
+
+
+
         Canvas(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
@@ -130,6 +136,10 @@ fun NewsScreen(
                 )
             }
         )
+
+
+
+
 
 
 
@@ -205,12 +215,40 @@ fun NewsScreen(
                         .padding(start = 15.dp, top = 10.dp )
                 )
 
-                RecyclerView(news = news, navController = navController)
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.BottomEnd
+                ){
+
+                    RecyclerView(news = news, navController = navController)
+
+                    if (documentExists.value == "0") {
+
+                        FloatingButton {
+                            // Aquí puedes agregar la lógica que se activará al hacer clic en el botón
+                            // Por ejemplo, puedes navegar a una nueva pantalla
+                            navController.navigate("addNews")
+                        }
+
+
+                    }
+
+
+                }
+
+
+
+
 
 
             }
 
+
+
+
         }
+
+
 
 
     }
@@ -270,25 +308,26 @@ fun ListItem(news: News, navController: NavHostController) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-
-
                 navController.navigate("news_details_screen/${news.id}")
             }
+            .padding(bottom = 4.dp)
 
     ) {
         Row(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            CoilImage(
-                imageUrl = news.Image,
-                contentDescription = null,
-                modifier = Modifier
-                    .height(100.dp),
-                contentScale = ContentScale.Crop,
-                width = Dp(100.0F),
-                height = Dp(100.0F)
-            )
+            news.Image?.let {
+                CoilImage(
+                    imageUrl = it,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .height(100.dp),
+                    contentScale = ContentScale.Crop,
+                    width = Dp(100.0F),
+                    height = Dp(100.0F)
+                )
+            }
 
             Column{
                 Text(
@@ -308,10 +347,13 @@ fun ListItem(news: News, navController: NavHostController) {
                         news.Description
                     }
                 )
+
+
             }
 
 
         }
+
     }
 }
 
@@ -357,6 +399,18 @@ fun RecyclerView(
                 ListItem(news = item, navController = navController)
             }
         }
+    }
+}
+
+
+@Composable
+fun FloatingButton(onClick: () -> Unit) {
+    SmallFloatingActionButton(
+        onClick = { onClick() },
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.secondary
+    ) {
+        Icon(Icons.Filled.Add, "Small floating action button.")
     }
 }
 

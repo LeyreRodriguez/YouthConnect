@@ -52,6 +52,7 @@ import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Firebase.Authentication.GoogleAuthUiClient
 import com.example.youthconnect.View.BottomNavigationScreens.AddInstructorScreen
+import com.example.youthconnect.View.BottomNavigationScreens.AddNews
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildListScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildProfileScreen
@@ -200,6 +201,8 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("signup") { SignUpView(navController = navController) }
 
+
+
                     composable("qr") {
                         checkCameraPermission(this@MainActivity )
                         val mcontext = LocalContext.current
@@ -213,6 +216,27 @@ class MainActivity : ComponentActivity() {
                     startDestination = NavScreen.NewsScreen.name,
                     route = "secondScreens"
                 ){
+
+                    composable("addNews") {
+                        Scaffold(
+                            bottomBar = {
+                                BottomNavigation(navController)
+                            }
+                        ) {padding->
+                            Box(
+                                modifier = Modifier
+                                    .padding(padding)
+                                    .fillMaxSize()
+                            ) {
+                                AddNews()
+                            }
+
+
+                        }
+
+
+                    }
+
                     composable(NavScreen.NewsScreen.name){
 
                         Scaffold(

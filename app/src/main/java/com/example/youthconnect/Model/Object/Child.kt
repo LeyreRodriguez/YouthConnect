@@ -11,6 +11,7 @@ data class Child(
     val Observations: String? = null,
     val ParentID: List<String>,
     val InstructorID: String,
-    val State : Boolean
+    val State : Boolean,
+    val Image: String? = null
 )
 

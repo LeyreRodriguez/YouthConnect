@@ -11,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.util.UUID
 import javax.inject.Inject
 
 
@@ -191,6 +192,24 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
             Log.e("FirestoreRepository", "getChild failed with $e")
             null
         }
+    }
+
+    override suspend fun addNews(news : News) {
+        val randomDocumentId = UUID.randomUUID().toString()
+
+        val documentRef: DocumentReference = firebaseFirestore.collection("News").document(randomDocumentId)
+
+        // Realiza la consulta para obtener el documento
+        documentRef.get()
+            .addOnSuccessListener { document ->
+
+                    firebaseFirestore.collection("News")
+                        .document(randomDocumentId)
+                        .set(news)
+
+
+            }
+
     }
 
     override suspend fun findDocument(userId: String): String? {
