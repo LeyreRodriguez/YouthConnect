@@ -1,7 +1,7 @@
 package com.example.youthconnect.Model.Firebase.Authentication
 
 import com.example.libraryapp.model.firebaseAuth.SignInResult
-import com.example.libraryapp.model.firebaseAuth.UserData
+import com.example.youthconnect.Model.Object.UserData
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 import java.util.concurrent.CancellationException
@@ -17,8 +17,8 @@ class EmailAuthUiClient (
                 data = user?.run {
                     UserData(
                         userId = uid,
-                        userName = displayName
-                     //   profilePictureUrl = photoUrl?.toString()
+                        userName = displayName,
+                        profilePictureUrl = photoUrl?.toString()
                     )
                 },
                 errorMessage = null

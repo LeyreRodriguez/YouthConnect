@@ -5,6 +5,7 @@ import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
+import com.example.youthconnect.Model.Object.UserData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -378,6 +379,17 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
         childDocument.update("instructorID", "")
     }
 
+    override suspend fun getUser(): UserData? {
+        return auth.currentUser?.run {
+            UserData(
+                userId = uid,
+                userName = displayName,
+                profilePictureUrl = photoUrl?.toString()
+            )
+
+        }
+
+    }
 
 
 }

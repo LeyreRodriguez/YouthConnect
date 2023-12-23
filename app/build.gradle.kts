@@ -166,6 +166,33 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-pager:0.32.0")
 
+
+//Progress bar
+    implementation ("androidx.activity:activity-ktx:1.4.0")
+
+    implementation ("androidx.activity:activity-ktx:1.4.0")
+
+    implementation ("io.ktor:ktor-client-android:2.3.6")
+    implementation ("io.ktor:ktor-client-json-jvm:2.3.6")
+    implementation ("io.ktor:ktor-client-serialization-jvm:2.3.6")
+    implementation("io.ktor:ktor-server-content-negotiation:2.3.6")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.6")
+
+
+    implementation ("com.google.accompanist:accompanist-pager:0.32.0")
+
+    //Accompanist
+    implementation ("com.google.accompanist:accompanist-permissions:0.31.3-beta")
+    implementation ("com.vanniktech:android-image-cropper:4.5.0")
+
+    implementation("androidx.compose.runtime:runtime-livedata:1.3.2")
+    implementation ("com.google.firebase:firebase-analytics:21.5.0")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics")
+
+
+
+
 }
 
 kapt {

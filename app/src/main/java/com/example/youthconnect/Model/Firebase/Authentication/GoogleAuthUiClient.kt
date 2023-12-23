@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import com.example.libraryapp.model.firebaseAuth.SignInResult
-import com.example.libraryapp.model.firebaseAuth.UserData
+import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.signin.internal.SignInClientImpl
@@ -46,6 +46,7 @@ class GoogleAuthUiClient (
                     UserData(
                         userId = uid,
                         userName = displayName,
+                        profilePictureUrl = photoUrl?.toString()
 
                     )
                 },
@@ -76,6 +77,7 @@ class GoogleAuthUiClient (
         UserData(
             userId = uid,
             userName = displayName,
+            profilePictureUrl = photoUrl?.toString()
 
         )
     }

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.libraryapp.model.firebaseAuth.SignInResult
 import com.example.libraryapp.model.firebaseAuth.SignInState
-import com.example.libraryapp.model.firebaseAuth.UserData
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -46,30 +45,7 @@ class LoginViewModel: ViewModel() {
         Log.d("LoginViewModel", "Email actualizado: $newEmail, contraseña : $newPassword")
     }
 
-    /*
-    suspend fun signInWithEmail(email: String, password: String): SignInResult {
-        return try {
-            val user = auth.signInWithEmailAndPassword(email, password).await().user
-            SignInResult(
-                data = user?.run {
-                    UserData(
-                        userId = uid,
-                        userName = displayName,
-                        profilePictureUrl = photoUrl?.toString()
-                    )
-                },
-                errorMessage = null
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (e is CancellationException) throw e
-            SignInResult(
-                data = null,
-                errorMessage = e.message
-            )
-        }
-    }
-    */
+
     fun signInWithEmail(email: String, passworld: String, home: () -> Unit) = viewModelScope.launch{
         try {
             auth.signInWithEmailAndPassword(email, passworld)

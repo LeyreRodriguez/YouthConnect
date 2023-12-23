@@ -1,9 +1,11 @@
 package com.example.youthconnect.Model.Firebase.Firestore
 
+
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
+import com.example.youthconnect.Model.Object.UserData
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -40,6 +42,8 @@ interface FirestoreRepository {
 
     suspend fun addInstructorToChild(child: Child, instructorID: String)
     suspend fun removeInstructorFromChild(child: Child, instructorID: String)
+
+    suspend fun getUser() : UserData?
 
 
 }
