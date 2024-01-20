@@ -1,7 +1,13 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -19,6 +25,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +46,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -47,10 +56,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Parent
@@ -82,7 +93,149 @@ fun ChildProfileScreen(
         }
     }
 
-        Box(
+
+    val context = LocalContext.current
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var showImagePickerDialog by remember { mutableStateOf(false) }
+
+
+    val imageUrlState = remember { mutableStateOf("") }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                UserViewModel.getProfileImage(
+                    onSuccess = { fetchedUrl ->
+                        imageUrlState.value = fetchedUrl
+                        Toast.makeText(
+                            context,
+                            "Imagen Actualizada",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    },
+                    onFailure = { exception ->
+                        Toast.makeText(
+                            context,
+                            "Error al bajar la imagen",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                )
+            }, onFailure = { exception ->
+                Toast.makeText(
+                    context,
+                    "Error al subir la imagen",
+                    Toast.LENGTH_LONG
+                ).show()
+            })
+        }
+    }
+
+    // Lanzador para tomar foto con la cámara
+    val takePictureLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+            // Aquí manejas la imagen capturada usando imageUri
+            imageUri?.let { uri ->
+                UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                    UserViewModel.getProfileImage(
+                        onSuccess = { fetchedUrl ->
+                            imageUrlState.value = fetchedUrl
+                            Toast.makeText(
+                                context,
+                                "Imagen Actualizada",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        },
+                        onFailure = { exception ->
+                            Toast.makeText(
+                                context,
+                                "Error al bajar la imagen",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    )
+                }, onFailure = { exception ->
+                    Toast.makeText(
+                        context,
+                        "Error al subir la imagen",
+                        Toast.LENGTH_LONG
+                    ).show()
+                })
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        UserViewModel.getProfileImage(
+            onSuccess = { url ->
+                imageUrlState.value = url
+            },
+            onFailure = { exception ->
+                // Manejar el error, por ejemplo, mostrar un mensaje
+            }
+        )
+    }
+
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted: Boolean ->
+            if (isGranted) {
+                // Permiso concedido, proceder con la acción
+                imageUri = UserViewModel.createImageUri(context)
+                imageUri?.let { uri ->
+                    takePictureLauncher.launch(uri)
+                }
+            } else {
+                // Permiso denegado, mostrar un mensaje
+                Toast.makeText(
+                    context,
+                    "No se puede abrir la cámara",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    )
+
+
+    if (showImagePickerDialog) {
+        AlertDialog(
+            onDismissRequest = { showImagePickerDialog = false },
+            title = { Text("Seleccionar Imagen") },
+            text = { Text("Elige de dónde quieres seleccionar la imagen.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    imagePickerLauncher.launch("image/*")
+                    showImagePickerDialog = false
+                }) {
+                    Text("Galería")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    when (PackageManager.PERMISSION_GRANTED) {
+                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                            // Permiso ya concedido, proceder con la acción
+                            imageUri = UserViewModel.createImageUri(context)
+                            imageUri?.let { uri ->
+                                takePictureLauncher.launch(uri)
+                            }
+                        }
+                        else -> {
+                            // Solicitar permiso
+                            permissionLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                    }
+                    showImagePickerDialog = false
+                }) {
+                    Text("Cámara")
+                }
+            }
+        )
+    }
+
+
+    Box(
             modifier = modifier.fillMaxSize(),
         ) {
             Canvas(
@@ -123,10 +276,12 @@ fun ChildProfileScreen(
                 val configuration = LocalConfiguration.current
                 val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
                 if(child?.GoOutAlone == true) {
-                    Image(
-                        painter = painterResource(id = R.drawable.user_icon),
-                        contentDescription = "icon",
-                        contentScale = ContentScale.Crop,
+
+
+                    // Profile Image
+                    AsyncImage(
+                        model = imageUrlState.value,
+                        contentDescription = "Profile Picture",
                         modifier = Modifier
                             .size(150.dp)
                             .border(
@@ -135,12 +290,18 @@ fun ChildProfileScreen(
                             )
                             .padding(4.dp)
                             .clip(CircleShape)
+                            .clickable {
+                                // TODO: Acciones al hacer clic en la imagen
+                                showImagePickerDialog = true
+                            },
+                        contentScale = ContentScale.Crop
                     )
                 } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.user_icon),
-                        contentDescription = "icon",
-                        contentScale = ContentScale.Crop,
+
+                    // Profile Image
+                    AsyncImage(
+                        model = imageUrlState.value,
+                        contentDescription = "Profile Picture",
                         modifier = Modifier
                             .size(150.dp)
                             .border(
@@ -149,6 +310,11 @@ fun ChildProfileScreen(
                             )
                             .padding(4.dp)
                             .clip(CircleShape)
+                            .clickable {
+                                // TODO: Acciones al hacer clic en la imagen
+                                showImagePickerDialog = true
+                            },
+                        contentScale = ContentScale.Crop
                     )
                 }
 

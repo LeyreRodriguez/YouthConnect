@@ -1,6 +1,7 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
@@ -63,6 +65,8 @@ import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
+import com.example.youthconnect.ui.theme.Green
+import com.example.youthconnect.ui.theme.Red
 
 
 @SuppressLint("SuspiciousIndentation", "UnrememberedMutableState")
@@ -263,6 +267,22 @@ fun userImage(user: String,
               navController: NavHostController,
               documentExists : String){
 
+    val UserViewModel : UserViewModel = hiltViewModel()
+
+
+
+    val imageUrlState = remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        UserViewModel.getProfileImage(
+            onSuccess = { url ->
+                imageUrlState.value = url
+            },
+            onFailure = { exception ->
+                // Manejar el error, por ejemplo, mostrar un mensaje
+            }
+        )
+    }
+
     Box(
         modifier = Modifier
             .size(50.dp)
@@ -291,10 +311,13 @@ fun userImage(user: String,
             .padding(4.dp)
             .clip(CircleShape)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.user_icon),
-            contentDescription = "icon",
-            modifier = Modifier.fillMaxSize(),
+
+
+        AsyncImage(
+            model = imageUrlState.value,
+            contentDescription = "Profile Picture",
+            modifier = Modifier.fillMaxSize()
+                ,
             contentScale = ContentScale.Crop
         )
     }

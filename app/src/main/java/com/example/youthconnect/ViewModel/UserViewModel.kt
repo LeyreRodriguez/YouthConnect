@@ -1,19 +1,34 @@
 package com.example.youthconnect.ViewModel
 
+import android.content.Context
+import android.net.Uri
+import android.os.Environment
 import android.util.Log
+import androidx.compose.ui.text.toLowerCase
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
+import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
+import com.example.youthconnect.Model.Object.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val firestoreRepository : FirestoreRepository
+    private val firestoreRepository : FirestoreRepository,
+    private val firebaseStorage: FirebaseStorageRepository
 ) : ViewModel() {
     private var document: String? = null
 
@@ -26,7 +41,21 @@ class UserViewModel @Inject constructor(
     private var allInstructor: List<Instructor?> = emptyList()
     private var instructor: Instructor? = null
 
-  //  var child by mutableStateOf(Child())
+
+    private var _userData = MutableStateFlow<UserData?>(null)
+    val userData = _userData.asStateFlow()
+
+
+    private var _logoutCompleted = MutableStateFlow(false)
+    var logoutCompleted = _logoutCompleted.asStateFlow()
+
+
+    init {
+        viewModelScope.launch {
+            _userData.value = firestoreRepository.getUser()
+        }
+
+    }
 
     suspend fun getCurrentUser() : String? {
         try {
@@ -149,6 +178,68 @@ class UserViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("Firestore", "Error en changeState", e)
 
+        }
+    }
+
+
+    fun uploadProfileImage(imageUri: Uri, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        viewModelScope.launch {
+            try {
+                firebaseStorage.uploadImageToFirebase(imageUri, onSuccess, onFailure)
+            } catch (e: Exception) {
+                onFailure(e)
+            }
+        }
+    }
+
+    fun getProfileImage(onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        viewModelScope.launch {
+            val userId = firebaseStorage.authConection?.currentUser?.email
+            if (userId != null) {
+                try {
+                    val url = firebaseStorage.getProfileImageUrl(userId)
+                    onSuccess(url)
+                } catch (e: Exception) {
+                    val url = "https://i.imgur.com/w3UEu8o.jpeg"
+                    onSuccess(url)
+                }
+            }
+        }
+    }
+
+    fun getProfileEspecificImage(email: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        viewModelScope.launch {
+            val userId = email
+            Log.i("JAJA", email)
+            if (userId != null) {
+                try {
+                    val url = firebaseStorage.getProfileImageUrl(userId)
+                    onSuccess(url)
+                } catch (e: Exception) {
+                    val url = "https://i.imgur.com/w3UEu8o.jpeg"
+                    onSuccess(url)
+                }
+            }
+        }
+    }
+
+
+    fun createImageUri(context: Context): Uri? {
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return try {
+            val file = File.createTempFile(
+                "JPEG_${timeStamp}_", /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+            )
+
+            // Para compatibilidad con Android N y posteriores, usas FileProvider
+            val authority = "${context.packageName}.provider"
+            FileProvider.getUriForFile(context, authority, file)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
         }
     }
 

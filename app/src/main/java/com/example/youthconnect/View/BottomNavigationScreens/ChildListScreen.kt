@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
@@ -142,19 +143,14 @@ fun ChildListScreen(navController : NavController, instructorID: String){
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
 
-/*
-    LaunchedEffect(Unit) {
-        childViewModel.getAllChilds()
-    }
-*/
+
 
     LaunchedEffect(UserViewModel) {
         try {
             childs = UserViewModel.getAllChildren()
             instructor = UserViewModel.getCurrentInstructorById(instructorID)
             myKids = UserViewModel.getChildByInstructorId(instructorID)
-            println("holaaaa")
-            println(myKids)
+
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -253,6 +249,20 @@ fun list(navController: NavController, child: Child, instructorID: String, myKid
         isChecked = myKids.any { it?.ID == child.ID }
     }
 
+    val UserViewModel : UserViewModel = hiltViewModel()
+
+    val imageUrlState = remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        UserViewModel.getProfileEspecificImage(child.ID.lowercase() + "@youthconnect.com",
+            onSuccess = { url ->
+                imageUrlState.value = url
+            },
+            onFailure = { exception ->
+                // Manejar el error, por ejemplo, mostrar un mensaje
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -267,10 +277,11 @@ fun list(navController: NavController, child: Child, instructorID: String, myKid
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.user_icon),
-                contentDescription = "icon",
-                contentScale = ContentScale.Crop,
+
+
+            AsyncImage(
+                model = imageUrlState.value,
+                contentDescription = "Profile Picture",
                 modifier = Modifier
                     .size(50.dp)
                     .border(
@@ -278,8 +289,12 @@ fun list(navController: NavController, child: Child, instructorID: String, myKid
                         CircleShape
                     )
                     .padding(4.dp)
-                    .clip(CircleShape)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
             )
+
+
+
 
             Text(
                 text = child.FullName,

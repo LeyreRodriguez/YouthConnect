@@ -145,7 +145,8 @@ fun SignUpView( navController: NavController) {
                      childCourse: String,
                      childID: String,
                      childPassword : String) : Boolean{
-        val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=]).{8,}".toRegex()
+        val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=.]).{8,}".toRegex()
+
         val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
         validateParentFullName = parentFullName.isNotBlank()
         validateParentID = parentID.matches(IDRegex)

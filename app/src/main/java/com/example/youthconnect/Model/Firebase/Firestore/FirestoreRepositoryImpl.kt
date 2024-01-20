@@ -391,5 +391,47 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
 
     }
 
+    override suspend fun getAllUser(): List<UserData> {
+        val allUsers: MutableList<UserData> = mutableListOf()
+
+        try {
+            val childQuerySnapshot = firebaseFirestore.collection("Child").get().await()
+            val instructorQuerySnapshot = firebaseFirestore.collection("Instructor").get().await()
+            val parentQuerySnapshot = firebaseFirestore.collection("Parents").get().await()
+
+            allUsers.addAll(childQuerySnapshot.documents.map { document ->
+                UserData(
+                    userId = document.getString("id") ?: "",
+                    userName = document.getString("fullName") ?: ""
+                    // profilePictureUrl = photoUrl?.toString()
+                )
+            })
+
+            allUsers.addAll(instructorQuerySnapshot.documents.map { document ->
+                UserData(
+                    userId = document.getString("id") ?: "",
+                    userName = document.getString("fullName") ?: ""
+                    // profilePictureUrl = photoUrl?.toString()
+                )
+            })
+
+            allUsers.addAll(parentQuerySnapshot.documents.map { document ->
+                UserData(
+                    userId = document.getString("id") ?: "",
+                    userName = document.getString("fullName") ?: ""
+                    // profilePictureUrl = photoUrl?.toString()
+                )
+            })
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "getAllUsers failed with $e")
+        }
+
+        return allUsers
+    }
+
+    override suspend fun getChatId(userID: String): String? {
+        TODO("Not yet implemented")
+    }
+
 
 }

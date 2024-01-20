@@ -173,7 +173,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                         CustomOutlinedTextField(
                             value = ID,
                             onValueChange = {ID = it},
-                            label = "Child's full name",
+                            label = "Full name",
                             showError = !validateUserID,
                             errorMessage = "The format of the ID doesn´t seem right"  ,
                             leadingIconImageVector = Icons.Default.PermIdentity,
@@ -197,7 +197,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                         CustomOutlinedTextField(
                             value = password,
                             onValueChange = {password = it },
-                            label = "Child's Password",
+                            label = "Password",
                             showError = !validateUserPassword,
                             errorMessage ="Must mix capital and non-capital letters, a number, special character and minimun length of 8" ,
                             isPasswordField = true,

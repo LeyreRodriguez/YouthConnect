@@ -14,7 +14,9 @@ import com.google.firebase.storage.storage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -37,11 +39,7 @@ class AppModule {
     @Provides
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
-/*
-    @Provides
-    @Singleton
-    fun providesImageRepository(storage: FirebaseStorage, db : FirebaseFirestore): ImageRepository = ImageRepositoryImpl(storage = storage, db = db)
-*/
+
     @Provides
     @Singleton
     fun provideFirebaseStorageRepository(
@@ -58,4 +56,11 @@ class AppModule {
         // Obtiene los datos del usuario de alguna fuente
         return UserData("userId", "userName", "userEmail")
     }
+
+
+
+
+
 }
+
+

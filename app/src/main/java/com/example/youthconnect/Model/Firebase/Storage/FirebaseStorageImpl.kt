@@ -2,6 +2,7 @@ package com.example.youthconnect.Model.Firebase.Storage
 
 
 import android.net.Uri
+import android.util.Log
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Sealed.Response
@@ -31,7 +32,8 @@ class FirebaseStorageImpl @Inject constructor(
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = auth.currentUser?.email ?: return
+
         val storageRef = storage.reference.child("users/$userId/profilePicture.jpg")
 
         storageRef.putFile(imageUri).addOnSuccessListener {

@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.NewsViewModel
+import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 
@@ -56,7 +57,9 @@ fun NewsDetails(newsId : String,
 ) {
 
     val NewsViewModel : NewsViewModel = hiltViewModel()
+    val UserViewModel : UserViewModel = hiltViewModel()
     var news by remember { mutableStateOf<News?>(null) }
+    val imageUrlState = remember { mutableStateOf("") }
 
     LaunchedEffect(NewsViewModel) {
         try {
@@ -65,6 +68,17 @@ fun NewsDetails(newsId : String,
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
+    }
+
+    LaunchedEffect(Unit) {
+        UserViewModel.getProfileImage(
+            onSuccess = { url ->
+                imageUrlState.value = url
+            },
+            onFailure = { exception ->
+                // Manejar el error, por ejemplo, mostrar un mensaje
+            }
+        )
     }
 
     Box(
@@ -121,7 +135,7 @@ fun NewsDetails(newsId : String,
                             .padding(start = 15.dp, top = 10.dp)
                     )
                 }
-
+/*
                 Image(
                     painter = painterResource(id = R.drawable.user_icon),
                     contentDescription = "icon",
@@ -141,6 +155,8 @@ fun NewsDetails(newsId : String,
                         .padding(4.dp)
                         .clip(CircleShape)
                 )
+
+                */
 
 
             }

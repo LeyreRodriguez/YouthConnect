@@ -44,6 +44,10 @@ interface FirestoreRepository {
     suspend fun removeInstructorFromChild(child: Child, instructorID: String)
 
     suspend fun getUser() : UserData?
+    suspend fun getAllUser() : List<UserData?>
+
+    suspend fun getChatId(userID: String) : String?
+
 
 
 }

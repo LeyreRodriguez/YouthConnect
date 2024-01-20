@@ -57,6 +57,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -74,7 +75,6 @@ import com.example.youthconnect.R
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import com.example.youthconnect.ViewModel.UserViewModel
-import com.example.youthconnect.ViewModel.profileViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,7 +86,7 @@ fun InstructorProfileScreen(instructorId : String,
 ) {
 
     val UserViewModel : UserViewModel = hiltViewModel()
-    val ProfileViewModel : profileViewModel = hiltViewModel()
+   // val ProfileViewModel : profileViewModel = hiltViewModel()
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
 
@@ -110,8 +110,8 @@ fun InstructorProfileScreen(instructorId : String,
 
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            ProfileViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                ProfileViewModel.getProfileImage(
+            UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                UserViewModel.getProfileImage(
                     onSuccess = { fetchedUrl ->
                         imageUrlState.value = fetchedUrl
                         Toast.makeText(
@@ -143,8 +143,8 @@ fun InstructorProfileScreen(instructorId : String,
         if (success) {
             // Aquí manejas la imagen capturada usando imageUri
             imageUri?.let { uri ->
-                ProfileViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                    ProfileViewModel.getProfileImage(
+                UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                    UserViewModel.getProfileImage(
                         onSuccess = { fetchedUrl ->
                             imageUrlState.value = fetchedUrl
                             Toast.makeText(
@@ -173,7 +173,7 @@ fun InstructorProfileScreen(instructorId : String,
     }
 
     LaunchedEffect(Unit) {
-        ProfileViewModel.getProfileImage(
+        UserViewModel.getProfileImage(
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -189,7 +189,7 @@ fun InstructorProfileScreen(instructorId : String,
         onResult = { isGranted: Boolean ->
             if (isGranted) {
                 // Permiso concedido, proceder con la acción
-                imageUri = ProfileViewModel.createImageUri(context)
+                imageUri = UserViewModel.createImageUri(context)
                 imageUri?.let { uri ->
                     takePictureLauncher.launch(uri)
                 }
@@ -223,7 +223,7 @@ fun InstructorProfileScreen(instructorId : String,
                     when (PackageManager.PERMISSION_GRANTED) {
                         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
                             // Permiso ya concedido, proceder con la acción
-                            imageUri = ProfileViewModel.createImageUri(context)
+                            imageUri = UserViewModel.createImageUri(context)
                             imageUri?.let { uri ->
                                 takePictureLauncher.launch(uri)
                             }
@@ -337,36 +337,6 @@ fun InstructorProfileScreen(instructorId : String,
                             contentScale = ContentScale.Crop
                         )
 
-                        /*
-                        Image(
-                            painter =   painterResource(id = R.drawable.user_icon),
-                            contentDescription = "icon",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(150.dp)
-                                .border(
-                                    BorderStroke(4.dp, remember {
-                                        Brush.sweepGradient(
-                                            listOf(
-                                                Green, Red
-                                            )
-                                        )
-                                    }),
-                                    CircleShape
-                                )
-                                .padding(4.dp)
-                                .clip(CircleShape)
-                                .clickable {
-                                  //  galleryLauncher.launch(Constants.ALL_IMAGES)
-                                }
-                        )
-*/
-
-
-
-
-
-//                    Log.i("UWU", instructor!!.fullName)
                         instructor?.FullName?.let {
 
                             Text(
@@ -503,6 +473,20 @@ fun InstructorProfileScreen(instructorId : String,
 @Composable
 fun user(navController: NavController, child: Child){
 
+
+    val UserViewModel : UserViewModel = hiltViewModel()
+
+    val imageUrlState = remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        UserViewModel.getProfileEspecificImage(child.ID.lowercase() + "@youthconnect.com",
+            onSuccess = { url ->
+                imageUrlState.value = url
+            },
+            onFailure = { exception ->
+                // Manejar el error, por ejemplo, mostrar un mensaje
+            }
+        )
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -519,10 +503,10 @@ fun user(navController: NavController, child: Child){
         ) {
 
             if(child.GoOutAlone) {
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
+
+                AsyncImage(
+                    model = imageUrlState.value,
+                    contentDescription = "Profile Picture",
                     modifier = Modifier
                         .size(30.dp)
                         .border(
@@ -530,13 +514,13 @@ fun user(navController: NavController, child: Child){
                             CircleShape
                         )
                         .padding(4.dp)
-                        .clip(CircleShape)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
             } else {
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
+                AsyncImage(
+                    model = imageUrlState.value,
+                    contentDescription = "Profile Picture",
                     modifier = Modifier
                         .size(30.dp)
                         .border(
@@ -544,7 +528,8 @@ fun user(navController: NavController, child: Child){
                             CircleShape
                         )
                         .padding(4.dp)
-                        .clip(CircleShape)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
             }
 

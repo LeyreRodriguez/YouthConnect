@@ -56,6 +56,7 @@ import com.example.youthconnect.View.BottomNavigationScreens.AddNews
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildListScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildProfileScreen
+import com.example.youthconnect.View.BottomNavigationScreens.HomeScreen
 import com.example.youthconnect.View.BottomNavigationScreens.InstructorProfileScreen
 import com.example.youthconnect.View.BottomNavigationScreens.LoginView
 import com.example.youthconnect.View.BottomNavigationScreens.NewsDetails
@@ -286,12 +287,37 @@ class MainActivity : ComponentActivity() {
                                     .padding(padding)
                                     .fillMaxSize()
                             ) {
-                                ChatScreen()
+                               // ChatScreen()
+                                HomeScreen(navController)
                             }
 
 
                         }
 
+                    }
+
+                    composable(
+                        route = "chatscreen/{currentUserId}/{recipientUserId}",
+                        arguments = listOf(
+                            navArgument("currentUserId") { type = NavType.StringType },
+                            navArgument("recipientUserId") { type = NavType.StringType },
+                        )
+                    ) { backStackEntry ->
+                        val currentUserId = backStackEntry.arguments?.getString("currentUserId") ?: ""
+                        val recipientUserId = backStackEntry.arguments?.getString("recipientUserId") ?: ""
+                        Scaffold(
+                            bottomBar = {
+                                BottomNavigation(navController)
+                            }
+                        ) { padding ->
+                            Box(
+                                modifier = Modifier
+                                    .padding(padding)
+                                    .fillMaxSize()
+                            ) {
+                                ChatScreen(currentUserId = currentUserId, recipientUserId = recipientUserId)
+                            }
+                        }
                     }
 
 
