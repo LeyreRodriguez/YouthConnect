@@ -19,9 +19,18 @@ class ChatViewModel @Inject constructor(
     private val firestoreRepository: FirestoreRepository,
     private val repo: FirebaseStorageRepository,
 ): ViewModel() {
+
+    private var _recipientUserId = MutableLiveData<String>()
+    val recipientUserId: LiveData<String> = _recipientUserId
+
     init {
-        val recipientUserId =
-        getMessages()
+        recipientUserId.observeForever { userId ->
+            Log.e("recipientUserId", userId)
+            val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
+                ?: ""
+            val chatId = generateChatId(currentUserId, userId)
+            loadMessages(chatId)
+        }
     }
 
     private val _message = MutableLiveData("")
@@ -29,8 +38,6 @@ class ChatViewModel @Inject constructor(
 
     private var _messages = MutableLiveData(emptyList<Map<String, Any>>().toMutableList())
     val messages: LiveData<MutableList<Map<String, Any>>> = _messages
-
-    private val _conversations = mutableMapOf<String, MutableLiveData<List<Map<String, Any>>>>()
 
 
     /**
@@ -43,11 +50,10 @@ class ChatViewModel @Inject constructor(
             "$user2Id-$user1Id"
         }
     }
+
     /**
      * Update the message value as user types
      */
-
-
     fun updateMessage(message: String) {
         _message.value = message
     }
@@ -58,34 +64,30 @@ class ChatViewModel @Inject constructor(
     fun addMessage(recipientUserId: String) {
         val message: String = _message.value ?: throw IllegalArgumentException("message empty")
         if (message.isNotEmpty()) {
-            val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@') ?: return
 
-            val chatId = generateChatId(currentUserId.uppercase(), recipientUserId.uppercase())
-
+            val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
+                ?: ""
+            val chatId = generateChatId(currentUserId, recipientUserId)
             Firebase.firestore.collection(Constants.MESSAGES).document().set(
                 hashMapOf(
                     Constants.MESSAGE to message,
-                    Constants.SENT_BY to currentUserId.uppercase(),
+                    Constants.SENT_BY to Firebase.auth.currentUser?.uid,
                     Constants.SENT_ON to System.currentTimeMillis(),
                     "chatId" to chatId
                 )
             ).addOnSuccessListener {
                 _message.value = ""
+                loadMessages(chatId)
             }
+
+
         }
     }
 
     /**
-     * Get the messages
+     * Cargar mensajes para un chat específico
      */
-
-    /**
-     * Quiero que a esta funcion se le pase el valor del id del destinatario y con eso deberia de funcionar
-     */
-    fun getMessages() {
-        val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@') ?: return
-
-        //val chatId = generateChatId(currentUserId.uppercase(), recipientUserId.uppercase())
+    private fun loadMessages(chatId : String) {
         Firebase.firestore.collection(Constants.MESSAGES)
             .whereEqualTo("chatId", chatId)
             .orderBy(Constants.SENT_ON)
@@ -95,7 +97,36 @@ class ChatViewModel @Inject constructor(
                     return@addSnapshotListener
                 }
 
-                val list = emptyList<Map<String, Any>>().toMutableList()
+                val list = mutableListOf<Map<String, Any>>()
+
+                if (value != null) {
+                    for (doc in value) {
+                        val data = doc.data
+                        data[Constants.IS_CURRENT_USER] =
+                            Firebase.auth.currentUser?.uid.toString() == data[Constants.SENT_BY].toString()
+
+                        list.add(data)
+                    }
+                }
+
+                updateMessages(list)
+            }
+    }
+
+    /**
+     * Get the messages
+     */
+    private fun getMessages(chatId : String) {
+        Firebase.firestore.collection(Constants.MESSAGES)
+            .whereEqualTo("chatId", chatId)
+            .orderBy(Constants.SENT_ON)
+            .addSnapshotListener { value, e ->
+                if (e != null) {
+                    Log.w(Constants.TAG, "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                val list = mutableListOf<Map<String, Any>>()
 
                 if (value != null) {
                     for (doc in value) {
@@ -126,5 +157,9 @@ class ChatViewModel @Inject constructor(
             Log.e("Firestore", "Error en getCurrentUser", e)
             return null
         }
+    }
+
+    fun initRecipientUserId(userId: String) {
+        _recipientUserId.value = userId
     }
 }

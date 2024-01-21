@@ -46,7 +46,7 @@ interface FirestoreRepository {
     suspend fun getUser() : UserData?
     suspend fun getAllUser() : List<UserData?>
 
-    suspend fun getChatId(userID: String) : String?
+    suspend fun getChatId(chatId : String) : String?
 
 
 

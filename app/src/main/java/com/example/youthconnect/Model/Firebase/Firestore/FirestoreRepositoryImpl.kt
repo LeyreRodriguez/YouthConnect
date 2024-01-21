@@ -1,6 +1,7 @@
 package com.example.youthconnect.Model.Firebase.Firestore
 
 import android.util.Log
+import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.News
@@ -429,8 +430,23 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
         return allUsers
     }
 
-    override suspend fun getChatId(userID: String): String? {
-        TODO("Not yet implemented")
+    override suspend fun getChatId(chatId : String): String? {
+        return try {
+            val querySnapshot = firebaseFirestore.collection(Constants.MESSAGES).get().await()
+
+            for (document in querySnapshot.documents) {
+                val documentChatId = document.getString("chatId")
+                if (documentChatId == chatId) {
+                    return documentChatId
+                }
+            }
+
+            // Si no se encuentra el campo chatID en ningún documento
+            return null
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "getChatId failed with $e")
+            null
+        }
     }
 
 

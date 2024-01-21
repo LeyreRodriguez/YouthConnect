@@ -150,7 +150,7 @@ fun HomeScreen(
                                     it
                                 )
 */
-                                navHostController.navigate("chatscreen/{user}/${it.userId}")
+                                navHostController.navigate("chatscreen/${it.userId}")
                             }
                         }
                     }
@@ -286,15 +286,9 @@ fun SpacerHeight(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(currentUserId: String, recipientUserId: String) {
+fun ChatScreen(recipientUserId: String, chatViewModel: ChatViewModel = hiltViewModel()) {
 
-    val chatViewModel: ChatViewModel = hiltViewModel()
-
-
-    // Observar el LiveData devuelto por getMessagesForUsers para actualizar la interfaz de usuario con los mensajes correspondientes
-    //val messages: List<Map<String, Any>> by chatViewModel.getMessagesForUsers(currentUserId, recipientUserId)
-     //   .observeAsState(initial = emptyList())
-
+    initRecipientUserId(recipientUserId, chatViewModel)
 
     val message: String by chatViewModel.message.observeAsState(initial = "")
     val messages: List<Map<String, Any>> by chatViewModel.messages.observeAsState(
@@ -356,4 +350,10 @@ fun ChatScreen(currentUserId: String, recipientUserId: String) {
             }
         )
     }
+}
+
+
+fun initRecipientUserId(recipientUserId: String, chatViewModel: ChatViewModel) {
+    // Llama a una función en el ViewModel para establecer el recipientUserId
+    chatViewModel.initRecipientUserId(recipientUserId)
 }

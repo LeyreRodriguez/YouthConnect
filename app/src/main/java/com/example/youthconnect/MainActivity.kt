@@ -297,13 +297,9 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable(
-                        route = "chatscreen/{currentUserId}/{recipientUserId}",
-                        arguments = listOf(
-                            navArgument("currentUserId") { type = NavType.StringType },
-                            navArgument("recipientUserId") { type = NavType.StringType },
-                        )
+                        route = "chatscreen/{recipientUserId}",
+                        arguments = listOf(navArgument("recipientUserId") { type = NavType.StringType })
                     ) { backStackEntry ->
-                        val currentUserId = backStackEntry.arguments?.getString("currentUserId") ?: ""
                         val recipientUserId = backStackEntry.arguments?.getString("recipientUserId") ?: ""
                         Scaffold(
                             bottomBar = {
@@ -315,9 +311,33 @@ class MainActivity : ComponentActivity() {
                                     .padding(padding)
                                     .fillMaxSize()
                             ) {
-                                ChatScreen(currentUserId = currentUserId, recipientUserId = recipientUserId)
+                                ChatScreen(recipientUserId = recipientUserId)
                             }
                         }
+                    }
+
+                    composable(
+                        route = NavScreen.ChildList.name +"/{instructorID}",
+                        arguments = listOf(navArgument("instructorID") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val instructorID = backStackEntry.arguments?.getString("instructorID") ?: ""
+                        Scaffold(
+                            bottomBar = {
+                                BottomNavigation(navController)
+                            }
+                        ) {padding->
+                            Box(
+                                modifier = Modifier
+                                    .padding(padding)
+                                    .fillMaxSize()
+                            ) {
+                                ChildListScreen(navController = navController, instructorID = instructorID)
+                            }
+
+
+                        }
+
+
                     }
 
 
