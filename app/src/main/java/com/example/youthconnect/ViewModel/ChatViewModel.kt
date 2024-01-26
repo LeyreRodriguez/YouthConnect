@@ -150,6 +150,9 @@ class ChatViewModel @Inject constructor(
     }
 
 
+    /**
+     * PONERLO SOLO EN USER VIEW MODEL
+     */
     suspend fun getAllUsers() : List<UserData?>? {
         try {
             return firestoreRepository.getAllUser()

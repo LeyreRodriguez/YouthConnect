@@ -5,7 +5,9 @@ import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
+import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -48,6 +50,11 @@ interface FirestoreRepository {
 
     suspend fun getChatId(chatId : String) : String?
 
+    suspend fun getQuestions() : List<Question?>
 
+    fun findID(documentId: String) : DocumentReference?
+
+    fun updateScore(documentReference: DocumentReference)
+    fun getScore(documentReference: DocumentReference)
 
 }

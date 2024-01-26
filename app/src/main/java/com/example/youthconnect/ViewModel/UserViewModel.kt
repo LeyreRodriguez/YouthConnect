@@ -243,4 +243,13 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    suspend fun getAllUsers() : List<UserData?>? {
+        try {
+            return firestoreRepository.getAllUser()
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en getCurrentUser", e)
+            return null
+        }
+    }
+
 }

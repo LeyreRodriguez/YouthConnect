@@ -6,14 +6,19 @@ import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
+import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import java.util.concurrent.ExecutionException
 import javax.inject.Inject
 
 
@@ -51,7 +56,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 Observations = document.getString("observations") ?: "",
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                 InstructorID = document.getString("instructorID") ?: "",
-                State = document.getBoolean("State") ?: false
+                State = document.getBoolean("State") ?: false,
+                Score = document.getLong("Score")?.toInt() ?: null
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -77,7 +83,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("State") ?: false
+                        State = document.getBoolean("State") ?: false,
+                        Score = document.getLong("Score")?.toInt() ?: null
                     )
                 }
         } catch (e: Exception) {
@@ -105,7 +112,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("State") ?: false
+                        State = document.getBoolean("State") ?: false,
+                        Score = document.getLong("Score")?.toInt() ?: null
                     )
                 }
         } catch (e: Exception) {
@@ -133,7 +141,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("State") ?: false
+                        State = document.getBoolean("State") ?: false,
+                        Score = document.getLong("Score")?.toInt() ?: null
                     )
                 }
         } catch (e: Exception) {
@@ -155,7 +164,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 Observations = document.getString("observations") ?: "",
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                 InstructorID = document.getString("instructorID") ?: "",
-                State = document.getBoolean("State") ?: false
+                State = document.getBoolean("State") ?: false,
+                Score = document.getLong("Score")?.toInt() ?: null
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -250,7 +260,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 FullName = document.getString("fullName") ?: "",
                 ID = document.getString("id") ?: "",
                 Password = document.getString("password") ?: "",
-                PhoneNumber = document.getString("phoneNumber") ?: ""
+                PhoneNumber = document.getString("phoneNumber") ?: "",
+                Score = document.getLong("Score")?.toInt() ?: null
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -271,7 +282,8 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                             FullName = document.getString("fullName") ?: "",
                             ID = document.getString("id") ?: "",
                             Password = document.getString("password") ?: "",
-                            PhoneNumber = document.getString("phoneNumber") ?: ""
+                            PhoneNumber = document.getString("phoneNumber") ?: "",
+                            Score = document.getLong("Score")?.toInt() ?: null
                         )
                     }
             }
@@ -290,6 +302,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 FullName = document.getString("FullName") ?: "",
                 ID = document.getString("ID") ?: "",
                 Password = document.getString("password") ?: "",
+                Score = document.getLong("Score")?.toInt() ?: null
             )
           //  document.toObject(Instructor::class.java)
         } catch (e: Exception) {
@@ -338,9 +351,25 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
     }
 
     override suspend fun addParent(parent: Parent) {
-        firebaseFirestore.collection("Parents")
-            .document(parent.ID)
-            .set(parent)
+
+
+
+        val documentRef: DocumentReference = firebaseFirestore.collection("Parents").document(parent.ID)
+
+        // Realiza la consulta para obtener el documento
+        documentRef.get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+
+                } else {
+                    // El documento no existe
+
+                    firebaseFirestore.collection("Parents")
+                        .document(parent.ID)
+                        .set(parent)
+
+                }
+            }
 
 
     }
@@ -448,6 +477,117 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
             null
         }
     }
+
+    override suspend fun getQuestions(): List<Question?> {
+        return try {
+            firebaseFirestore.collection("Quiz")
+                .get()
+                .await()
+                .documents
+                .map { document ->
+                    Question(
+                        Answer = document.getString("Answer") ?: "",
+                        OptionA = document.getString("OptionA") ?: "",
+                        OptionB = document.getString("OptionB") ?: "",
+                        OptionC = document.getString("OptionC") ?: "",
+                        OptionD = document.getString("OptionD") ?: "",
+                        Question = document.getString("Question") ?: "",
+                    )
+                }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "getNews failed with $e")
+            throw e
+        }
+
+
+    }
+
+
+
+    override fun findID(documentId: String): DocumentReference? {
+
+        // Lista de nombres de colecciones
+        val colecciones = listOf("Child", "Parents", "Instructor")
+
+        // Iterar sobre cada colección
+        for (coleccion in colecciones) {
+            val documentReference = firebaseFirestore.collection(coleccion).document(documentId)
+
+            // Verificar si el documento existe en la colección actual
+            if (documentExist(documentReference)) {
+                // Devolver el DocumentReference si se encuentra el documento
+                return documentReference
+            }
+        }
+
+        // Devolver null si el documento no se encuentra en ninguna colección
+        return null
+    }
+
+    private fun documentExist(documentReference: DocumentReference): Boolean {
+        val task: Task<DocumentSnapshot> = documentReference.get()
+
+        return try {
+            Tasks.await(task)
+            task.isSuccessful && task.result.exists()
+        } catch (e: ExecutionException) {
+            // Manejar cualquier excepción
+            false
+        } catch (e: InterruptedException) {
+            // Manejar cualquier excepción
+            false
+        }
+    }
+
+
+    override fun updateScore(documentReference: DocumentReference) {
+
+
+        documentReference.get().addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot.exists()) {
+                // Obtener el valor actual de Score
+                val scoreActual = documentSnapshot.getLong("score") ?: 0
+
+                // Incrementar el valor de Score
+                val nuevoScore = scoreActual + 1
+
+                // Actualizar el documento con el nuevo valor de Score
+                documentReference.update("score", nuevoScore)
+                    .addOnSuccessListener {
+                        // Éxito al actualizar el documento
+                        println("Score incrementado con éxito a $nuevoScore en la colección ${documentReference.path}")
+                    }
+                    .addOnFailureListener { e ->
+                        // Manejar cualquier error al actualizar el documento
+                        println("Error al incrementar el Score en la colección ${documentReference.path}: $e")
+                    }
+            } else {
+                // Manejar el caso en que el documento no exista
+                println("El documento con ID ${documentReference.id} no existe en la colección ${documentReference.path}")
+            }
+        }
+    }
+
+    override fun getScore(documentReference: DocumentReference) {
+
+
+        documentReference.get().addOnSuccessListener { documentSnapshot ->
+            if (documentSnapshot.exists()) {
+                // Obtener el valor actual de Score
+                val scoreActual = documentSnapshot.getLong("score") ?: 0
+
+                scoreActual.toString()
+            } else {
+                // Manejar el caso en que el documento no exista
+                println("El documento con ID ${documentReference.id} no existe en la colección ${documentReference.path}")
+                null
+            }
+        }
+        null
+    }
+
+
+
 
 
 }

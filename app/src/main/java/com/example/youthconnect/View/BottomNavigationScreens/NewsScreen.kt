@@ -192,20 +192,7 @@ fun NewsScreen(
                 modifier
                     .fillMaxWidth()
                     .padding(15.dp)) {
-                Text(
-                    text = "Timer",
-                    style = TextStyle(
-                        fontSize = 40.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF000000),
-                        letterSpacing = 0.9.sp,
 
-                        ), modifier = Modifier
-                        .padding(start = 15.dp, top = 10.dp )
-                )
-
-                Spacer(modifier = modifier.padding(50.dp))
 
                 Text(
                     text = "Last News",

@@ -1,7 +1,6 @@
 package com.example.youthconnect
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -63,6 +62,7 @@ import com.example.youthconnect.View.BottomNavigationScreens.NewsDetails
 import com.example.youthconnect.View.BottomNavigationScreens.NewsScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ParentsProfileScreen
 import com.example.youthconnect.View.BottomNavigationScreens.QuizScreen
+import com.example.youthconnect.View.BottomNavigationScreens.Scores
 import com.example.youthconnect.View.BottomNavigationScreens.SignUpView
 import com.example.youthconnect.View.Components.BottomNavigation
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -268,7 +268,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(padding)
                                     .fillMaxSize()
                             ) {
-                                QuizScreen()
+                                QuizScreen(navController)
                             }
 
 
@@ -379,6 +379,26 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 // Log.w("HOLA", "TUS MUERTIS AUN MAS")
                                 AddInstructorScreen()
+                            }
+
+
+                        }
+
+                    }
+
+                    composable("Scores"){
+                        Scaffold(
+                            bottomBar = {
+                                BottomNavigation(navController)
+                            }
+                        ) {padding->
+                            Box(
+                                modifier = Modifier
+                                    .padding(padding)
+                                    .fillMaxSize()
+                            ) {
+                                // Log.w("HOLA", "TUS MUERTIS AUN MAS")
+                                Scores()
                             }
 
 

@@ -185,12 +185,12 @@ fun SignUpView( navController: NavController) {
                 parentsID,
                 "",
                 false)
-
-            signUpViewModel.registerUser(childID, childPassword)
             signUpViewModel.registerUser(parentID, password)
+            signUpViewModel.registerUser(childID, childPassword)
 
-            signUpViewModel.addChild(child)
             signUpViewModel.addParent(parent)
+            signUpViewModel.addChild(child)
+
             navController.navigate(NavScreen.NewsScreen.name)
         }else{
             Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT).show()

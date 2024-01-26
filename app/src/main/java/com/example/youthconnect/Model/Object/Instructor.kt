@@ -3,7 +3,8 @@ package com.example.youthconnect.Model.Object
 data class Instructor(
     val FullName: String,
     val ID: String,
-    val Password: String
+    val Password: String,
+    val Score : Int? =  0
 
 )
 

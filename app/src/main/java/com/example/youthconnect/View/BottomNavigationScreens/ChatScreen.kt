@@ -145,11 +145,7 @@ fun HomeScreen(
                     items(allUsers, key = { it?.userId ?: "" }) {
                         if (it != null) {
                             UserEachRow(person = it) {
-                               /* navHostController.currentBackStackEntry?.savedStateHandle?.set(
-                                    "data",
-                                    it
-                                )
-*/
+
                                 navHostController.navigate("chatscreen/${it.userId}")
                             }
                         }
