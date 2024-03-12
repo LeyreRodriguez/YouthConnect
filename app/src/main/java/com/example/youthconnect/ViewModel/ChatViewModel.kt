@@ -40,6 +40,7 @@ class ChatViewModel @Inject constructor(
     val messages: LiveData<MutableList<Map<String, Any>>> = _messages
 
 
+
     /**
      * Generar un ID único para una conversación entre dos usuarios
      */
@@ -71,18 +72,22 @@ class ChatViewModel @Inject constructor(
             Firebase.firestore.collection(Constants.MESSAGES).document().set(
                 hashMapOf(
                     Constants.MESSAGE to message,
-                    Constants.SENT_BY to Firebase.auth.currentUser?.uid,
+                    Constants.SENT_BY to currentUserId,
                     Constants.SENT_ON to System.currentTimeMillis(),
-                    "chatId" to chatId
+                    "chatId" to chatId,
+                    "seen" to false
                 )
             ).addOnSuccessListener {
                 _message.value = ""
                 loadMessages(chatId)
+
             }
 
 
         }
     }
+
+
 
     /**
      * Cargar mensajes para un chat específico
@@ -103,7 +108,8 @@ class ChatViewModel @Inject constructor(
                     for (doc in value) {
                         val data = doc.data
                         data[Constants.IS_CURRENT_USER] =
-                            Firebase.auth.currentUser?.uid.toString() == data[Constants.SENT_BY].toString()
+                            Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
+                                    ?: "" == data[Constants.SENT_BY].toString()
 
                         list.add(data)
                     }
@@ -132,7 +138,8 @@ class ChatViewModel @Inject constructor(
                     for (doc in value) {
                         val data = doc.data
                         data[Constants.IS_CURRENT_USER] =
-                            Firebase.auth.currentUser?.uid.toString() == data[Constants.SENT_BY].toString()
+                            Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
+                                    ?: "" == data[Constants.SENT_BY].toString()
 
                         list.add(data)
                     }

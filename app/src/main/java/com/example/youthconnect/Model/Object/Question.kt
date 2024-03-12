@@ -1,12 +1,12 @@
 package com.example.youthconnect.Model.Object
 
 data class Question(
-    val Answer: String = "",
-    val OptionA: String = "",
-    val OptionB: String = "",
-    val OptionC: String = "",
-    val OptionD: String = "",
-    val Question: String = "",
+    val answer: String = "",
+    val optionA: String = "",
+    val optionB: String = "",
+    val optionC: String = "",
+    val optionD: String = "",
+    val question: String = "",
 
 
 )

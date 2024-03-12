@@ -2,6 +2,7 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
@@ -72,6 +75,10 @@ fun QuizScreen( navController: NavHostController,
     val screenWidthDp = configuration.screenWidthDp.dp
     val buttonWidth = screenWidthDp / 2
 
+    val documentExists = remember { mutableStateOf("-1") }
+    var result by remember { mutableStateOf<String?>("") }
+
+
     LaunchedEffect(Unit) {
         try {
             withContext(Dispatchers.IO) {
@@ -87,9 +94,15 @@ fun QuizScreen( navController: NavHostController,
 
 
 
+
     LaunchedEffect(UserViewModel) {
         try {
             user = UserViewModel.getCurrentUser()
+            result = user?.let { UserViewModel.findDocument(it) }
+
+            if (result != null) {
+                documentExists.value = result.toString()
+            }
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
@@ -102,6 +115,8 @@ fun QuizScreen( navController: NavHostController,
     } else {
         null
     }
+
+
 
 
 
@@ -133,6 +148,31 @@ fun QuizScreen( navController: NavHostController,
                 )
             }
         )
+        var showDialog by remember { mutableStateOf(false)  }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+            contentAlignment = Alignment.BottomEnd
+        ){
+
+
+             if (documentExists.value == "0") {
+
+                FloatingButton {
+                     showDialog = true
+                }
+
+
+             }
+
+            if (showDialog) {
+                AddQuestions(onDismiss = { showDialog = false })
+            }
+
+
+        }
 
         Column(
             verticalArrangement = Arrangement.Top,
@@ -163,7 +203,7 @@ fun QuizScreen( navController: NavHostController,
 
             ) {
 
-                currentQuestion?.Question?.let {
+                currentQuestion?.question?.let {
                     Text(
                         text = it,
                         style = TextStyle(
@@ -187,16 +227,24 @@ fun QuizScreen( navController: NavHostController,
                     ) {
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 10.dp, end = 10.dp)
                         ) {
 
                             Button(
                                 onClick = {
+
+                                    if (currentQuestionIndex == 0) {
+                                        QuizViewModel.resetScore(user.toString())
+                                    }
+
                                     if (currentQuestion != null) {
-                                        if(currentQuestion.Answer.equals("OptionA")){
+                                        if(currentQuestion.answer.equals("OptionA")){
                                             user?.let { QuizViewModel.updateScore(it) }
                                         }
                                     }
+
                                     if (currentQuestionIndex == questions.size -1) {
                                         navController.navigate("Scores")
                                     }
@@ -216,7 +264,7 @@ fun QuizScreen( navController: NavHostController,
                                 )
 
                             ) {
-                                currentQuestion?.OptionA?.let {
+                                currentQuestion?.optionA?.let {
                                     Text(
                                         text = it,
                                         style = TextStyle(
@@ -233,8 +281,13 @@ fun QuizScreen( navController: NavHostController,
 
                             Button(
                                 onClick = {
+
+                                    if (currentQuestionIndex == 0) {
+                                        QuizViewModel.resetScore(user.toString())
+                                    }
+
                                     if (currentQuestion != null) {
-                                        if(currentQuestion.Answer.equals("OptionB")){
+                                        if(currentQuestion.answer.equals("OptionB")){
                                             user?.let { QuizViewModel.updateScore(it) }
                                         }
                                     }
@@ -257,7 +310,7 @@ fun QuizScreen( navController: NavHostController,
 
 
                             ) {
-                                currentQuestion?.OptionB?.let {
+                                currentQuestion?.optionB?.let {
                                     Text(
                                         text = it,
                                         style = TextStyle(
@@ -274,13 +327,20 @@ fun QuizScreen( navController: NavHostController,
                         }
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 10.dp, end = 10.dp)
                         ) {
 
                             Button(
                                 onClick = {
+
+                                    if (currentQuestionIndex == 0) {
+                                        QuizViewModel.resetScore(user.toString())
+                                    }
+
                                     if (currentQuestion != null) {
-                                        if(currentQuestion.Answer.equals("OptionC")){
+                                        if(currentQuestion.answer.equals("OptionC")){
                                             user?.let { QuizViewModel.updateScore(it) }
                                         }
                                     }
@@ -303,7 +363,7 @@ fun QuizScreen( navController: NavHostController,
 
 
                             ) {
-                                currentQuestion?.OptionC?.let {
+                                currentQuestion?.optionC?.let {
                                     Text(
                                         text = it,
                                         style = TextStyle(
@@ -320,8 +380,13 @@ fun QuizScreen( navController: NavHostController,
 
                             Button(
                                 onClick = {
+
+                                    if (currentQuestionIndex == 0) {
+                                        QuizViewModel.resetScore(user.toString())
+                                    }
+
                                     if (currentQuestion != null) {
-                                        if(currentQuestion.Answer.equals("OptionD")){
+                                        if(currentQuestion.answer.equals("OptionD")){
                                             user?.let { QuizViewModel.updateScore(it) }
                                         }
                                     }
@@ -345,7 +410,7 @@ fun QuizScreen( navController: NavHostController,
 
 
                             ) {
-                                currentQuestion?.OptionD?.let {
+                                currentQuestion?.optionD?.let {
                                     Text(
                                         text = it,
                                         style = TextStyle(
@@ -363,6 +428,7 @@ fun QuizScreen( navController: NavHostController,
                     }
                 }
 
+
             }
         }
     }
@@ -371,20 +437,19 @@ fun QuizScreen( navController: NavHostController,
 
 
 @Composable
-fun Scores( modifier : Modifier = Modifier.background(color = Color.White)){
+fun Scores( navController: NavHostController,modifier : Modifier = Modifier.background(color = Color.White)){
 
 
     var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
     val QuizViewModel : QuizViewModel = hiltViewModel()
     val UserViewModel : UserViewModel = hiltViewModel()
     var user by remember { mutableStateOf<String?>("") }
-
+    var score by remember { mutableStateOf<String?>("") }
 
     var allUsers by remember { mutableStateOf<List<UserData?>>(emptyList()) }
 
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp.dp
-    val buttonWidth = screenWidthDp / 2
 
     LaunchedEffect(Unit) {
         try {
@@ -397,11 +462,7 @@ fun Scores( modifier : Modifier = Modifier.background(color = Color.White)){
         }
     }
 
-
-
-
-
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(Unit) {
         try {
             user = UserViewModel.getCurrentUser()
             allUsers = UserViewModel.getAllUsers()!!
@@ -410,6 +471,16 @@ fun Scores( modifier : Modifier = Modifier.background(color = Color.White)){
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
+
+    LaunchedEffect(Unit) {
+        try {
+            score = QuizViewModel.getScore(user.toString()).toString()
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
+        }
+    }
+
 
 
     Box(
@@ -446,7 +517,9 @@ fun Scores( modifier : Modifier = Modifier.background(color = Color.White)){
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(20.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
     ) {
         Spacer(modifier = Modifier.height(26.dp)) // Espaciador vertical
 
@@ -464,13 +537,8 @@ fun Scores( modifier : Modifier = Modifier.background(color = Color.White)){
 
         )
 
-
-        /**
-         * GET SCORE MAL HECHO
-         */
-
         Text(
-            text = user?.let { QuizViewModel.getScore(it).toString() } + " / " + questions.size.toString(),
+            text =   score + " / " + questions.size.toString() ,
             style = TextStyle(
                 fontSize = 30.sp,
                 fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -485,11 +553,55 @@ fun Scores( modifier : Modifier = Modifier.background(color = Color.White)){
 
 
 
-        LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-            items(items = allUsers) { item ->
-                item?.userName?.let { Text(text = it) }
-            }
+        val puntuacion = score?.toIntOrNull() ?: 0
+        val divisor = questions.size.toFloat()
+
+        val porcentajeAciertos = if (divisor != 0f) {
+            puntuacion.toFloat() / divisor
+        } else {
+            0f // O cualquier otro valor predeterminado que desees en caso de división por cero
         }
+
+        Log.e("porcentajeAciertos", porcentajeAciertos.toString())
+
+        val imagen = when {
+            porcentajeAciertos.toDouble() == 1.0 -> R.drawable.mas_ochenta
+            porcentajeAciertos < 0.5 -> R.drawable.menos_cincuenta
+            porcentajeAciertos >= 0.5 -> R.drawable.aprobado
+            else -> throw IllegalArgumentException("El porcentaje de aciertos debe estar entre 0 y 1")
+        }
+
+
+        val text = when {
+            porcentajeAciertos.toDouble() == 1.0 -> "PERFECTO"
+            porcentajeAciertos < 0.5 -> "INTENTALO DE NUEVO \n A LA PRÓXIMA SALDRÁ MEJOR"
+            porcentajeAciertos >= 0.5 ->  "ENHORABUENA, HAS APROBADO"
+            else -> throw IllegalArgumentException("El porcentaje de aciertos debe estar entre 0 y 1")
+        }
+
+
+            Text(
+                text =    text,
+                style = TextStyle(
+                    fontSize = 30.sp,
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFFFFFFFF),
+                    letterSpacing = 0.3.sp,
+                ),
+                color = Color.Black,
+                textAlign = TextAlign.Center
+
+            )
+
+            Image(
+                painter = painterResource(id = imagen),
+                contentDescription = null,
+                modifier = Modifier.padding(16.dp)
+            )
+
+
+
 
 
 
@@ -497,7 +609,8 @@ fun Scores( modifier : Modifier = Modifier.background(color = Color.White)){
 
         Button(
             onClick = {
-
+                QuizViewModel.resetScore(user.toString())
+                navController.navigate(NavScreen.QuizScreen.name)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -529,12 +642,7 @@ fun Scores( modifier : Modifier = Modifier.background(color = Color.White)){
         }
     }
 }
-@Preview(showBackground = true  )
-@Composable
 
-fun Preview(){
 
-    Scores()
-}
 
 

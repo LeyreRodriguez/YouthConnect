@@ -142,11 +142,6 @@ fun NewsScreen(
         )
 
 
-
-
-
-
-
         Column( horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(15.dp)) {
 

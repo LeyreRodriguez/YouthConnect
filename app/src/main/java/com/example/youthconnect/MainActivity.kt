@@ -26,6 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +54,7 @@ import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Firebase.Authentication.GoogleAuthUiClient
 import com.example.youthconnect.View.BottomNavigationScreens.AddInstructorScreen
 import com.example.youthconnect.View.BottomNavigationScreens.AddNews
+import com.example.youthconnect.View.BottomNavigationScreens.AddQuestions
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildListScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildProfileScreen
@@ -238,6 +241,7 @@ class MainActivity : ComponentActivity() {
 
                     }
 
+
                     composable(NavScreen.NewsScreen.name){
 
                         Scaffold(
@@ -397,8 +401,8 @@ class MainActivity : ComponentActivity() {
                                     .padding(padding)
                                     .fillMaxSize()
                             ) {
-                                // Log.w("HOLA", "TUS MUERTIS AUN MAS")
-                                Scores()
+
+                                Scores(navController)
                             }
 
 

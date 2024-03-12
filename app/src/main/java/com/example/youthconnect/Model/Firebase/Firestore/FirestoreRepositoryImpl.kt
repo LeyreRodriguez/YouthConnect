@@ -10,16 +10,23 @@ import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import java.util.concurrent.ExecutionException
 import javax.inject.Inject
+import kotlinx.coroutines.async
+
 
 
 class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore: FirebaseFirestore):
@@ -486,12 +493,12 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 .documents
                 .map { document ->
                     Question(
-                        Answer = document.getString("Answer") ?: "",
-                        OptionA = document.getString("OptionA") ?: "",
-                        OptionB = document.getString("OptionB") ?: "",
-                        OptionC = document.getString("OptionC") ?: "",
-                        OptionD = document.getString("OptionD") ?: "",
-                        Question = document.getString("Question") ?: "",
+                        answer = document.getString("answer") ?: "",
+                        optionA = document.getString("optionA") ?: "",
+                        optionB = document.getString("optionB") ?: "",
+                        optionC = document.getString("optionC") ?: "",
+                        optionD = document.getString("optionD") ?: "",
+                        question = document.getString("question") ?: "",
                     )
                 }
         } catch (e: Exception) {
@@ -502,48 +509,30 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
 
     }
 
+    override fun addNewQuestion(question: Question ) {
+        val quizCollectionRef = firebaseFirestore.collection("Quiz")
 
-
-    override fun findID(documentId: String): DocumentReference? {
-
-        // Lista de nombres de colecciones
-        val colecciones = listOf("Child", "Parents", "Instructor")
-
-        // Iterar sobre cada colección
-        for (coleccion in colecciones) {
-            val documentReference = firebaseFirestore.collection(coleccion).document(documentId)
-
-            // Verificar si el documento existe en la colección actual
-            if (documentExist(documentReference)) {
-                // Devolver el DocumentReference si se encuentra el documento
-                return documentReference
+        // Agregar un nuevo documento con ID automático
+        quizCollectionRef.add(question)
+            .addOnSuccessListener { documentReference ->
+                // Éxito al agregar el documento
+                println("Documento agregado con ID: ${documentReference.id}")
             }
-        }
+            .addOnFailureListener { e ->
+                // Error al agregar el documento
+                println("Error al agregar documento: $e")
+            }
 
-        // Devolver null si el documento no se encuentra en ninguna colección
-        return null
-    }
-
-    private fun documentExist(documentReference: DocumentReference): Boolean {
-        val task: Task<DocumentSnapshot> = documentReference.get()
-
-        return try {
-            Tasks.await(task)
-            task.isSuccessful && task.result.exists()
-        } catch (e: ExecutionException) {
-            // Manejar cualquier excepción
-            false
-        } catch (e: InterruptedException) {
-            // Manejar cualquier excepción
-            false
-        }
     }
 
 
-    override fun updateScore(documentReference: DocumentReference) {
 
 
-        documentReference.get().addOnSuccessListener { documentSnapshot ->
+    override fun updateScore(collection: String, documentId: String) {
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection(collection).document(documentId)
+
+        docRef.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
                 // Obtener el valor actual de Score
                 val scoreActual = documentSnapshot.getLong("score") ?: 0
@@ -552,39 +541,95 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 val nuevoScore = scoreActual + 1
 
                 // Actualizar el documento con el nuevo valor de Score
-                documentReference.update("score", nuevoScore)
+                docRef.update("score", nuevoScore)
                     .addOnSuccessListener {
                         // Éxito al actualizar el documento
-                        println("Score incrementado con éxito a $nuevoScore en la colección ${documentReference.path}")
+                        println("Score incrementado con éxito a $nuevoScore en la colección $collection con ID $documentId")
                     }
                     .addOnFailureListener { e ->
                         // Manejar cualquier error al actualizar el documento
-                        println("Error al incrementar el Score en la colección ${documentReference.path}: $e")
+                        println("Error al incrementar el Score en la colección $collection con ID $documentId: $e")
                     }
             } else {
                 // Manejar el caso en que el documento no exista
-                println("El documento con ID ${documentReference.id} no existe en la colección ${documentReference.path}")
+                println("El documento con ID $documentId no existe en la colección $collection")
             }
         }
     }
 
-    override fun getScore(documentReference: DocumentReference) {
+
+    override fun resetScore(collection: String, documentId: String) {
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection(collection).document(documentId)
+
+        docRef.update("score", 0)
+            .addOnSuccessListener {
+                // Éxito al actualizar el documento
+                println("Score reset successfully to 0 in collection $collection with ID $documentId")
+            }
+            .addOnFailureListener { e ->
+                // Manejar cualquier error al actualizar el documento
+                println("Error resetting score in collection $collection with ID $documentId: $e")
+            }
+    }
 
 
-        documentReference.get().addOnSuccessListener { documentSnapshot ->
-            if (documentSnapshot.exists()) {
-                // Obtener el valor actual de Score
-                val scoreActual = documentSnapshot.getLong("score") ?: 0
 
-                scoreActual.toString()
+
+    override suspend fun findUserType(id: String): String {
+        val colecciones = listOf("Child", "Instructor", "Parents")
+
+        for (coleccion in colecciones) {
+            try {
+                val snapshot = firebaseFirestore.collection(coleccion).document(id).get().await()
+                if (snapshot.exists()) {
+
+                    return coleccion
+                }
+            } catch (e: FirebaseFirestoreException) {
+                // Manejar excepciones si es necesario
+                e.printStackTrace()
+            }
+        }
+
+        // Si no se encuentra en ninguna colección
+        return ""
+    }
+
+
+    override fun getScore(coleccion: String, idDocumento: String): String {
+
+        val docRef = firebaseFirestore.collection(coleccion).document(idDocumento)
+
+        try {
+            // Obtener el documento de manera sincrónica
+            val document = Tasks.await(docRef.get())
+
+            if (document.exists()) {
+                // Obtener el valor del campo "score" como entero
+                val score = document.getLong("score")
+                if (score != null) {
+                    return score.toString() // Convertir el score a String
+                } else {
+                    throw NullPointerException("El campo 'score' no existe o es nulo.")
+                }
             } else {
-                // Manejar el caso en que el documento no exista
-                println("El documento con ID ${documentReference.id} no existe en la colección ${documentReference.path}")
-                null
+                throw IllegalStateException("El documento no existe.")
             }
+        } catch (e: ExecutionException) {
+            // Manejar excepciones
+            throw e.cause ?: Exception("Error desconocido al obtener el documento.")
+        } catch (e: InterruptedException) {
+            // Manejar excepciones
+            throw Exception("Interrupción mientras se esperaba el resultado.")
         }
-        null
     }
+
+
+
+
+
+
 
 
 

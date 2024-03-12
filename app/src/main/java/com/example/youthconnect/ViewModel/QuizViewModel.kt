@@ -12,7 +12,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -40,33 +43,52 @@ class QuizViewModel @Inject constructor(
         }
     }
 
+     fun addNewQuestion(question: Question) {
+        try {
+            firestoreRepository.addNewQuestion(question)
+
+        } catch (e: Exception) {
+            // Maneja cualquier excepción aquí, por ejemplo, registrándola o lanzándola
+        }
+
+    }
+
 
 
      fun updateScore(userID: String){
 
-         GlobalScope.launch(Dispatchers.IO) {
-             val documentReference = firestoreRepository.findID(userID)
-
-             if (documentReference != null) {
-
-                 firestoreRepository.updateScore(documentReference)
+             val collection = runBlocking {
+                 firestoreRepository.findUserType(userID)
              }
-         }
+
+             if (collection != null) {
+
+                 firestoreRepository.updateScore(collection, userID)
+             }
 
 
     }
 
-    fun getScore(userID: String){
 
-        GlobalScope.launch(Dispatchers.IO) {
-            val documentReference = firestoreRepository.findID(userID)
+    fun resetScore(userID: String){
 
-            if (documentReference != null) {
+        val collection = runBlocking {
+            firestoreRepository.findUserType(userID)
+        }
 
-                firestoreRepository.getScore(documentReference)
-            }
+        if (collection != null) {
+
+            firestoreRepository.resetScore(collection, userID)
         }
 
 
+    }
+
+    suspend fun getScore(userID: String): String? = withContext(Dispatchers.IO) {
+        val collection = firestoreRepository.findUserType(userID)
+        if (collection != null) {
+            return@withContext firestoreRepository.getScore(collection, userID)
+        }
+        return@withContext ""
     }
 }

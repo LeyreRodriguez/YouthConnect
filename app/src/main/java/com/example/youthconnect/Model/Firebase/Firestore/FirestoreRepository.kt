@@ -7,6 +7,7 @@ import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -51,10 +52,17 @@ interface FirestoreRepository {
     suspend fun getChatId(chatId : String) : String?
 
     suspend fun getQuestions() : List<Question?>
+    fun addNewQuestion(question: Question )
 
-    fun findID(documentId: String) : DocumentReference?
 
-    fun updateScore(documentReference: DocumentReference)
-    fun getScore(documentReference: DocumentReference)
+    fun updateScore(collection: String, documentId: String)
+
+    fun resetScore(collection: String, documentId: String)
+
+    suspend fun findUserType(id: String): String
+
+    fun getScore(coleccion: String, idDocumento: String): String
+
+
 
 }

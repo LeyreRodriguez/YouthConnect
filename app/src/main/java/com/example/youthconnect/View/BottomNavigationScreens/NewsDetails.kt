@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -135,42 +136,23 @@ fun NewsDetails(newsId : String,
                             .padding(start = 15.dp, top = 10.dp)
                     )
                 }
-/*
-                Image(
-                    painter = painterResource(id = R.drawable.user_icon),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .border(
-                            BorderStroke(4.dp, remember {
-                                Brush.sweepGradient(
-                                    listOf(
-                                        Green, Red
-                                    )
-                                )
-                            }),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                )
-
-                */
-
 
             }
+
+
+
             val configuration = LocalConfiguration.current
             val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
             news?.Image?.let {
                 CoilImage(
                     imageUrl = it,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f), // Proporción de aspecto cuadrado, puedes ajustarlo según tus necesidades
                     contentScale = ContentScale.Crop,
                     width = screenWidth,
-                    height = Dp(150.0F)
-
+                    height = Dp(300.0F) // Altura inicial
                 )
             }
 

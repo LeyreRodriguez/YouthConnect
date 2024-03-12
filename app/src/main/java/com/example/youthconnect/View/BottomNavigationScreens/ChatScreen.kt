@@ -85,6 +85,8 @@ import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ui.theme.Line
 import com.example.youthconnect.ui.theme.Yellow
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 
 @Composable
@@ -188,7 +190,7 @@ fun UserEachRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .noRippleEffect { onClick() }
+            .clickable { onClick() }
             .padding(horizontal = 20.dp, vertical = 5.dp),
     ) {
         Column {
@@ -197,20 +199,20 @@ fun UserEachRow(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row {
-                   //IconComponentDrawable(icon = person.icon, size = 60.dp)
                     SpacerWidth()
                     Column {
                         person.userName?.let {
                             Text(
-                                text = it, style = TextStyle(
-                                    color = Color.Black, fontSize = 15.sp, fontWeight = FontWeight.Bold
+                                text = it,
+                                style = TextStyle(
+                                    color =  Color.Black,  // Cambiar el color del texto si hay nuevos mensajes no vistos
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             )
                         }
                         SpacerHeight(5.dp)
-
                     }
-
                 }
 
             }
@@ -218,36 +220,11 @@ fun UserEachRow(
             Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Line)
         }
     }
-
 }
 
-@Composable
-fun UserStory(
-    person: UserData, modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.padding(end = 10.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .border(1.dp, Yellow, CircleShape)
-                .background(Yellow, shape = CircleShape)
-                .size(70.dp),
-            contentAlignment = Alignment.Center
-        ) {
-           // IconComponentDrawable(icon = person.icon, size = 65.dp)
-        }
-        SpacerHeight(8.dp)
-        person.userName?.let {
-            Text(
-                text = it, style = TextStyle(
-                    color = Color.White, fontSize = 13.sp,
-                ), modifier = Modifier.align(CenterHorizontally)
-            )
-        }
 
-    }
-}
+
+
 
 
 @SuppressLint("UnnecessaryComposedModifier")
