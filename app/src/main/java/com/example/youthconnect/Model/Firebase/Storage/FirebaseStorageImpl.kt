@@ -76,7 +76,7 @@ class FirebaseStorageImpl @Inject constructor(
         }
     }
 
-    override suspend fun addNewsImageUrlToFirestore(download: Uri, news : News): AddImageUrlToFirestoreResponse {
+    override suspend fun addNewsImageUrlToFirestore(download: String, news : News): AddImageUrlToFirestoreResponse {
         return try {
             db.collection("News").document(news.id).set(mapOf(
                 Constants.URL to download,

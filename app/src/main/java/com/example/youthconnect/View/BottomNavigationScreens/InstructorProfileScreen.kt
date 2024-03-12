@@ -89,7 +89,7 @@ fun InstructorProfileScreen(instructorId : String,
    // val ProfileViewModel : profileViewModel = hiltViewModel()
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
-
+    var showDialog by remember { mutableStateOf(false)  }
 
     LaunchedEffect(UserViewModel) {
         try {
@@ -279,7 +279,8 @@ fun InstructorProfileScreen(instructorId : String,
                         .size(80.dp)
                         .padding(15.dp)
                         .clickable {
-                            navController.navigate(NavScreen.AddInstructor.name)
+                            //navController.navigate(NavScreen.AddInstructor.name)
+                            showDialog = true
                         }
                         .border(
                             BorderStroke(4.dp, remember {
@@ -295,6 +296,10 @@ fun InstructorProfileScreen(instructorId : String,
                         .clip(CircleShape)
 
                 )
+                if (showDialog) {
+                    AddInstructor(onDismiss = { showDialog = false })
+                }
+
 
                 Column(
                     modifier = Modifier

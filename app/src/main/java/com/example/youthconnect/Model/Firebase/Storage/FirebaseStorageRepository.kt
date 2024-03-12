@@ -14,7 +14,7 @@ interface FirebaseStorageRepository {
     suspend fun getProfileImageUrl(userId: String): String
 
     suspend fun addNewsImageToFirebaseStorage(imageUri: Uri,  id : String) : AddImageToStorageResponse
-    suspend fun addNewsImageUrlToFirestore(download : Uri, news : News) : AddImageUrlToFirestoreResponse
+    suspend fun addNewsImageUrlToFirestore(download : String, news : News) : AddImageUrlToFirestoreResponse
 
     suspend fun getNewsImageUrlFromFirestore(): GetImageFromFirestoreResponse
 

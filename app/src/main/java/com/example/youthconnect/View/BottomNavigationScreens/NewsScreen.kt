@@ -85,6 +85,7 @@ fun NewsScreen(
 
     val documentExists = remember { mutableStateOf("-1") }
     var result by remember { mutableStateOf<String?>("") }
+    var showDialog by remember { mutableStateOf(false)  }
 
 
     LaunchedEffect(NewsViewModel) {
@@ -213,10 +214,15 @@ fun NewsScreen(
                         FloatingButton {
                             // Aquí puedes agregar la lógica que se activará al hacer clic en el botón
                             // Por ejemplo, puedes navegar a una nueva pantalla
-                            navController.navigate("addNews")
+                           // navController.navigate("addNews")
+                            showDialog = true
                         }
 
 
+                    }
+
+                    if (showDialog) {
+                        AddNews(onDismiss = { showDialog = false })
                     }
 
 

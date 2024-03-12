@@ -67,15 +67,11 @@ class NewsViewModel @Inject constructor(
         addImageToStorageResponse = repo.addNewsImageToFirebaseStorage(imageUri, id)
     }
 
-    fun addNewsToDatabase(downloadUrl : Uri, news : News) = viewModelScope.launch {
+    fun addNewsToDatabase(downloadUrl : String, news : News) = viewModelScope.launch {
         addImageToStorageResponse = Response.Loading
         addImageToDatabaseResponse = repo.addNewsImageUrlToFirestore(downloadUrl, news)
     }
 
-    fun getNewsImageFromDatabase() = viewModelScope.launch {
-        getImageFromDatabaseResponse = Response.Loading
-        getImageFromDatabaseResponse = repo.getNewsImageUrlFromFirestore()
-    }
 
 
 

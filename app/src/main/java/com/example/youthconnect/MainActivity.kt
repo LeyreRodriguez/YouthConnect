@@ -221,25 +221,7 @@ class MainActivity : ComponentActivity() {
                     route = "secondScreens"
                 ){
 
-                    composable("addNews") {
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                AddNews()
-                            }
 
-
-                        }
-
-
-                    }
 
 
                     composable(NavScreen.NewsScreen.name){
