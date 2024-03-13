@@ -301,29 +301,6 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    composable(
-                        route = NavScreen.ChildList.name +"/{instructorID}",
-                        arguments = listOf(navArgument("instructorID") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val instructorID = backStackEntry.arguments?.getString("instructorID") ?: ""
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                ChildListScreen(navController = navController, instructorID = instructorID)
-                            }
-
-
-                        }
-
-
-                    }
 
 
 

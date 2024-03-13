@@ -59,6 +59,7 @@ class NewsViewModel @Inject constructor(
         private set
     var addImageToDatabaseResponse by mutableStateOf<Response<Boolean>>(Response.Success(null))
         private set
+
     var getImageFromDatabaseResponse by mutableStateOf<Response<String>>(Response.Success(null))
         private set
 
@@ -67,12 +68,15 @@ class NewsViewModel @Inject constructor(
         addImageToStorageResponse = repo.addNewsImageToFirebaseStorage(imageUri, id)
     }
 
-    fun addNewsToDatabase(downloadUrl : String, news : News) = viewModelScope.launch {
+    fun addNewsToDatabase(downloadUrl : Uri, news : News) = viewModelScope.launch {
         addImageToStorageResponse = Response.Loading
-        addImageToDatabaseResponse = repo.addNewsImageUrlToFirestore(downloadUrl, news)
+        addImageToDatabaseResponse = repo.addNewsImageUrlToFirestore(downloadUrl.toString(), news)
     }
 
-
+    fun getNewsImageFromDatabase() = viewModelScope.launch {
+        getImageFromDatabaseResponse = Response.Loading
+        getImageFromDatabaseResponse = repo.getNewsImageUrlFromFirestore()
+    }
 
 
 }

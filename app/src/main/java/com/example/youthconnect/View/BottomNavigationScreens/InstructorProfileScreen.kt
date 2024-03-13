@@ -30,7 +30,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Output
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -358,11 +363,7 @@ fun InstructorProfileScreen(instructorId : String,
                             )
                         }
 
-
-
-                        //  Spacer(modifier = Modifier.size(40.dp))
                     }
-
 
 
                     Column (
@@ -406,7 +407,7 @@ fun InstructorProfileScreen(instructorId : String,
                         ) {
                             items(items = children) { item ->
                                 if (item != null) {
-                                    user(navController = navController, item)
+                                    MyChildren(navController = navController, item)
                                 }
                             }
                         }
@@ -475,84 +476,5 @@ fun InstructorProfileScreen(instructorId : String,
 
 
 
-@Composable
-fun user(navController: NavController, child: Child){
-
-
-    val UserViewModel : UserViewModel = hiltViewModel()
-
-    val imageUrlState = remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(child.ID.lowercase() + "@youthconnect.com",
-            onSuccess = { url ->
-                imageUrlState.value = url
-            },
-            onFailure = { exception ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
-            }
-        )
-    }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-
-                navController.navigate("child_profile_screen/${child.ID}")
-            }
-            .padding(4.dp)
-
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-
-            if(child.GoOutAlone) {
-
-                AsyncImage(
-                    model = imageUrlState.value,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .border(
-                            BorderStroke(4.dp, SolidColor(Green)),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                AsyncImage(
-                    model = imageUrlState.value,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .border(
-                            BorderStroke(4.dp, SolidColor(Red)),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            Text(
-                text = child.FullName,
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-                modifier = Modifier.padding(start = 10.dp)
-
-            )
-
-
-
-
-        }
-    }
-}
 
 

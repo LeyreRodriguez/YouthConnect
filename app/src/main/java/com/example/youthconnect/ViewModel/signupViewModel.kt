@@ -98,8 +98,13 @@ class signUpViewModel @Inject constructor(
 
 
     fun selectChild(child :Child, instructorID: String, isChecked:Boolean){
+
+
         viewModelScope.launch {
             if (isChecked) {
+                Log.d("Checkbox", "isChecked: $isChecked")
+                Log.d("instructorID", "instructorID: $instructorID")
+                Log.d("child", "child: $child")
                 // Si el checkbox está marcado, agrega al instructor al niño
                 firestoreRepository.addInstructorToChild(child, instructorID)
 

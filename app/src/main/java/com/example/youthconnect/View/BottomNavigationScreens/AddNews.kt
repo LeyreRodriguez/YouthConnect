@@ -2,64 +2,38 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 
-import androidx.compose.foundation.layout.Column
-
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.PermIdentity
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarResult.ActionPerformed
 import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Newspaper
-import androidx.compose.material.icons.filled.QuestionAnswer
-import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material.icons.outlined.Newspaper
-import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.youthconnect.Model.Constants.ALL_IMAGES
-import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.News
-import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Sealed.Response
-import com.example.youthconnect.R
 import com.example.youthconnect.ViewModel.NewsViewModel
-import com.example.youthconnect.ViewModel.QuizViewModel
-import com.example.youthconnect.ViewModel.signUpViewModel
-import kotlinx.coroutines.launch
 import java.util.UUID
 
 
@@ -80,8 +54,11 @@ fun AddNews(onDismiss: () -> Unit) {
         selectedUri?.let {
             imageUri = it // Actualizar la URI de la imagen seleccionada
             newsViewModel.addNewsToStorage(selectedUri, id) // Podrías mover esta llamada al ViewModel si es necesario
+            Log.e("FOTO2", selectedUri.toString())
         }
     }
+
+
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -110,6 +87,7 @@ fun AddNews(onDismiss: () -> Unit) {
                     ) {
                         Text("Select Image")
                     }
+                    Log.e("FOTO", imageUri.toString())
 
                     // Mostrar la imagen seleccionada
                     imageUri?.let { uri ->
@@ -130,7 +108,15 @@ fun AddNews(onDismiss: () -> Unit) {
             TextButton(
                 onClick = {
                     val news = News(id, title, description)
-                    newsViewModel.addNewsToDatabase(imageUri.toString(), news)
+                    newsViewModel.getNewsImageFromDatabase()
+
+                    // Check if the image upload was successful
+                    if (newsViewModel.addImageToStorageResponse is Response.Success) {
+                        val imageUrl = (newsViewModel.addImageToStorageResponse as Response.Success).data.toString()
+
+                        // Invoke addNewsToDatabase with imageUrl as String
+                        newsViewModel.addNewsToDatabase(Uri.parse(imageUrl), news)
+                    }
 
                     title = ""
                     description = ""

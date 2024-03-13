@@ -26,8 +26,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +46,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -71,6 +74,7 @@ import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ViewModel.signUpViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
+import com.example.youthconnect.ui.theme.Yellow
 
 
 @Composable
@@ -368,108 +372,3 @@ fun ParentsProfileScreen(parentId : String,
     }
 
 
-
-
-
-
-@Composable
-fun MyChildren(navController: NavController, child: Child){
-    val UserViewModel : UserViewModel = hiltViewModel()
-
-    val imageUrlState = remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(child.ID.lowercase() + "@youthconnect.com",
-            onSuccess = { url ->
-                imageUrlState.value = url
-            },
-            onFailure = { exception ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
-            }
-        )
-    }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-
-                navController.navigate("child_profile_screen/${child.ID}")
-            }
-            .padding(4.dp)
-
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-
-            if(child.GoOutAlone) {
-
-                AsyncImage(
-                    model = imageUrlState.value,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .border(
-                            BorderStroke(4.dp, SolidColor(Green)),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                AsyncImage(
-                    model = imageUrlState.value,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .border(
-                            BorderStroke(4.dp, SolidColor(Red)),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            Text(
-                text = child.FullName,
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-                modifier = Modifier.padding(start = 10.dp)
-
-            )
-
-            if(child.State){
-                Text(
-                    text = "Inside",
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    ),
-                    modifier = Modifier.padding(start = 10.dp)
-
-                )
-            }else{
-
-                Text(
-                    text = "Outside",
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    ),
-                    modifier = Modifier.padding(start = 10.dp)
-
-                )
-
-            }
-
-
-
-
-        }
-    }
-}

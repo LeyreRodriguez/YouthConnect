@@ -64,7 +64,7 @@ class FirebaseStorageImpl @Inject constructor(
         }
     }
 
-    override suspend fun addNewsImageToFirebaseStorage(imageUri: Uri,  id : String): AddImageToStorageResponse {
+    override suspend fun addNewsImageToFirebaseStorage(imageUri: Uri, id: String): AddImageToStorageResponse {
         return try {
             val downloadUrl = storage.reference.child(Constants.NEWS_IMAGES).child(id)
                 .putFile(imageUri).await()

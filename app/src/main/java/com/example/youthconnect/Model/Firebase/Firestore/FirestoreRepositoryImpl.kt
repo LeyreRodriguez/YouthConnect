@@ -63,7 +63,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 Observations = document.getString("observations") ?: "",
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                 InstructorID = document.getString("instructorID") ?: "",
-                State = document.getBoolean("State") ?: false,
+                State = document.getBoolean("state") ?: false,
                 Score = document.getLong("Score")?.toInt() ?: null
             )
         } catch (e: Exception) {
@@ -90,7 +90,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("State") ?: false,
+                        State = document.getBoolean("state") ?: false,
                         Score = document.getLong("Score")?.toInt() ?: null
                     )
                 }
@@ -119,7 +119,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("State") ?: false,
+                        State = document.getBoolean("state") ?: false,
                         Score = document.getLong("Score")?.toInt() ?: null
                     )
                 }
@@ -148,7 +148,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         Observations = document.getString("observations") ?: "",
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("State") ?: false,
+                        State = document.getBoolean("state") ?: false,
                         Score = document.getLong("Score")?.toInt() ?: null
                     )
                 }
@@ -171,7 +171,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 Observations = document.getString("observations") ?: "",
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                 InstructorID = document.getString("instructorID") ?: "",
-                State = document.getBoolean("State") ?: false,
+                State = document.getBoolean("state") ?: false,
                 Score = document.getLong("Score")?.toInt() ?: null
             )
         } catch (e: Exception) {
@@ -393,10 +393,10 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
             val childDocumentRef = firebaseFirestore.collection("Child").document(childId)
             val childDocument = childDocumentRef.get().await()
 
-            val currentState = childDocument.getBoolean("State") ?: false
+            val currentState = childDocument.getBoolean("state") ?: false
 
             // Cambiar el valor de State al opuesto del estado actual
-            childDocumentRef.update("State", !currentState).await()
+            childDocumentRef.update("state", !currentState).await()
 
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "toggleChildState failed with $e")

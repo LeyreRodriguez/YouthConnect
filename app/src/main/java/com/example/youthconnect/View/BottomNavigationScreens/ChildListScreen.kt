@@ -1,6 +1,7 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -62,6 +63,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
@@ -217,7 +219,9 @@ fun ChildListScreen(navController : NavController, instructorID: String){
                             it?.FullName?.contains(searchedText, ignoreCase = true) ?: false
                         }, key = { it?.ID ?: "" }) { item ->
                             if (item != null) {
-                                list(navController = navController, item, instructorID, myKids)
+                              // list(navController = navController, item, instructorID, myKids)
+                                MyChildren(navController = navController, item)
+
                             }
                         }
                     }
@@ -239,17 +243,36 @@ fun ChildListScreen(navController : NavController, instructorID: String){
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun list(navController: NavController, child: Child, instructorID: String, myKids: List<Child?>) {
+fun MyChildren(navController: NavController, child: Child) {
 
     val SignUpViewModel: signUpViewModel = hiltViewModel()
-
+    val UserViewModel: UserViewModel = hiltViewModel()
     var isChecked by remember { mutableStateOf(false) }
+
+
+
+    var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
+    var instructorID by remember { mutableStateOf("") }
+
+
+
+    LaunchedEffect(UserViewModel) {
+        try {
+            instructorID = UserViewModel.getCurrentUser().toString()
+            myKids = instructorID?.let { UserViewModel.getChildByInstructorId(it) }!!
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
+        }
+    }
+
+
 
     LaunchedEffect(key1 = child.ID, key2 = myKids) {
         isChecked = myKids.any { it?.ID == child.ID }
     }
 
-    val UserViewModel : UserViewModel = hiltViewModel()
+
 
     val imageUrlState = remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
@@ -293,9 +316,6 @@ fun list(navController: NavController, child: Child, instructorID: String, myKid
                 contentScale = ContentScale.Crop
             )
 
-
-
-
             Text(
                 text = child.FullName,
                 style = TextStyle(
@@ -308,14 +328,22 @@ fun list(navController: NavController, child: Child, instructorID: String, myKid
                 textAlign = TextAlign.Start
             )
 
-            Checkbox(
-                checked = isChecked,
-                onCheckedChange = { newCheckedState ->
-                    isChecked = newCheckedState
-                    SignUpViewModel.selectChild(child, instructorID, newCheckedState)
-                },
-                modifier = Modifier.padding(end = 8.dp)
-            )
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+
+            if (currentRoute == NavScreen.ChildList.name +"/{instructorID}") {
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = { newCheckedState ->
+                        isChecked = newCheckedState
+                        if (instructorID != null) {
+                            SignUpViewModel.selectChild(child, instructorID, newCheckedState)
+                        }
+                    },
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
         }
     }
 }
+
+
