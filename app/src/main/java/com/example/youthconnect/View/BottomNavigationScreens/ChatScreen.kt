@@ -3,6 +3,8 @@ package com.example.youthconnect.View.BottomNavigationScreens
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,6 +47,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -69,21 +73,34 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ui.theme.Line
+import com.example.youthconnect.ui.theme.Violet
 import com.example.youthconnect.ui.theme.Yellow
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -116,68 +133,70 @@ fun HomeScreen(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
+        modifier = Modifier.fillMaxSize(),
     ) {
+        Canvas(
+            modifier = Modifier.fillMaxSize(),
+            onDraw = {
+                // Dibuja un rectángulo blanco como fondo
+                drawRect(Color.White)
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 30.dp)
-        ) {
-           // HeaderOrViewStory(allUsers)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Color.White, RoundedCornerShape(
-                            topStart = 30.dp, topEnd = 30.dp
-                        )
+                // Define el pincel para el borde con el gradiente del Brush
+                val borderBrush = Brush.horizontalGradient(
+                    listOf(
+                        Color(0xFFE15554),
+                        Color(0xFF3BB273),
+                        Color(0xFFE1BC29),
+                        Color(0xFF4D9DE0)
                     )
-            ) {
-                BottomSheetSwipeUp(
-                    modifier = Modifier
-                        .align(TopCenter)
-                        .padding(top = 15.dp)
                 )
-                LazyColumn(
-                    modifier = Modifier.padding(bottom = 15.dp, top = 30.dp)
-                ) {
-                    items(allUsers, key = { it?.userId ?: "" }) {
-                        if (it != null) {
-                            UserEachRow(person = it) {
 
-                                navHostController.navigate("chatscreen/${it.userId}")
+                // Dibuja el borde con el pincel definido
+                drawRect(
+                    brush = borderBrush,
+                    topLeft = Offset(0f, 0f),
+                    size = Size(size.width, size.height),
+                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
+                )
+            }
+        )
+
+
+        Column(modifier = Modifier.fillMaxHeight()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(10.dp)) {
+
+                val textState = remember { mutableStateOf(TextFieldValue(""))}
+
+                SearchView(state= textState, placeHolder= "Search here...", modifier = Modifier)
+
+                val searchedText = textState.value.text
+
+
+                LazyColumn(modifier = Modifier.padding(10.dp)) {
+                    items(items = allUsers.filter {
+                        it?.userName?.contains(searchedText, ignoreCase = true) ?: false
+                    }, key = { it?.userId ?: "" }) { item ->
+                        if (item != null) {
+                            // list(navController = navController, item, instructorID, myKids)
+                           // MyChildren(navController = navController, item)
+                            UserEachRow(person = item) {
+                                navHostController.navigate("chatscreen/${item.userId}")
                             }
+
+
                         }
                     }
                 }
+
             }
+
         }
 
     }
 
+
 }
-
-
-@Composable
-fun BottomSheetSwipeUp(
-    modifier: Modifier
-) {
-
-    Box(
-        modifier = modifier
-            .background(
-                Color.Gray,
-                RoundedCornerShape(90.dp)
-            )
-            .width(90.dp)
-            .height(5.dp)
-
-    )
-}
-
 
 @OptIn(InternalPlatformTextApi::class)
 @Composable
@@ -186,39 +205,60 @@ fun UserEachRow(
     onClick: () -> Unit
 ) {
 
-    Box(
+    val UserViewModel : UserViewModel = hiltViewModel()
+    val imageUrlState = remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        UserViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
+            onSuccess = { url ->
+                imageUrlState.value = url
+            },
+            onFailure = { exception ->
+                print("Child not found")
+            }
+        )
+    }
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
             .clickable { onClick() }
-            .padding(horizontal = 20.dp, vertical = 5.dp),
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row {
-                    SpacerWidth()
-                    Column {
-                        person.userName?.let {
-                            Text(
-                                text = it,
-                                style = TextStyle(
-                                    color =  Color.Black,  // Cambiar el color del texto si hay nuevos mensajes no vistos
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            )
-                        }
-                        SpacerHeight(5.dp)
-                    }
-                }
+            .padding(4.dp)
 
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+
+            AsyncImage(
+                model = imageUrlState.value,
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(50.dp)
+
+                    .padding(4.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            person.userName?.let {
+                Text(
+                    text = it,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    ),
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .align(CenterVertically)
+
+                )
             }
-            SpacerHeight(15.dp)
-            Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Line)
+
+
         }
+
+
     }
 }
 
@@ -239,24 +279,6 @@ fun Modifier.noRippleEffect(onClick: () -> Unit) = composed {
 
 
 
-
-
-
-
-@Composable
-fun SpacerWidth(
-    width: Dp = 10.dp
-) {
-    Spacer(modifier = Modifier.width(width))
-}
-
-@Composable
-fun SpacerHeight(
-    height: Dp = 10.dp
-) {
-    Spacer(modifier = Modifier.height(height))
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(recipientUserId: String, chatViewModel: ChatViewModel = hiltViewModel()) {
@@ -267,62 +289,70 @@ fun ChatScreen(recipientUserId: String, chatViewModel: ChatViewModel = hiltViewM
     val messages: List<Map<String, Any>> by chatViewModel.messages.observeAsState(
         initial = emptyList<Map<String, Any>>().toMutableList()
     )
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(weight = 0.85f, fill = true),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            reverseLayout = true
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom
         ) {
-            items(messages) { message ->
-                val isCurrentUser = message[Constants.IS_CURRENT_USER] as Boolean
 
-                SingleMessage(
-                    message = message[Constants.MESSAGE].toString(),
-                    isCurrentUser = isCurrentUser
-                )
-            }
-        }
-        OutlinedTextField(
-            value = message,
-            onValueChange = {
-                chatViewModel.updateMessage(it)
-            },
-            label = {
-                Text(
-                    "Type Your Message"
-                )
-            },
-            maxLines = 1,
-            modifier = Modifier
-                .padding(horizontal = 15.dp, vertical = 1.dp)
-                .fillMaxWidth()
-                .weight(weight = 0.09f, fill = true),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text
-            ),
-            singleLine = true,
-            trailingIcon = {
-                IconButton(
-                    onClick = {
-                        chatViewModel.addMessage(recipientUserId)
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = "Send Button"
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(weight = 0.85f, fill = true),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                reverseLayout = true
+            ) {
+                items(messages) { message ->
+                    val isCurrentUser = message[Constants.IS_CURRENT_USER] as Boolean
+
+                    SingleMessage(
+                        message = message[Constants.MESSAGE].toString(),
+                        isCurrentUser = isCurrentUser
                     )
                 }
             }
-        )
-    }
+            OutlinedTextField(
+                value = message,
+                onValueChange = {
+                    chatViewModel.updateMessage(it)
+                },
+                label = {
+                    Text(
+                        "Type Your Message"
+                    )
+                },
+                maxLines = 5,
+                modifier = Modifier
+                    .padding(horizontal = 15.dp, vertical = 1.dp)
+                    .fillMaxWidth()
+                    .weight(weight = 0.09f, fill = true),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text
+                ),
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            chatViewModel.addMessage(recipientUserId)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Send,
+                            contentDescription = "Send Button",
+                            tint = Violet
+                        )
+                    }
+                }
+            )
+        }
+
+
+
+
+
+
 }
 
 

@@ -104,6 +104,7 @@ fun SignUpView( navController: NavController) {
     var validateChildPassword by rememberSaveable { mutableStateOf(true) }
     var isChildPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var isParentPasswordVisible by rememberSaveable { mutableStateOf(false) }
+
     var parentFullName by remember { mutableStateOf("") }
     var parentID  by remember { mutableStateOf("") }
     var parentPhoneNumber  by remember { mutableStateOf("") }
@@ -112,21 +113,14 @@ fun SignUpView( navController: NavController) {
     var childID  by remember { mutableStateOf("")}
     var childCourse  by remember { mutableStateOf("") }
     var childPassword  by remember { mutableStateOf("") }
+
     var belongsToSchool  by remember { mutableStateOf(false) }
     var faithGroups  by remember { mutableStateOf(false) }
     var goOutAlone  by remember { mutableStateOf(false) }
     var observations  by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     val mcontext = LocalContext.current
-    val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=]).{8,}".toRegex()
-    val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
-    validateParentFullName = parentFullName.isNotBlank()
-    validateParentID = parentID.matches(IDRegex)
-    validateParentPhoneNumber = Patterns.PHONE.matcher(parentPhoneNumber).matches()
-    validateParentPassword = password.matches(passwordRegex)
-    validateChildFullName = childFullName.isNotBlank()
-    validateChildID = childID.matches(IDRegex)
-    validateChildPassword = childPassword.matches(passwordRegex)
+
 
     val validateParentFullNameError = "Please, input a a valid name"
     val validateParentIDError = "The format of the ID doesn´t seem right"
@@ -134,7 +128,6 @@ fun SignUpView( navController: NavController) {
     val validateParentPasswordError = "Must mix capital and non-capital letters, a number, special character and minimun length of 8"
     val validateChildFullNameError = "Please, input a valid ID"
     val validateChildIDError = "The format of the ID doesn´t seem right"
-    val validateChildCourseError = "You have to choose one course"
     val validateChildPasswordError = "Must mix capital and non-capital letters, a number, special character and minimun length of 8"
 
     fun validateData(parentFullName: String,
@@ -142,12 +135,12 @@ fun SignUpView( navController: NavController) {
                      parentPhoneNumber: String,
                      parentPassword : String,
                      childFullName: String,
-                     childCourse: String,
                      childID: String,
                      childPassword : String) : Boolean{
-        val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=.]).{8,}".toRegex()
+        val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%\$^&+=./\\\\_-]).{8,}".toRegex()
 
         val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
+
         validateParentFullName = parentFullName.isNotBlank()
         validateParentID = parentID.matches(IDRegex)
         validateParentPhoneNumber = Patterns.PHONE.matcher(parentPhoneNumber).matches()
@@ -155,6 +148,7 @@ fun SignUpView( navController: NavController) {
         validateChildFullName = childFullName.isNotBlank()
         validateChildID = childID.matches(IDRegex)
         validateChildPassword = childPassword.matches(passwordRegex)
+
         return validateParentFullName && validateParentID && validateParentPhoneNumber && validateParentPassword && validateChildFullName && validateChildID && validateChildPassword
     }
     fun register(parentFullName: String,
@@ -162,11 +156,10 @@ fun SignUpView( navController: NavController) {
                  parentPhoneNumber: String,
                  parentPassword : String,
                  childFullName: String,
-                 childCourse: String,
                  childID: String,
                  childPassword : String)
     {
-        if (validateData(parentFullName, parentID, parentPhoneNumber, parentPassword, childFullName, childCourse, childID, childPassword)){
+        if (validateData(parentFullName, parentID, parentPhoneNumber, parentPassword, childFullName, childID, childPassword)){
 
             val parentsID : List<String>  = listOf(parentID)
             val parent = Parent(parentFullName,
@@ -185,11 +178,14 @@ fun SignUpView( navController: NavController) {
                 parentsID,
                 "",
                 false)
+
             signUpViewModel.registerUser(parentID, password)
             signUpViewModel.registerUser(childID, childPassword)
 
-            signUpViewModel.addParent(parent)
+
             signUpViewModel.addChild(child)
+            signUpViewModel.addParent(parent)
+
 
             navController.navigate(NavScreen.NewsScreen.name)
         }else{
@@ -201,7 +197,7 @@ fun SignUpView( navController: NavController) {
         if (shouldNavigate == true) {
             navController.navigate("login") {
                 // Configuraciones adicionales de navegación si las necesitas
-                popUpTo("seconScreens") { inclusive = true }
+                popUpTo("secondScreens") { inclusive = true }
             }
         }
     }
@@ -418,7 +414,7 @@ fun SignUpView( navController: NavController) {
 
                         Button(
                             onClick = {
-                                register(parentFullName, parentID, parentPhoneNumber, password, childFullName,childCourse, childID, childPassword)
+                                register(parentFullName, parentID, parentPhoneNumber, password, childFullName, childID, childPassword)
 
                             },
                             modifier = Modifier

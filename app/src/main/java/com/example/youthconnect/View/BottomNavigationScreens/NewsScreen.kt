@@ -166,7 +166,9 @@ fun NewsScreen(
 
 
 
-                userImage(user = user.toString(), navController = navController , documentExists.value)
+                if (user.toString().isNotEmpty()) {
+                     userImage(user = user.toString(), navController = navController , documentExists.value)
+                }
 
 
             }
@@ -275,13 +277,15 @@ fun userImage(user: String,
         modifier = Modifier
             .size(50.dp)
             .clickable {
-
+                Log.e("USER", user)
                 if (documentExists == "0") {
                     navController.navigate("instructor_profile_screen/${user}")
-                } else if (documentExists == "1") {
+                }  else if (documentExists == "1") {
                     navController.navigate("parent_profile_screen/${user}")
-                } else {
+                } else if (documentExists == "2") {
                     navController.navigate("child_profile_screen/${user}")
+                } else{
+                    navController.navigate("parent_profile_screen/${user}")
                 }
 
             }

@@ -242,6 +242,8 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+
+
                     composable(NavScreen.QuizScreen.name){
                         Scaffold(
                             bottomBar = {
@@ -327,6 +329,8 @@ class MainActivity : ComponentActivity() {
 
 
                     }
+
+
 
                     composable("Scores"){
                         Scaffold(

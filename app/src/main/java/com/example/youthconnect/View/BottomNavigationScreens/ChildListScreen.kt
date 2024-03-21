@@ -92,7 +92,7 @@ fun SearchView(
             },
             modifier
                 //.fillMaxWidth()
-                .padding(20.dp)
+                .padding(10.dp)
                 .clip(RoundedCornerShape(30.dp))
                 .border(2.dp, Color.DarkGray, RoundedCornerShape(30.dp)),
 
@@ -136,10 +136,6 @@ fun SearchView(
 @Composable
 fun ChildListScreen(navController : NavController, instructorID: String){
 
-/*
-    val childViewModel: ChildViewModel = viewModel()
-    val childState by childViewModel.childState.collectAsState(initial = emptyList())
-*/
     val UserViewModel : UserViewModel = hiltViewModel()
     var childs by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var instructor by remember { mutableStateOf<Instructor?>(null) }
@@ -157,11 +153,6 @@ fun ChildListScreen(navController : NavController, instructorID: String){
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
-
-
-
-
-
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {

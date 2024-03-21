@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -369,8 +371,10 @@ fun ChildProfileScreen(
                         fontWeight = FontWeight(400),
                         color = Color(0xFF000000),
                         letterSpacing = 0.9.sp,
+                        textAlign = TextAlign.Center
                     ), modifier = Modifier
                         .padding(start = 15.dp, top = 10.dp)
+                        .fillMaxWidth()
                         .clickable { loginViewModel.signOut()
                             navController.navigate("login")}
                 )

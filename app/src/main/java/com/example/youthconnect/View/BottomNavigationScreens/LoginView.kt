@@ -62,35 +62,51 @@ import com.example.youthconnect.R
 @Composable
 fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavController, state : SignInState, onSignInClick: () -> Unit) {
 
-
+    val mcontext = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
 
     var ID by remember {mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
+
     var validateUserID by rememberSaveable { mutableStateOf(true) }
     var validateUserPassword by rememberSaveable { mutableStateOf(true) }
-
-    val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=]).{8,}".toRegex()
-    val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
-
-    validateUserID = ID.matches(IDRegex)
-    validateUserPassword = password.matches(passwordRegex)
-
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+
+
+
 
     LaunchedEffect(key1 = state.signInError){
         state.signInError?.let { error ->
             Toast.makeText(
-                context,
+                mcontext,
                 error,
                 Toast.LENGTH_LONG
             ).show()
         }
     }
 
+
+    fun validate(ID : String, password : String) : Boolean{
+        val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=./\\\\_-]).{8,}".toRegex()
+        val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
+
+        validateUserID = ID.matches(IDRegex)
+        validateUserPassword = password.matches(passwordRegex)
+
+        return validateUserID && validateUserPassword
+    }
+
+    fun register(ID : String, password : String){
+        if (validate(ID, password)){
+            loginViewModel.signInWithEmail(ID + "@youthconnect.com", password) {
+                navController.navigate(NavScreen.NewsScreen.name)
+            }
+        }else{
+            Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     val brush = Brush.horizontalGradient(
         listOf(
@@ -163,17 +179,11 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                         modifier = Modifier.fillMaxSize())
                     {
 
-/*
-                        OutlinedTextField(
-                            value = ID,
-                            onValueChange = { ID = it },
-                            label = { Text("Enter username") },
-                        )
-*/
+
                         CustomOutlinedTextField(
                             value = ID,
                             onValueChange = {ID = it},
-                            label = "Full name",
+                            label = "ID",
                             showError = !validateUserID,
                             errorMessage = "The format of the ID doesn´t seem right"  ,
                             leadingIconImageVector = Icons.Default.PermIdentity,
@@ -185,15 +195,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                                 onNext = {focusManager.moveFocus(FocusDirection.Down)}
                             )
                         )
-/*
-                        OutlinedTextField(
-                            value = password,
-                            onValueChange = { password = it },
-                            label = { Text("Enter password") },
-                            visualTransformation = PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-                        )
-*/
+
                         CustomOutlinedTextField(
                             value = password,
                             onValueChange = {password = it },
@@ -213,31 +215,10 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                             )
                         )
 
-                        ClickableText(
-                            text = AnnotatedString("Forgot your password?"),
-                            onClick = { offset ->
-                                Log.d("ClickableText", "$offset -th character is clicked.")
-                            },
-                            style = TextStyle(
-                                fontSize = 15.sp,
-                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
-                                letterSpacing = 0.3.sp,
-                            ),
-                            modifier = Modifier.align(Alignment.End)
-                        )
 
                         Button(
                             onClick = {
-
-                                loginViewModel.signInWithEmail(ID + "@youthconnect.com", password) {
-
-                                        // Inicio de sesión exitoso, navegar a la pantalla de noticias
-                                        navController.navigate(NavScreen.NewsScreen.name)
-
-                                }
-
+                                register(ID, password)
 
                             },
                             modifier = Modifier

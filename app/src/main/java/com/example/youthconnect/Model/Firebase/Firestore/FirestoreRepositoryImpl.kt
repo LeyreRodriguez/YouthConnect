@@ -64,7 +64,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                 InstructorID = document.getString("instructorID") ?: "",
                 State = document.getBoolean("state") ?: false,
-                Score = document.getLong("Score")?.toInt() ?: null
+                Score = document.getLong("score")?.toInt() ?: null
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -91,7 +91,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
                         State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("Score")?.toInt() ?: null
+                        Score = document.getLong("score")?.toInt() ?: null
                     )
                 }
         } catch (e: Exception) {
@@ -120,7 +120,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
                         State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("Score")?.toInt() ?: null
+                        Score = document.getLong("score")?.toInt() ?: null
                     )
                 }
         } catch (e: Exception) {
@@ -149,7 +149,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
                         State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("Score")?.toInt() ?: null
+                        Score = document.getLong("score")?.toInt() ?: null
                     )
                 }
         } catch (e: Exception) {
@@ -172,7 +172,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                 InstructorID = document.getString("instructorID") ?: "",
                 State = document.getBoolean("state") ?: false,
-                Score = document.getLong("Score")?.toInt() ?: null
+                Score = document.getLong("score")?.toInt() ?: null
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -268,7 +268,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                 ID = document.getString("id") ?: "",
                 Password = document.getString("password") ?: "",
                 PhoneNumber = document.getString("phoneNumber") ?: "",
-                Score = document.getLong("Score")?.toInt() ?: null
+                Score = document.getLong("score")?.toInt() ?: null
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -290,7 +290,7 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
                             ID = document.getString("id") ?: "",
                             Password = document.getString("password") ?: "",
                             PhoneNumber = document.getString("phoneNumber") ?: "",
-                            Score = document.getLong("Score")?.toInt() ?: null
+                            Score = document.getLong("score")?.toInt() ?: null
                         )
                     }
             }
@@ -306,10 +306,10 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
             val document = firebaseFirestore.collection("Instructor").document(instructorID).get().await()
             Log.i("AWA", document.data.toString())
             Instructor(
-                FullName = document.getString("FullName") ?: "",
-                ID = document.getString("ID") ?: "",
+                FullName = document.getString("fullName") ?: "",
+                ID = document.getString("id") ?: "",
                 Password = document.getString("password") ?: "",
-                Score = document.getLong("Score")?.toInt() ?: null
+                Score = document.getLong("score")?.toInt() ?: null
             )
           //  document.toObject(Instructor::class.java)
         } catch (e: Exception) {
@@ -436,33 +436,48 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
             val instructorQuerySnapshot = firebaseFirestore.collection("Instructor").get().await()
             val parentQuerySnapshot = firebaseFirestore.collection("Parents").get().await()
 
-            allUsers.addAll(childQuerySnapshot.documents.map { document ->
-                UserData(
-                    userId = document.getString("id") ?: "",
-                    userName = document.getString("fullName") ?: ""
-                    // profilePictureUrl = photoUrl?.toString()
-                )
+            allUsers.addAll(childQuerySnapshot.documents.mapNotNull { document ->
+                val userId = document.getString("id") ?: ""
+
+                if (userId.isNotEmpty()) {
+                    UserData(
+                        userId = userId,
+                        userName = document.getString("fullName") ?: ""
+                        // profilePictureUrl = photoUrl?.toString()
+                    )
+                } else {
+                    null
+                }
             })
 
-            allUsers.addAll(instructorQuerySnapshot.documents.map { document ->
-                UserData(
-                    userId = document.getString("id") ?: "",
-                    userName = document.getString("fullName") ?: ""
-                    // profilePictureUrl = photoUrl?.toString()
-                )
+            allUsers.addAll(instructorQuerySnapshot.documents.mapNotNull { document ->
+                val userId = document.getString("id") ?: ""
+                if (userId.isNotEmpty()) {
+                    UserData(
+                        userId = userId,
+                        userName = document.getString("fullName") ?: ""
+                        // profilePictureUrl = photoUrl?.toString()
+                    )
+                } else {
+                    null
+                }
             })
 
-            allUsers.addAll(parentQuerySnapshot.documents.map { document ->
-                UserData(
-                    userId = document.getString("id") ?: "",
-                    userName = document.getString("fullName") ?: ""
-                    // profilePictureUrl = photoUrl?.toString()
-                )
+            allUsers.addAll(parentQuerySnapshot.documents.mapNotNull { document ->
+                val userId = document.getString("id") ?: ""
+                if (userId.isNotEmpty()) {
+                    UserData(
+                        userId = userId,
+                        userName = document.getString("fullName") ?: ""
+                        // profilePictureUrl = photoUrl?.toString()
+                    )
+                } else {
+                    null
+                }
             })
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getAllUsers failed with $e")
         }
-
         return allUsers
     }
 

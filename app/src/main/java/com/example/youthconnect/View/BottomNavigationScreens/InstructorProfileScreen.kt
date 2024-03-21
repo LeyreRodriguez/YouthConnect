@@ -381,6 +381,7 @@ fun InstructorProfileScreen(instructorId : String,
                                 textAlign = TextAlign.Center
                             ), modifier = Modifier
                                 .padding(start = 15.dp, top = 10.dp)
+                                .fillMaxWidth()
                                 .clickable { loginViewModel.signOut()
                                     navController.navigate("login")}
                         )
