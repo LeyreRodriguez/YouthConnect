@@ -39,12 +39,6 @@ class LoginViewModel: ViewModel() {
         _state.update { SignInState() }
     }
 
-    fun updateCredentials(newEmail: String, newPassword: String) {
-        userEmail = newEmail
-        userPassword = newPassword
-        Log.d("LoginViewModel", "Email actualizado: $newEmail, contraseña : $newPassword")
-    }
-
 
     fun signInWithEmail(email: String, passworld: String, home: () -> Unit) = viewModelScope.launch{
         try {

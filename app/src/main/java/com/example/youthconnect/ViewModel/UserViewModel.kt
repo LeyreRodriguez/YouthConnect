@@ -15,9 +15,11 @@ import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -40,6 +42,7 @@ class UserViewModel @Inject constructor(
     private var parent: Parent? = null
     private var allInstructor: List<Instructor?> = emptyList()
     private var instructor: Instructor? = null
+    private var user: UserData? = null
 
 
     private var _userData = MutableStateFlow<UserData?>(null)
@@ -66,6 +69,18 @@ class UserViewModel @Inject constructor(
             return null
         }
     }
+
+    suspend fun getUserById(ID: String): UserData? {
+        return try {
+            user = firestoreRepository.getUserById(ID)
+            user
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en getUserById", e)
+            null
+        }
+    }
+
+
 
     suspend fun findDocument(userId : String) : String?{
         Log.e("USER", userId)
@@ -250,6 +265,12 @@ class UserViewModel @Inject constructor(
             Log.e("Firestore", "Error en getCurrentUser", e)
             return null
         }
+    }
+
+
+    suspend fun getUserType(userID: String): String? {
+        val collection = firestoreRepository.findUserType(userID)
+        return collection
     }
 
 }

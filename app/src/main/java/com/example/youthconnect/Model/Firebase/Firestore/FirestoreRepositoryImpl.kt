@@ -8,43 +8,41 @@ import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.firestore.firestore
-import kotlinx.coroutines.Deferred
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import java.util.concurrent.ExecutionException
 import javax.inject.Inject
-import kotlinx.coroutines.async
 
 
 
-class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore: FirebaseFirestore):
+class FirestoreRepositoryImpl @Inject constructor(
+    private val firebaseFirestore: FirebaseFirestore,
+    private val storage: FirebaseStorage,
+):
     FirestoreRepository {
     override val dataBase: FirebaseFirestore?
         get() = firebaseFirestore
+    override val storageDataBase: FirebaseStorage?
+        get() = storage
 
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
     override suspend fun getCurrentUser() : String? {
         var user = auth.currentUser;
-        if (user != null) {
+        return if (user != null) {
             val email = user.email
-
             val numeroConvertido = email?.substringBefore("@").toString().dropLast(1) + email?.substringBefore("@").toString().takeLast(1).uppercase()
-            return  numeroConvertido
+            numeroConvertido
 
         } else {
-            return ""
+            ""
         }
     }
 
@@ -428,6 +426,51 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
 
     }
 
+    override suspend fun getUserById(Id : String): UserData? {
+        val childRef = firebaseFirestore.collection("Child").document(Id)
+        var userData: UserData? = null
+
+        val childSnapshot = childRef.get().await()
+        if (childSnapshot.exists()) {
+            val userId = childSnapshot.getString("id")
+            val userName = childSnapshot.getString("fullName")
+            val profilePictureUrl = userId?.let { getProfilePictureUrl(it) }
+            userData = userId?.let { UserData(it, userName, profilePictureUrl) }
+        } else {
+            val parentRef = firebaseFirestore.collection("Parents").document(Id)
+            val parentSnapshot = parentRef.get().await()
+            if (parentSnapshot.exists()) {
+                val userId = parentSnapshot.getString("id")
+                val userName = parentSnapshot.getString("fullName")
+                val profilePictureUrl = userId?.let { getProfilePictureUrl(it) }
+                userData = userId?.let { UserData(it, userName, profilePictureUrl) }
+            } else {
+                val instructorRef = firebaseFirestore.collection("Instructor").document(Id)
+                val instructorSnapshot = instructorRef.get().await()
+                if (instructorSnapshot.exists()) {
+                    val userId = instructorSnapshot.getString("id")
+                    val userName = instructorSnapshot.getString("fullName")
+                    val profilePictureUrl = userId?.let { getProfilePictureUrl(it) }
+                    userData = userId?.let { UserData(it, userName, profilePictureUrl) }
+                }
+            }
+        }
+
+        return userData
+    }
+
+    private suspend fun getProfilePictureUrl(userId: String): String? {
+        val storageRef = storage.reference.child("users/$userId@youthconnect.com/profile_picture.jpg")
+        return try {
+            storageRef.downloadUrl.await().toString()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
+
+
     override suspend fun getAllUser(): List<UserData> {
         val allUsers: MutableList<UserData> = mutableListOf()
 
@@ -610,6 +653,9 @@ class FirestoreRepositoryImpl @Inject constructor(private val firebaseFirestore:
         // Si no se encuentra en ninguna colección
         return ""
     }
+
+
+
 
 
     override fun getScore(coleccion: String, idDocumento: String): String {

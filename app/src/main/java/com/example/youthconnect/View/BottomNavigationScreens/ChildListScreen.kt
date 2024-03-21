@@ -210,9 +210,7 @@ fun ChildListScreen(navController : NavController, instructorID: String){
                             it?.FullName?.contains(searchedText, ignoreCase = true) ?: false
                         }, key = { it?.ID ?: "" }) { item ->
                             if (item != null) {
-                              // list(navController = navController, item, instructorID, myKids)
                                 MyChildren(navController = navController, item)
-
                             }
                         }
                     }
@@ -250,19 +248,18 @@ fun MyChildren(navController: NavController, child: Child) {
     LaunchedEffect(UserViewModel) {
         try {
             instructorID = UserViewModel.getCurrentUser().toString()
-            myKids = instructorID?.let { UserViewModel.getChildByInstructorId(it) }!!
 
+            myKids = instructorID?.let { UserViewModel.getChildByInstructorId(it) }!!
+           // myKids = UserViewModel.getAllChildren()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
 
 
-
     LaunchedEffect(key1 = child.ID, key2 = myKids) {
         isChecked = myKids.any { it?.ID == child.ID }
     }
-
 
 
     val imageUrlState = remember { mutableStateOf("") }

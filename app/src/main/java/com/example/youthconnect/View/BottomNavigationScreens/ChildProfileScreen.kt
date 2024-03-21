@@ -67,6 +67,7 @@ import coil.compose.AsyncImage
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Parent
+import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
 import com.example.youthconnect.View.QR.DisplayQRCode
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -80,11 +81,19 @@ fun ChildProfileScreen(
     loginViewModel: LoginViewModel = viewModel(),
     navController: NavController
 ){
+    Log.i("CHILDID", childId)
 
     var child by remember { mutableStateOf<Child?>(null) }
     var parents by remember { mutableStateOf<List<Parent?>>(emptyList()) }
 
     val UserViewModel : UserViewModel = hiltViewModel()
+
+    val userState = remember { mutableStateOf<UserData?>(null) }
+
+    LaunchedEffect(UserViewModel) {
+        val user = UserViewModel.getUserById(childId)
+        userState.value = user
+    }
 
     LaunchedEffect(UserViewModel) {
         try {
@@ -277,48 +286,24 @@ fun ChildProfileScreen(
 
                 val configuration = LocalConfiguration.current
                 val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
-                if(child?.GoOutAlone == true) {
 
 
-                    // Profile Image
-                    AsyncImage(
-                        model = imageUrlState.value,
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .border(
-                                BorderStroke(4.dp, SolidColor(Green)),
-                                CircleShape
-                            )
-                            .padding(4.dp)
-                            .clip(CircleShape)
-                            .clickable {
-                                // TODO: Acciones al hacer clic en la imagen
-                                showImagePickerDialog = true
-                            },
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
 
-                    // Profile Image
-                    AsyncImage(
-                        model = imageUrlState.value,
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .border(
-                                BorderStroke(4.dp, SolidColor(Red)),
-                                CircleShape
-                            )
-                            .padding(4.dp)
-                            .clip(CircleShape)
-                            .clickable {
-                                // TODO: Acciones al hacer clic en la imagen
-                                showImagePickerDialog = true
-                            },
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                val imageUrl = userState.value?.profilePictureUrl ?: "https://i.imgur.com/w3UEu8o.jpeg"
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(if (imageUrl.startsWith("http")) 100.dp else 50.dp) // Aumenta el tamaño si es una URL
+                        .border(
+                            BorderStroke(4.dp, SolidColor(if (child?.GoOutAlone == true) Green else Red)),
+                            CircleShape
+                        )
+                        .padding(4.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+
 
                 child?.FullName?.let {
                     Text(

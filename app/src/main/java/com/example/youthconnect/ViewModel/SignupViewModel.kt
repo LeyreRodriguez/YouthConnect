@@ -7,10 +7,8 @@ import com.example.youthconnect.Model.Firebase.Authentication.EmailAuthUiClient
 import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
-import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,11 +43,7 @@ class signUpViewModel @Inject constructor(
     val updatedState: StateFlow<Boolean?> = _updatedState.asStateFlow()
 
     fun changeScreen(){
-        if(_showFirstScreen2.value){
-            _showFirstScreen2.value = false
-        }else{
-            _showFirstScreen2.value = true
-        }
+        _showFirstScreen2.value = !_showFirstScreen2.value
         Log.d("Variable publica: ", "${showFirstScreen2.value}")
         Log.d("Variable privada: ", "${_showFirstScreen2.value}")
 

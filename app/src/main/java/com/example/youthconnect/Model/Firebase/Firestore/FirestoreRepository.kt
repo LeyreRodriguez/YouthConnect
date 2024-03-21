@@ -10,10 +10,12 @@ import com.example.youthconnect.Model.Object.UserData
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 
 interface FirestoreRepository {
     val dataBase: FirebaseFirestore?
+    val storageDataBase: FirebaseStorage?
 
     suspend fun getCurrentUser() : String?
     suspend fun getChild(childId: String): Child?
@@ -47,6 +49,7 @@ interface FirestoreRepository {
     suspend fun removeInstructorFromChild(child: Child, instructorID: String)
 
     suspend fun getUser() : UserData?
+    suspend fun getUserById(Id : String ): UserData?
     suspend fun getAllUser() : List<UserData?>
 
     suspend fun getChatId(chatId : String) : String?
@@ -60,6 +63,7 @@ interface FirestoreRepository {
     fun resetScore(collection: String, documentId: String)
 
     suspend fun findUserType(id: String): String
+
 
     fun getScore(coleccion: String, idDocumento: String): String
 
