@@ -40,6 +40,9 @@ class ChatViewModel @Inject constructor(
     val messages: LiveData<MutableList<Map<String, Any>>> = _messages
 
 
+    private var _isMessageSeen = MutableLiveData<Boolean>(false)
+    val isMessageSeen: LiveData<Boolean> = _isMessageSeen
+
 
     /**
      * Generar un ID único para una conversación entre dos usuarios
@@ -93,6 +96,8 @@ class ChatViewModel @Inject constructor(
      * Cargar mensajes para un chat específico
      */
     private fun loadMessages(chatId : String) {
+        val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase() ?: ""
+
         Firebase.firestore.collection(Constants.MESSAGES)
             .whereEqualTo("chatId", chatId)
             .orderBy(Constants.SENT_ON)
@@ -107,10 +112,16 @@ class ChatViewModel @Inject constructor(
                 if (value != null) {
                     for (doc in value) {
                         val data = doc.data
+                        val sentBy = data[Constants.SENT_BY].toString()
+                        val isCurrentUser = currentUserId == sentBy
                         data[Constants.IS_CURRENT_USER] =
                             Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
                                     ?: "" == data[Constants.SENT_BY].toString()
 
+                        if (!isCurrentUser) {
+                            // Actualizar el campo 'seen' solo si el usuario actual no es el remitente
+                            doc.reference.update("seen", true)
+                        }
                         list.add(data)
                     }
                 }
@@ -119,35 +130,6 @@ class ChatViewModel @Inject constructor(
             }
     }
 
-    /**
-     * Get the messages
-     */
-    private fun getMessages(chatId : String) {
-        Firebase.firestore.collection(Constants.MESSAGES)
-            .whereEqualTo("chatId", chatId)
-            .orderBy(Constants.SENT_ON)
-            .addSnapshotListener { value, e ->
-                if (e != null) {
-                    Log.w(Constants.TAG, "Listen failed.", e)
-                    return@addSnapshotListener
-                }
-
-                val list = mutableListOf<Map<String, Any>>()
-
-                if (value != null) {
-                    for (doc in value) {
-                        val data = doc.data
-                        data[Constants.IS_CURRENT_USER] =
-                            Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
-                                    ?: "" == data[Constants.SENT_BY].toString()
-
-                        list.add(data)
-                    }
-                }
-
-                updateMessages(list)
-            }
-    }
 
     /**
      * Update the list after getting the details from firestore
@@ -172,4 +154,34 @@ class ChatViewModel @Inject constructor(
     fun initRecipientUserId(userId: String) {
         _recipientUserId.value = userId
     }
+
+
+    fun getUnseenMessages(): MutableLiveData<List<String>> {
+        val unseenSentByLiveData = MutableLiveData<List<String>>()
+
+        Firebase.firestore.collection(Constants.MESSAGES)
+            .whereEqualTo("seen", false)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    Log.e(Constants.TAG, "Error al obtener mensajes no vistos", error)
+                    unseenSentByLiveData.value = emptyList()
+                    return@addSnapshotListener
+                }
+
+                val unseenSentBy = mutableListOf<String>()
+                value?.documents?.forEach { document ->
+                    val messageData = document.data
+                    if (messageData != null) {
+                        val sentBy = messageData["sent_by"] as? String ?: ""
+                        unseenSentBy.add(sentBy)
+                    }
+                }
+
+                unseenSentByLiveData.value = unseenSentBy.distinct() // Para eliminar duplicados si es necesario
+            }
+
+        return unseenSentByLiveData
+    }
+
+
 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,8 +36,9 @@ import com.example.youthconnect.ViewModel.ChatViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.filled.PermIdentity
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Card
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.youthconnect.Model.Object.UserData
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -65,9 +68,9 @@ import coil.compose.AsyncImage
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ui.theme.Green
+import com.example.youthconnect.ui.theme.Red
 import com.example.youthconnect.ui.theme.Violet
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
+import com.example.youthconnect.ui.theme.Yellow
 
 
 @Composable
@@ -91,10 +94,18 @@ fun HomeScreen(
         }
     }
 
+
+
     LaunchedEffect(Unit) {
         allUsers = ChatViewModel.getAllUsers()!!
 
     }
+    val unseenMessagesState = ChatViewModel.getUnseenMessages().observeAsState(initial = emptyList())
+
+    val unseenMessages by remember {
+        unseenMessagesState
+    }
+    val lazyColumnState = LazyListState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -142,13 +153,13 @@ fun HomeScreen(
                         it?.userName?.contains(searchedText, ignoreCase = true) ?: false
                     }, key = { it?.userId ?: "" }) { item ->
                         if (item != null) {
-                            // list(navController = navController, item, instructorID, myKids)
-                           // MyChildren(navController = navController, item)
-                            UserEachRow(person = item) {
+                            val hasUnseenMessages = ChatViewModel.getUnseenMessages().value.orEmpty().isNotEmpty()
+                            UserEachRow(
+                                person = item,
+                                unseenMessages = unseenMessages
+                            ) {
                                 navHostController.navigate("chatscreen/${item.userId}")
                             }
-
-
                         }
                     }
                 }
@@ -166,11 +177,16 @@ fun HomeScreen(
 @Composable
 fun UserEachRow(
     person: UserData,
+    unseenMessages: List<String>,
     onClick: () -> Unit
 ) {
 
+    Log.i("list", unseenMessages.toString())
+
+
     val UserViewModel : UserViewModel = hiltViewModel()
     val imageUrlState = remember { mutableStateOf("") }
+
     LaunchedEffect(Unit) {
         UserViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
@@ -205,19 +221,26 @@ fun UserEachRow(
                 contentScale = ContentScale.Crop
             )
 
-            person.userName?.let {
-                Text(
-                    text = it,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    ),
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                        .align(CenterVertically)
+            Text(
+                text = person.userName ?: "",
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Color.Black
+                ),
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .align(CenterVertically)
+            )
 
+            if (person.userId in unseenMessages) {
+                Icon(
+                    imageVector = Icons.Default.Circle ,
+                    contentDescription = "Recieved",
+                    tint = Red
                 )
             }
+
 
 
         }
@@ -254,6 +277,7 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
 
     LaunchedEffect(UserViewModel) {
         val user = UserViewModel.getUserById(recipientUserId)
+
         userState.value = user
     }
     Log.i("USER",userState.value?.profilePictureUrl.toString())
@@ -338,6 +362,8 @@ fun Recipient(userData: UserData, navController : NavController){
 
     val UserViewModel : UserViewModel = hiltViewModel()
 
+
+
     val imageUrlState = remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
         UserViewModel.getProfileEspecificImage(userData.userId.lowercase() + "@youthconnect.com",
@@ -361,15 +387,13 @@ fun Recipient(userData: UserData, navController : NavController){
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-
-                if(userType == "Child"){
+                if (userType == "Child") {
                     navController.navigate("child_profile_screen/${userData.userId}")
-                } else if(userType == "Parents"){
+                } else if (userType == "Parents") {
                     navController.navigate("parent_profile_screen/${userData.userId}")
-                }else{
+                } else {
                     navController.navigate("instructor_profile_screen/${userData.userId}")
                 }
-
             }
             .padding(4.dp)
     ) {
@@ -408,7 +432,8 @@ fun Recipient(userData: UserData, navController : NavController){
                 text = userData.userName.toString(),
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
+                    color = Color.Black // Establece el color en rojo si el mensaje está marcado como visto
                 ),
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp)
