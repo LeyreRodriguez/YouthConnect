@@ -57,8 +57,6 @@ class LoginViewModel: ViewModel() {
 
     fun signOut() = viewModelScope.launch{
         try {
-
-
             auth.signOut()
         }
         catch (e: Exception){

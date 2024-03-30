@@ -109,6 +109,21 @@ class UserViewModel @Inject constructor(
         }
     }
 
+    suspend fun getAllInstructors(): List<Instructor?> {
+        try {
+
+            if (allInstructor.isEmpty()){
+                allInstructor = firestoreRepository.getAllInstructors()
+            }
+
+            return allInstructor
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en getAllChildren", e)
+            return emptyList()
+        }
+    }
+
     suspend fun getChildByInstructorId(instructorId: String): List<Child?> {
         try {
 
@@ -122,6 +137,22 @@ class UserViewModel @Inject constructor(
             return emptyList()
         }
     }
+
+
+    suspend fun getInstructorByChildId(childId: String): Instructor? {
+        try {
+
+
+            instructor = firestoreRepository.getInstructorByChildId(childId)
+
+            return instructor
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en getChildByInstructorId", e)
+            return null
+        }
+    }
+
 
     suspend fun getChildByParentsId(parentID: String): List<Child?> {
         try {
@@ -272,6 +303,23 @@ class UserViewModel @Inject constructor(
     suspend fun getUserType(userID: String): String? {
         val collection = firestoreRepository.findUserType(userID)
         return collection
+    }
+
+
+    suspend fun getRollState(childId :String) : List<String>?{
+        val collection = firestoreRepository.getRollCall(childId)
+        Log.i("Collection", collection.toString())
+        return collection
+    }
+
+
+    fun changeInstructor(child :Child, instructorID: String){
+
+
+        viewModelScope.launch {
+                firestoreRepository.addInstructorToChild(child, instructorID)
+
+        }
     }
 
 }

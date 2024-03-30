@@ -38,6 +38,8 @@ interface FirestoreRepository {
     suspend fun getParentsByParentsID(parentsID : List<String>) : List<Parent?>
 
     suspend fun getCurrentInstructorById( instructorID : String) : Instructor?
+    suspend fun getInstructorByChildId(childId: String): Instructor?
+    suspend fun getAllInstructors(): List<Instructor?>
 
     suspend fun addChild(child: Child)
     suspend fun addParent(parent: Parent)
@@ -46,6 +48,8 @@ interface FirestoreRepository {
     suspend fun changeState(childId : String)
 
     suspend fun addInstructorToChild(child: Child, instructorID: String)
+    suspend fun rollCall(child: Child)
+    suspend fun getRollCall(childId: String) : List<String>?
     suspend fun removeInstructorFromChild(child: Child, instructorID: String)
 
     suspend fun getUser() : UserData?

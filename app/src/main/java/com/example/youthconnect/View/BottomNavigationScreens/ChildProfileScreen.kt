@@ -26,8 +26,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.MarkEmailUnread
+import androidx.compose.material.icons.outlined.Park
+import androidx.compose.material.icons.outlined.School
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -89,6 +97,11 @@ fun ChildProfileScreen(
 
     val userState = remember { mutableStateOf<UserData?>(null) }
 
+    val documentExists = remember { mutableStateOf("-1") }
+    var result by remember { mutableStateOf<String?>("") }
+    var showDialog by remember { mutableStateOf(false)  }
+    var user by remember { mutableStateOf<String?>("") }
+
     LaunchedEffect(UserViewModel) {
         val user = UserViewModel.getUserById(childId)
         currentUser = UserViewModel.getCurrentUser()
@@ -99,10 +112,17 @@ fun ChildProfileScreen(
         try {
             child = UserViewModel.getCurrentChildById(childId)
             parents = child?.ParentID?.let { UserViewModel.getParentsByParentsID(it) }!!
+            user = UserViewModel.getCurrentUser()
+            result = user?.let { UserViewModel.findDocument(it) }
+
+            if (result != null) {
+                documentExists.value = result.toString()
+            }
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
+
 
 
     val context = LocalContext.current
@@ -292,50 +312,83 @@ fun ChildProfileScreen(
                     modifier = Modifier
                         .size(150.dp)
                         .border(
-                            BorderStroke(4.dp, SolidColor(if (child?.GoOutAlone == true) Green else Red)),
+                            BorderStroke(
+                                4.dp,
+                                SolidColor(if (child?.GoOutAlone == true) Green else Red)
+                            ),
                             CircleShape
                         )
                         .padding(4.dp)
                         .clip(CircleShape)
-                    .clickable {
-                    // TODO: Acciones al hacer clic en la imagen
+                        .clickable {
+                            // TODO: Acciones al hacer clic en la imagen
 
-                        if(currentUser == child?.ID){
-                            showImagePickerDialog = true
-                        }
+                            if (currentUser == child?.ID) {
+                                showImagePickerDialog = true
+                            }
 
-                },
+                        },
                     contentScale = ContentScale.Crop
                 )
 
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center){
+                    child?.FullName?.let {
+                        Text(
+                            text = it,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFF000000),
+                                letterSpacing = 0.9.sp,
+                            ), modifier = Modifier
+                                .padding(start = 15.dp, top = 10.dp, end = 5.dp)
+                        )
+                    }
 
-                child?.FullName?.let {
-                    Text(
-                        text = it,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                        ), modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                    )
+                    if (child?.State ?: "" == false){
+                        Icon(
+                            imageVector = Icons.Outlined.Park ,
+                            contentDescription = "Recieved",
+                            tint = Color.Black,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }else{
+                        Icon(
+                            imageVector = Icons.Outlined.Home ,
+                            contentDescription = "Recieved",
+                            tint =  Color.Black,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
                 }
 
-                child?.Course?.let {
-                    Text(
-                        text = it,
-                        style = TextStyle(
-                            fontSize = 15.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                        ), modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                    )
-                }
+
+
+
+
+                    child?.Course?.let {
+                        Text(
+                            text = it,
+                            style = TextStyle(
+                                fontSize = 15.sp,
+                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFF000000),
+                                letterSpacing = 0.9.sp,
+                            ), modifier = Modifier
+                                .padding(start = 15.dp, top = 10.dp)
+                        )
+                    }
+
+
+
+
+
 
                 child?.Observations?.let {
                     Text(
@@ -364,8 +417,10 @@ fun ChildProfileScreen(
                         ), modifier = Modifier
                             .padding(start = 15.dp, top = 10.dp)
                             .fillMaxWidth()
-                            .clickable { loginViewModel.signOut()
-                                navController.navigate("login")}
+                            .clickable {
+                                loginViewModel.signOut()
+                                navController.navigate("login")
+                            }
                     )
                 }
 
@@ -427,6 +482,18 @@ fun ChildProfileScreen(
                // Log.i("AWA", child.ID)
                 DisplayQRCode(childId)
 
+                if (documentExists.value == "0") {
+
+                    OutlinedButton(onClick = { showDialog = true }) {
+                        Text("See roll call")
+                    }
+
+                }
+                if (showDialog) {
+                    SeeRollCall(onDismiss = { showDialog = false }, childId)
+                }
+
+
             }
         }
 
@@ -464,148 +531,5 @@ fun QRCodeGenerator(text: String, modifier: Modifier = Modifier) {
 }
 
 
-@Preview(showBackground = true)
-@Composable
-
-fun ChildProfileView() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-            onDraw = {
-                // Dibuja un rectángulo blanco como fondo
-                drawRect(Color.White)
-
-                // Define el pincel para el borde con el gradiente del Brush
-                val borderBrush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFFE15554),
-                        Color(0xFF3BB273),
-                        Color(0xFFE1BC29),
-                        Color(0xFF4D9DE0)
-                    )
-                )
-
-                // Dibuja el borde con el pincel definido
-                drawRect(
-                    brush = borderBrush,
-                    topLeft = Offset(0f, 0f),
-                    size = Size(size.width, size.height),
-                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                )
-            }
-        )
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(15.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center
-        ) {
-
-
-            val configuration = LocalConfiguration.current
-            val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
-            Image(
-                painter = painterResource(id = R.drawable.user_icon),
-                contentDescription = "icon",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(150.dp)
-                    .border(
-                        BorderStroke(4.dp, remember {
-                            Brush.sweepGradient(
-                                listOf(
-                                    Green, Red
-                                )
-                            )
-                        }),
-                        CircleShape
-                    )
-                    .padding(4.dp)
-                    .clip(CircleShape)
-            )
-
-            Text(
-                text = "Leyre Rodriguez Quintana",
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                    fontWeight = FontWeight(400),
-                    color = Color(0xFF000000),
-                    letterSpacing = 0.9.sp,
-                ), modifier = Modifier
-                    .padding(start = 15.dp, top = 10.dp)
-            )
-
-            Text(
-                text = "4ºESO",
-                style = TextStyle(
-                    fontSize = 15.sp,
-                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                    fontWeight = FontWeight(400),
-                    color = Color(0xFF000000),
-                    letterSpacing = 0.9.sp,
-                ), modifier = Modifier
-                    .padding(start = 15.dp, top = 10.dp)
-            )
-
-            Spacer(modifier = Modifier.size(40.dp))
-
-            Row() {
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                    Text(
-                        text = "Parents",
-                        style = TextStyle(
-                            fontSize = 15.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                        )
-                    )
-
-
-                    val parentState =
-                        listOf<String>("Florencio Rodriguez Rodriguez", "Juani Quintana Monroy")
-                    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-                        items(items = parentState) { item ->
-                            Text(text = item)
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.size(20.dp))
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                    Text(
-                        text = "Telephone",
-                        style = TextStyle(
-                            fontSize = 15.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                        )
-                    )
-                    val numbers = listOf<String>("680806622", "635556961")
-                    LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-                        items(items = numbers) { item ->
-                            Text(text = item)
-                        }
-                    }
-                }
-
-
-            }
-
-            DisplayQRCode("54148418R")
-        }
-    }
-}
 
 

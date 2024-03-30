@@ -1,11 +1,11 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,18 +23,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,15 +46,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -59,6 +63,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -67,7 +72,6 @@ import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
-import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ViewModel.signUpViewModel
 import com.example.youthconnect.ui.theme.Green
@@ -228,10 +232,14 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
                             it?.FullName?.contains(searchedText, ignoreCase = true) ?: false
                         }, key = { it?.ID ?: "" }) { item ->
                             if (item != null) {
-                                MyChildren(navController = navController, item)
+                               // MyChildren(navController = navController, item)
+                                Greeting(navController = navController, item)
                             }
                         }
                     }
+
+
+
 
                 }
 
@@ -261,6 +269,11 @@ fun MyChildren(navController: NavController, child: Child) {
     var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var instructorID by remember { mutableStateOf("") }
 
+    val documentExists = remember { mutableStateOf("-1") }
+    var result by remember { mutableStateOf<String?>("") }
+    var showDialog by remember { mutableStateOf(false)  }
+    var user by remember { mutableStateOf<String?>("") }
+
 
 
     LaunchedEffect(UserViewModel) {
@@ -269,15 +282,22 @@ fun MyChildren(navController: NavController, child: Child) {
 
             myKids = instructorID?.let { UserViewModel.getChildByInstructorId(it) }!!
            // myKids = UserViewModel.getAllChildren()
+
+            user = UserViewModel.getCurrentUser()
+            result = user?.let { UserViewModel.findDocument(it) }
+
+            if (result != null) {
+                documentExists.value = result.toString()
+            }
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
 
-
-    LaunchedEffect(key1 = child.ID, key2 = myKids) {
-        isChecked = myKids.any { it?.ID == child.ID }
-    }
+//
+  //  LaunchedEffect(key1 = child.ID, key2 = myKids) {
+    //    isChecked = myKids.any { it?.ID == child.ID }
+    //}
 
 
     val imageUrlState = remember { mutableStateOf("") }
@@ -334,18 +354,143 @@ fun MyChildren(navController: NavController, child: Child) {
                 textAlign = TextAlign.Start
             )
 
+
             val currentRoute = navController.currentBackStackEntry?.destination?.route
 
-            if (currentRoute == NavScreen.ChildList.name +"/{instructorID}") {
+            if (documentExists.value == "0" && currentRoute != NavScreen.ChildList.name +"/{instructorID}") {
+
                 Checkbox(
                     checked = isChecked,
                     onCheckedChange = { newCheckedState ->
                         isChecked = newCheckedState
                         if (instructorID != null) {
-                            SignUpViewModel.selectChild(child, instructorID, newCheckedState)
+                            SignUpViewModel.rollCall(child, newCheckedState)
                         }
                     },
                     modifier = Modifier.padding(end = 8.dp)
+                )
+
+            }
+
+        }
+    }
+}
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Greeting(navController : NavController, child : Child, modifier: Modifier = Modifier) {
+    val expanded = remember { mutableStateOf(false) }
+    val extraPadding = if (expanded.value) 10.dp else 0.dp
+
+    val SignUpViewModel: signUpViewModel = hiltViewModel()
+    val UserViewModel: UserViewModel = hiltViewModel()
+    var isChecked by remember { mutableStateOf(false) }
+
+    var expandedMenu by remember { mutableStateOf(false) }
+
+    var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
+    var instructorID by remember { mutableStateOf("") }
+
+    val documentExists = remember { mutableStateOf("-1") }
+    var result by remember { mutableStateOf<String?>("") }
+    var showDialog by remember { mutableStateOf(false)  }
+    var user by remember { mutableStateOf<String?>("") }
+    var instructor by remember { mutableStateOf<Instructor?>(null) }
+    var instructorsList by remember { mutableStateOf<List<Instructor?>>(emptyList()) }
+
+
+
+    LaunchedEffect(UserViewModel) {
+        try {
+            instructorID = UserViewModel.getCurrentUser().toString()
+
+            myKids = instructorID?.let { UserViewModel.getChildByInstructorId(it) }!!
+            // myKids = UserViewModel.getAllChildren()
+
+            user = UserViewModel.getCurrentUser()
+            result = user?.let { UserViewModel.findDocument(it) }
+
+            if (result != null) {
+                documentExists.value = result.toString()
+            }
+            instructor = UserViewModel.getInstructorByChildId(child.ID)
+            instructorsList = UserViewModel.getAllInstructors()
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
+        }
+    }
+
+    val imageUrlState = remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        UserViewModel.getProfileEspecificImage(child.ID.lowercase() + "@youthconnect.com",
+            onSuccess = { url ->
+                imageUrlState.value = url
+            },
+            onFailure = { exception ->
+                // Manejar el error, por ejemplo, mostrar un mensaje
+            }
+        )
+    }
+
+    Surface(
+        //color = MaterialTheme.colorScheme.primary,
+        modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp),
+        onClick = {navController.navigate("child_profile_screen/${child.ID}")}
+    ) {
+
+        Row(modifier = Modifier.padding(24.dp)) {
+
+            AsyncImage(
+                model = imageUrlState.value,
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(50.dp)
+                    .border(
+                        BorderStroke(4.dp, SolidColor(if (child.GoOutAlone) Green else Red)),
+                        CircleShape
+                    )
+                    .padding(4.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(bottom = extraPadding, start = 10.dp)
+            ) {
+                Text(text = child.FullName,  fontWeight = FontWeight.Bold)
+                if (expanded.value) {
+                    Text(text = "Instructor: ")
+                    val mcontext = LocalContext.current
+                    instructor?.let {
+                        CustomDropdownMenu(instructorsList, it.FullName, Color.DarkGray, onSelected = { selectedOption ->
+                            UserViewModel.changeInstructor(child, instructorID)
+                        })
+                    }
+                    if(child.FaithGroups){
+                        Text(text = "Belongs to faith groups")
+                    }else{
+                        Text(text = "Does not belong to a faith group")
+                    }
+
+                    if(child.BelongsToSchool){
+                        Text(text = "Belongs to school")
+                    }else{
+                        Text(text = "Does not belong to school")
+                    }
+                    child.Observations?.let { Text(text = it) }
+
+                }
+            }
+            IconButton(
+                onClick = { expanded.value = !expanded.value }
+            ) {
+                Icon(
+                    if (expanded.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = if (expanded.value) "Show less" else "Show more"
                 )
             }
         }
@@ -353,3 +498,83 @@ fun MyChildren(navController: NavController, child: Child) {
 }
 
 
+
+
+@Composable
+fun CustomDropdownMenu(
+    list: List<Instructor?>, // Menu Options
+    defaultSelected: String, // Default Selected Option on load
+    color: Color, // Color
+    modifier: Modifier = Modifier, // Modifier
+    onSelected: (String) -> Unit, // Pass the Selected Option
+) {
+    var selectedIndex by remember { mutableStateOf(0) }
+    var expand by remember { mutableStateOf(false) }
+    var stroke by remember { mutableStateOf(1) }
+    var selectedOption by remember(defaultSelected) { mutableStateOf(defaultSelected) }
+
+    Box(
+        modifier = modifier
+            .padding(8.dp)
+            .border(
+                BorderStroke(stroke.dp, color),
+                shape = RoundedCornerShape(4.dp)
+            )
+            .clickable {
+                expand = !expand
+                stroke = if (expand) 2 else 1
+            },
+        contentAlignment = Alignment.Center
+    ) {
+
+        Text(
+            text = selectedOption,
+            color = color,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+        )
+
+        DropdownMenu(
+            expanded = expand,
+            onDismissRequest = {
+                expand = false
+                stroke = 1
+            },
+            properties = PopupProperties(
+                focusable = false,
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+            ),
+            modifier = Modifier
+                .background(Color.White)
+                .padding(2.dp)
+                .fillMaxWidth(.4f)
+        ) {
+            list.forEachIndexed { index, item ->
+                DropdownMenuItem(
+                    text = {
+                        if (item != null) {
+                            Text(
+                                text = item.FullName,
+                                color = color,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    },
+                    onClick = {
+                        selectedIndex = index
+                        if (item != null) {
+                            selectedOption = item.FullName
+                        }
+                        onSelected(selectedOption)
+                        expand = false
+                        stroke = 1
+                    })
+
+            }
+        }
+    }
+}

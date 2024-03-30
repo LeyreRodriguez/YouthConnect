@@ -69,6 +69,16 @@ class signUpViewModel @Inject constructor(
         }
     }
 
+
+    fun signOut() = viewModelScope.launch{
+        try {
+            auth.signOut()
+        }
+        catch (e: Exception){
+            Log.d("Login Email", "${e.message}")
+        }
+    }
+
      fun addChild(child: Child){
 
          viewModelScope.launch {
@@ -91,23 +101,19 @@ class signUpViewModel @Inject constructor(
     }
 
 
-    fun selectChild(child :Child, instructorID: String, isChecked:Boolean){
+
+
+
+    fun rollCall(child :Child, isChecked:Boolean){
 
 
         viewModelScope.launch {
             if (isChecked) {
-                Log.d("Checkbox", "isChecked: $isChecked")
-                Log.d("instructorID", "instructorID: $instructorID")
-                Log.d("child", "child: $child")
+
                 // Si el checkbox está marcado, agrega al instructor al niño
-                firestoreRepository.addInstructorToChild(child, instructorID)
+                firestoreRepository.rollCall(child)
 
-           //     _updatedState.value = true
-            } else {
-                // Si el checkbox está desmarcado, elimina al instructor del niño
-                firestoreRepository.removeInstructorFromChild(child, instructorID)
-
-           //     _updatedState.value = false
+                //     _updatedState.value = true
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.youthconnect.Model.Firebase.Firestore
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.Child
@@ -18,6 +19,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.ExecutionException
 import javax.inject.Inject
@@ -63,7 +65,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                 InstructorID = document.getString("instructorID") ?: "",
                 State = document.getBoolean("state") ?: false,
-                Score = document.getLong("score")?.toInt() ?: null
+                Score = document.getLong("score")?.toInt() ?: null,
+                RollCall = document.get("rollCall") as? List<String> ?: emptyList()
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -90,7 +93,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
                         State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("score")?.toInt() ?: null
+                        Score = document.getLong("score")?.toInt() ?: null,
+                        RollCall = document.get("rollCall") as? List<String> ?: emptyList()
                     )
                 }
         } catch (e: Exception) {
@@ -119,7 +123,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
                         State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("score")?.toInt() ?: null
+                        Score = document.getLong("score")?.toInt() ?: null,
+                        RollCall = document.get("rollCall") as? List<String> ?: emptyList()
                     )
                 }
         } catch (e: Exception) {
@@ -148,7 +153,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                         ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                         InstructorID = document.getString("instructorID") ?: "",
                         State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("score")?.toInt() ?: null
+                        Score = document.getLong("score")?.toInt() ?: null,
+                        RollCall = document.get("rollCall") as? List<String> ?: emptyList()
                     )
                 }
         } catch (e: Exception) {
@@ -171,7 +177,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 ParentID = document.get("parentID") as? List<String> ?: emptyList(),
                 InstructorID = document.getString("instructorID") ?: "",
                 State = document.getBoolean("state") ?: false,
-                Score = document.getLong("score")?.toInt() ?: null
+                Score = document.getLong("score")?.toInt() ?: null,
+                RollCall = document.get("rollCall") as? List<String> ?: emptyList()
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -196,6 +203,30 @@ class FirestoreRepositoryImpl @Inject constructor(
                     Date = document.getString("Date") ?: "" // Obtén el valor del campo "Date"
                 )
             }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "getNews failed with $e")
+            emptyList()
+        }
+    }
+
+    override suspend fun getAllInstructors(): List<Instructor?> {
+        return try {
+            val querySnapshot = firebaseFirestore.collection("Instructor")
+                .get()
+                .await()
+
+            querySnapshot.documents
+                .filter { document ->
+                    document.getString("id") != "00000000A" // Filtrar el instructor con ID "00000000A"
+                }
+                .map { document ->
+                    Instructor(
+                        FullName = document.getString("fullName") ?: "",
+                        ID = document.getString("id") ?: "",
+                        Password = document.getString("password") ?: "",
+                        Score = document.getLong("score")?.toInt() ?: null
+                    )
+                }
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getNews failed with $e")
             emptyList()
@@ -310,6 +341,28 @@ class FirestoreRepositoryImpl @Inject constructor(
         }
     }
 
+
+    override suspend fun getInstructorByChildId(childId: String): Instructor? {
+        return try {
+            val document = firebaseFirestore.collection("Child").document(childId).get().await()
+            val instructorId = document.getString("instructorID")
+            if (instructorId != null && instructorId.isNotEmpty()) {
+                val instructorDocument = firebaseFirestore.collection("Instructor").document(instructorId).get().await()
+                Instructor(
+                    FullName = instructorDocument.getString("fullName") ?: "",
+                    ID = instructorDocument.getString("id") ?: "",
+                    Password = instructorDocument.getString("password") ?: "",
+                    Score = instructorDocument.getLong("score")?.toInt() ?: null
+                )
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "getChild failed with $e")
+            null
+        }
+    }
+
     override suspend fun addChild(child: Child) {
         val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.ID)
 
@@ -401,6 +454,68 @@ class FirestoreRepositoryImpl @Inject constructor(
         childDocument.update("instructorID", instructorID)
 
     }
+
+    override suspend fun rollCall(child: Child) {
+        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.ID)
+        val today = LocalDate.now().toString()
+
+        Log.i("TODAy", today)
+
+        documentRef.get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val rollCallList  = document.get("rollCall") as? List<String> ?: emptyList()
+                    var newrollCallList = rollCallList
+                    newrollCallList = if(today in rollCallList){
+                        rollCallList
+                    }else {
+                        rollCallList + today
+                    }
+
+                    val updates = hashMapOf<String, Any>(
+                        "rollCall" to newrollCallList
+                        // Puedes agregar más campos según sea necesario
+                    )
+
+                    documentRef.update(updates)
+                        .addOnSuccessListener {
+                            // La actualización fue exitosa
+                            Log.i("Actualizacion", "completada")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.i("Actualizacion", "no completada")
+                        }
+
+                    val data = document.data
+                } else {
+
+                }
+            }
+
+    }
+
+
+    override suspend fun getRollCall(childId: String) : List<String>? {
+        try {
+            val documentSnapshot = firebaseFirestore.collection("Child")
+                .document(childId)
+                .get()
+                .await()
+
+            if (documentSnapshot.exists()) {
+                val rollCall = documentSnapshot["rollCall"] as? List<String>
+                return rollCall
+            } else {
+                println("El documento con el ID $childId no existe en la colección 'Child'.")
+            }
+        } catch (e: Exception) {
+            println("Error al obtener el documento de Firestore: ${e.message}")
+        }
+
+        return null
+    }
+
+
 
     override suspend fun removeInstructorFromChild(child: Child, instructorID: String) {
         val childDocument = firebaseFirestore.collection("Child").document(child.ID)

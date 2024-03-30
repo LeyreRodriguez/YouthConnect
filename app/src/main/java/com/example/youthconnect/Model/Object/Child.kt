@@ -11,7 +11,8 @@ data class Child(
     val Observations: String? = null,
     val ParentID: List<String>,
     var InstructorID: String,
-    val State : Boolean,
-    val Score : Int? =  0
+    val State: Boolean,
+    val Score: Int? =  0,
+    val RollCall: List<String>? = emptyList()
 )
 

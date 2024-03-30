@@ -6,25 +6,29 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.Image
-
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Title
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Newspaper
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -33,9 +37,14 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.youthconnect.Model.Constants.ALL_IMAGES
 import com.example.youthconnect.Model.Enum.NavScreen
+import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.News
+import com.example.youthconnect.Model.Object.Parent
+import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.Model.Sealed.Response
 import com.example.youthconnect.ViewModel.NewsViewModel
+import com.example.youthconnect.ViewModel.UserViewModel
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import java.util.UUID
 
 
@@ -136,6 +145,54 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
                 onClick = { onDismiss() }
             ) {
                 Text("Dismiss")
+            }
+        }
+    )
+}
+
+
+@SuppressLint("SuspiciousIndentation")
+@Composable
+fun SeeRollCall(onDismiss: () -> Unit, childId : String ) {
+
+
+    val UserViewModel : UserViewModel = hiltViewModel()
+
+    var rollCall by remember { mutableStateOf<List<String>?>(emptyList()) }
+
+
+    LaunchedEffect(UserViewModel) {
+        try {
+            rollCall = UserViewModel.getRollState(childId)
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
+        }
+    }
+
+
+    Log.i("ROLLCALL", rollCall.toString())
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icons.Outlined.Checklist },
+        title = { Text(text = "Assisted days") },
+        text = {
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(rollCall!!) { item ->
+                    Text(text = item)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onDismiss()
+                }
+            ) {
+                Text("Confirm")
             }
         }
     )

@@ -34,7 +34,7 @@ class QuizViewModel @Inject constructor(
             if (allQuestions.isEmpty()){
                 allQuestions = firestoreRepository.getQuestions()
             }
-            searchedQuestion = allQuestions
+            searchedQuestion = allQuestions.shuffled()
             return searchedQuestion
 
         } catch (e: Exception) {
