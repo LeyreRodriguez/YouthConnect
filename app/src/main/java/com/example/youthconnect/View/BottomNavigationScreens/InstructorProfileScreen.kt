@@ -93,6 +93,7 @@ fun InstructorProfileScreen(instructorId : String,
     val UserViewModel : UserViewModel = hiltViewModel()
    // val ProfileViewModel : profileViewModel = hiltViewModel()
     var instructor by remember { mutableStateOf<Instructor?>(null) }
+    var currentUser by remember { mutableStateOf<String?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var showDialog by remember { mutableStateOf(false)  }
 
@@ -100,6 +101,7 @@ fun InstructorProfileScreen(instructorId : String,
         try {
             instructor = UserViewModel.getCurrentInstructorById(instructorId)
             children = UserViewModel.getChildByInstructorId(instructorId)
+            currentUser = UserViewModel.getCurrentUser()
             Log.i("InstructorProfileScreen", "Instructor: $instructor, Children: $children")
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching data", e)
@@ -178,7 +180,7 @@ fun InstructorProfileScreen(instructorId : String,
     }
 
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileImage(
+        UserViewModel.getProfileEspecificImage(instructorId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -276,33 +278,36 @@ fun InstructorProfileScreen(instructorId : String,
                     }
                 )
 
-                Image(
-                    painter = painterResource(id = R.drawable.baseline_person_add_24 ),
-                    contentDescription = "icon",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(15.dp)
-                        .clickable {
-                            //navController.navigate(NavScreen.AddInstructor.name)
-                            showDialog = true
-                        }
-                        .border(
-                            BorderStroke(4.dp, remember {
-                                Brush.sweepGradient(
-                                    listOf(
-                                        Green, Red
-                                    )
-                                )
-                            }),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape)
+                if(currentUser == instructor?.ID) {
 
-                )
-                if (showDialog) {
-                    AddInstructor(onDismiss = { showDialog = false })
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_person_add_24),
+                        contentDescription = "icon",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(15.dp)
+                            .clickable {
+                                //navController.navigate(NavScreen.AddInstructor.name)
+                                showDialog = true
+                            }
+                            .border(
+                                BorderStroke(4.dp, remember {
+                                    Brush.sweepGradient(
+                                        listOf(
+                                            Green, Red
+                                        )
+                                    )
+                                }),
+                                CircleShape
+                            )
+                            .padding(4.dp)
+                            .clip(CircleShape)
+
+                    )
+                    if (showDialog) {
+                        AddInstructor(onDismiss = { showDialog = false })
+                    }
                 }
 
 
@@ -369,22 +374,24 @@ fun InstructorProfileScreen(instructorId : String,
                     Column (
                         modifier = Modifier.fillMaxWidth()
                     ){
+                        if(currentUser == instructor?.ID){
+                            Text(
+                                text = "LogOut",
+                                style = TextStyle(
+                                    fontSize = 30.sp,
+                                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                    fontWeight = FontWeight(400),
+                                    color = Color(0xFF000000),
+                                    letterSpacing = 0.9.sp,
+                                    textAlign = TextAlign.Center
+                                ), modifier = Modifier
+                                    .padding(start = 15.dp, top = 10.dp)
+                                    .fillMaxWidth()
+                                    .clickable { loginViewModel.signOut()
+                                        navController.navigate("login")}
+                            )
+                        }
 
-                        Text(
-                            text = "LogOut",
-                            style = TextStyle(
-                                fontSize = 30.sp,
-                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
-                                letterSpacing = 0.9.sp,
-                                textAlign = TextAlign.Center
-                            ), modifier = Modifier
-                                .padding(start = 15.dp, top = 10.dp)
-                                .fillMaxWidth()
-                                .clickable { loginViewModel.signOut()
-                                    navController.navigate("login")}
-                        )
 
 
                         Text(
@@ -416,54 +423,58 @@ fun InstructorProfileScreen(instructorId : String,
 
                     }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly, // Distribuye las imágenes equitativamente
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
+                    if(currentUser == instructor?.ID) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly, // Distribuye las imágenes equitativamente
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
 
 
-                        val context = LocalContext.current
+                            val context = LocalContext.current
 
 
-                        Image(
-                            painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24 ),
-                            contentDescription = "icon",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(120.dp)
-                                .padding(10.dp)
-                                .clickable {
-
-                                    //context.startActivity(Intent(context, QrScan::class.java))
-                                    navController.navigate("qr")
 
 
-                                }
-                                .background(Color(0xFFD9D9D9), CircleShape)
+                            Image(
+                                painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
+                                contentDescription = "icon",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .padding(10.dp)
+                                    .clickable {
 
-                                .padding(4.dp)
-                                .clip(CircleShape)
-
-                        )
-
-                        Image(
-                            painter = painterResource(id = R.drawable.baseline_format_list_bulleted_24 ),
-                            contentDescription = "icon",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(120.dp)
-                                .padding(10.dp)
-                                .clickable {
+                                        //context.startActivity(Intent(context, QrScan::class.java))
+                                        navController.navigate("qr")
 
 
-                                    navController.navigate(NavScreen.ChildList.name + "/${instructorId}")
-                                }
-                                .background(Color(0xFFD9D9D9), CircleShape)
-                                .padding(4.dp)
-                                .clip(CircleShape)
+                                    }
+                                    .background(Color(0xFFD9D9D9), CircleShape)
 
-                        )
+                                    .padding(4.dp)
+                                    .clip(CircleShape)
+
+                            )
+
+                            Image(
+                                painter = painterResource(id = R.drawable.baseline_format_list_bulleted_24),
+                                contentDescription = "icon",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(120.dp)
+                                    .padding(10.dp)
+                                    .clickable {
+
+
+                                        navController.navigate(NavScreen.ChildList.name + "/${instructorId}")
+                                    }
+                                    .background(Color(0xFFD9D9D9), CircleShape)
+                                    .padding(4.dp)
+                                    .clip(CircleShape)
+
+                            )
+                        }
                     }
 
                 }

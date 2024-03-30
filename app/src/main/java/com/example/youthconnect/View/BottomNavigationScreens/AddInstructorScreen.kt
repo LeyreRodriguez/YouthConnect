@@ -136,8 +136,10 @@ fun AddInstructor (onDismiss: () -> Unit){
                         InstructorPassword
                     )
 
-                    signUpViewModel.registerUser(InstructorID, InstructorPassword)
+                    signUpViewModel.registerUser(instructor.ID, instructor.Password)
                     signUpViewModel.addInstructor(instructor)
+
+
                     InstructorFullName  =""
                     InstructorID=""
                     InstructorPassword=""

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,8 +38,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.MarkEmailUnread
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material3.Card
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +56,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -60,6 +64,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -80,32 +85,26 @@ fun HomeScreen(
 
     val ChatViewModel : ChatViewModel = hiltViewModel()
     var allUsers by remember { mutableStateOf<List<UserData?>>(emptyList()) }
-
     var user by remember { mutableStateOf<String>("") }
-
+    var userType by remember { mutableStateOf<String>("") }
     val UserViewModel : UserViewModel = hiltViewModel()
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(Unit) {
         try {
-            user = UserViewModel.getCurrentUser().toString()
-
+            val currentUser = UserViewModel.getCurrentUser().toString()
+            val userTypeResult = UserViewModel.getUserType(currentUser).toString()
+            user = currentUser
+            userType = userTypeResult
+            allUsers = ChatViewModel.getAllUsers(userTypeResult) ?: emptyList()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
-    }
-
-
-
-    LaunchedEffect(Unit) {
-        allUsers = ChatViewModel.getAllUsers()!!
-
     }
     val unseenMessagesState = ChatViewModel.getUnseenMessages().observeAsState(initial = emptyList())
 
     val unseenMessages by remember {
         unseenMessagesState
     }
-    val lazyColumnState = LazyListState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -135,6 +134,7 @@ fun HomeScreen(
                 )
             }
         )
+
 
 
         Column(modifier = Modifier.fillMaxHeight()) {
@@ -221,6 +221,15 @@ fun UserEachRow(
                 contentScale = ContentScale.Crop
             )
 
+            if (person.userId in unseenMessages) {
+                Icon(
+                    imageVector = Icons.Outlined.MarkEmailUnread,
+                    contentDescription = "Recieved",
+                    tint = Red,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
             Text(
                 text = person.userName ?: "",
                 style = TextStyle(
@@ -233,13 +242,7 @@ fun UserEachRow(
                     .align(CenterVertically)
             )
 
-            if (person.userId in unseenMessages) {
-                Icon(
-                    imageVector = Icons.Default.Circle ,
-                    contentDescription = "Recieved",
-                    tint = Red
-                )
-            }
+
 
 
 
@@ -267,7 +270,7 @@ fun Modifier.noRippleEffect(onClick: () -> Unit) = composed {
 
 
 @SuppressLint("SuspiciousIndentation")
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ChatScreen(recipientUserId: String, navHostController: NavController, chatViewModel: ChatViewModel = hiltViewModel()) {
 
@@ -289,18 +292,28 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
     val messages: List<Map<String, Any>> by chatViewModel.messages.observeAsState(
         initial = emptyList<Map<String, Any>>().toMutableList()
     )
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+      //  contentAlignment = Alignment.TopCenter, // Alinea el texto en la parte superior y central
+    ) {
+
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
+          //  verticalArrangement = Arrangement.Bottom
         ) {
 
-
-            userState.value?.let { Recipient(userData = it, navController = navHostController) }
+            Box(
+                //modifier = Modifier.fillMaxSize()
+                contentAlignment = Alignment.TopCenter
+            ) {
+                userState.value?.let { Recipient(userData = it, navController = navHostController) }
+            }
 
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .weight(weight = 0.85f, fill = true),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -314,41 +327,48 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
                         isCurrentUser = isCurrentUser
                     )
                 }
+
             }
-            OutlinedTextField(
-                value = message,
-                onValueChange = {
-                    chatViewModel.updateMessage(it)
-                },
-                label = {
-                    Text(
-                        "Type Your Message"
-                    )
-                },
-                maxLines = 5,
-                modifier = Modifier
-                    .padding(horizontal = 15.dp, vertical = 1.dp)
-                    .fillMaxWidth()
-                    .weight(weight = 0.09f, fill = true),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text
-                ),
-                singleLine = true,
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            chatViewModel.addMessage(recipientUserId)
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Send,
-                            contentDescription = "Send Button",
-                            tint = Violet
+            Box(
+               // modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                OutlinedTextField(
+                    value = message,
+                    onValueChange = {
+                        chatViewModel.updateMessage(it)
+                    },
+                    label = {
+                        Text(
+                            "Type Your Message"
                         )
+                    },
+                    maxLines = 5,
+                    modifier = Modifier
+                        .padding(horizontal = 15.dp, vertical = 1.dp)
+                        .fillMaxWidth(),
+                       // .weight(weight = 0.09f, fill = true),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text
+                    ),
+                    singleLine = true,
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                chatViewModel.addMessage(recipientUserId)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Send,
+                                contentDescription = "Send Button",
+                                tint = Violet
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         }
+    }
 
 
 
@@ -382,7 +402,7 @@ fun Recipient(userData: UserData, navController : NavController){
         userType = UserViewModel.getUserType(userData.userId).toString()
     }
 
-    Log.i("USERTYPE", userType)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()

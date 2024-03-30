@@ -216,9 +216,6 @@ class MainActivity : ComponentActivity() {
                     route = "secondScreens"
                 ){
 
-
-
-
                     composable(NavScreen.NewsScreen.name){
 
                         Scaffold(

@@ -11,6 +11,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.tasks.await
+import java.time.Instant
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class FirebaseStorageImpl @Inject constructor(
@@ -82,7 +84,8 @@ class FirebaseStorageImpl @Inject constructor(
                 Constants.URL to download,
                 "Description" to news.Description,
                 "Title" to news.Title,
-                "id" to news.id
+                "id" to news.id,
+                "Date" to Instant.now().toString()
             )).await()
             Response.Success(true)
         }catch (e:Exception){

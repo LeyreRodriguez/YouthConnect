@@ -29,8 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.youthconnect.Model.Constants.ALL_IMAGES
+import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Sealed.Response
 import com.example.youthconnect.ViewModel.NewsViewModel
@@ -39,7 +41,7 @@ import java.util.UUID
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun AddNews(onDismiss: () -> Unit) {
+fun AddNews(onDismiss: () -> Unit , navController: NavController) {
     val newsViewModel: NewsViewModel = hiltViewModel()
 
     val id = UUID.randomUUID().toString()
@@ -87,7 +89,6 @@ fun AddNews(onDismiss: () -> Unit) {
                     ) {
                         Text("Select Image")
                     }
-                    Log.e("FOTO", imageUri.toString())
 
                     // Mostrar la imagen seleccionada
                     imageUri?.let { uri ->
@@ -108,6 +109,8 @@ fun AddNews(onDismiss: () -> Unit) {
             TextButton(
                 onClick = {
                     val news = News(id, title, description)
+
+                    Log.i("NEWS", news.toString())
                     newsViewModel.getNewsImageFromDatabase()
 
                     // Check if the image upload was successful
@@ -120,7 +123,9 @@ fun AddNews(onDismiss: () -> Unit) {
 
                     title = ""
                     description = ""
-                    onDismiss()
+
+                    navController.navigate(NavScreen.NewsScreen.name)
+                    //onDismiss()
                 }
             ) {
                 Text("Confirm")

@@ -3,6 +3,7 @@ package com.example.youthconnect.Model.Sealed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Newspaper
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.youthconnect.Model.Enum.NavScreen
@@ -13,6 +14,7 @@ sealed class ItemsBottomBar(
     val title: String,
     val ruta: String
 ){
+
     object NewsBottom : ItemsBottomBar
         (
         Icons.Outlined.Newspaper ,
@@ -33,5 +35,7 @@ sealed class ItemsBottomBar(
         "Chat",
         NavScreen.ChatScreen.name
     )
+
+
 
 }

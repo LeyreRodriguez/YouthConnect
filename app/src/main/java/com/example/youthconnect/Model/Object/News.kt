@@ -4,7 +4,8 @@ data class News(
     val id: String = "",
     val Title: String = "",
     val Description: String = "",
-    val Image: String? = null
+    val Image: String? = null,
+    var Date: String? = null
 )
 
 

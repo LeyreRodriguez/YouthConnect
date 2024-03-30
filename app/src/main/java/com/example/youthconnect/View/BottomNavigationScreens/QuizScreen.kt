@@ -65,8 +65,8 @@ fun QuizScreen( navController: NavHostController,
     modifier : Modifier = Modifier.background(color = Color.White)
 ) {
     var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
-    val QuizViewModel : QuizViewModel = hiltViewModel()
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val QuizViewModel: QuizViewModel = hiltViewModel()
+    val UserViewModel: UserViewModel = hiltViewModel()
     var user by remember { mutableStateOf<String?>("") }
     var currentQuestionIndex by remember { mutableStateOf(0) }
 
@@ -148,287 +148,300 @@ fun QuizScreen( navController: NavHostController,
                 )
             }
         )
-        var showDialog by remember { mutableStateOf(false)  }
+        var showDialog by remember { mutableStateOf(false) }
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(10.dp),
             contentAlignment = Alignment.BottomEnd
-        ){
+        ) {
 
 
-             if (documentExists.value == "0") {
+            if (documentExists.value == "0") {
 
                 FloatingButton {
-                     showDialog = true
+                    showDialog = true
                 }
 
 
-             }
+            }
 
             if (showDialog) {
                 AddQuestions(onDismiss = { showDialog = false })
             }
 
 
-        }
-
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
-
-            Text(
-                text = "AJ MAJO QUIZ",
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                    fontWeight = FontWeight(400),
-                    color = Color(0xFFFFFFFF),
-                    letterSpacing = 0.3.sp,
-                ),
-                color = Color.Black,
-                textAlign = TextAlign.Center
-
-            )
-
 
             Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
-
             ) {
 
-                currentQuestion?.question?.let {
-                    Text(
-                        text = it,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFFFFFFFF),
-                            letterSpacing = 0.3.sp,
-                        ),
-                        color = Color.Black,
-                        textAlign = TextAlign.Center
-                    )
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically){
+
+                    if (user.toString().isNotEmpty()) {
+                        userImage(user = user.toString(), navController = navController , documentExists.value)
+                    }
+
+
                 }
+                Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
 
-                Box(){
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
+                Text(
+                    text = "AJ MAJO QUIZ",
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFFFFFFFF),
+                        letterSpacing = 0.3.sp,
+                    ),
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
 
-                    ) {
+                )
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 10.dp, end = 10.dp)
+
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
+
+                ) {
+
+                    currentQuestion?.question?.let {
+                        Text(
+                            text = it,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFFFFFFFF),
+                                letterSpacing = 0.3.sp,
+                            ),
+                            color = Color.Black,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Box() {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
+
                         ) {
 
-                            Button(
-                                onClick = {
-
-                                    if (currentQuestionIndex == 0) {
-                                        QuizViewModel.resetScore(user.toString())
-                                    }
-
-                                    if (currentQuestion != null) {
-                                        if(currentQuestion.answer.equals("OptionA")){
-                                            user?.let { QuizViewModel.updateScore(it) }
-                                        }
-                                    }
-
-                                    if (currentQuestionIndex == questions.size -1) {
-                                        navController.navigate("Scores")
-                                    }
-                                    currentQuestionIndex++
-
-                                          },
+                            Row(
                                 modifier = Modifier
-                                    .width(buttonWidth)
-                                    .height(100.dp)
-                                    .background(
-                                        color = Red,
-                                        shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
-                                    ),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = Red, // Set the background color as per your requirement
-
-                                )
-
+                                    .fillMaxWidth()
+                                    .padding(start = 10.dp, end = 10.dp)
                             ) {
-                                currentQuestion?.optionA?.let {
-                                    Text(
-                                        text = it,
-                                        style = TextStyle(
-                                            fontSize = 15.sp,
-                                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                            fontWeight = FontWeight(400),
-                                            color = Color(0xFFFFFFFF),
-                                            letterSpacing = 0.3.sp,
+
+                                Button(
+                                    onClick = {
+
+                                        if (currentQuestionIndex == 0) {
+                                            QuizViewModel.resetScore(user.toString())
+                                        }
+
+                                        if (currentQuestion != null) {
+                                            if (currentQuestion.answer.equals("OptionA")) {
+                                                user?.let { QuizViewModel.updateScore(it) }
+                                            }
+                                        }
+
+                                        if (currentQuestionIndex == questions.size - 1) {
+                                            navController.navigate("Scores")
+                                        }
+                                        currentQuestionIndex++
+
+                                    },
+                                    modifier = Modifier
+                                        .width(buttonWidth)
+                                        .height(100.dp)
+                                        .background(
+                                            color = Red,
+                                            shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
                                         ),
-                                        textAlign = TextAlign.Center
+                                    colors = ButtonDefaults.buttonColors(
+                                        backgroundColor = Red, // Set the background color as per your requirement
+
                                     )
+
+                                ) {
+                                    currentQuestion?.optionA?.let {
+                                        Text(
+                                            text = it,
+                                            style = TextStyle(
+                                                fontSize = 15.sp,
+                                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                                fontWeight = FontWeight(400),
+                                                color = Color(0xFFFFFFFF),
+                                                letterSpacing = 0.3.sp,
+                                            ),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+
+                                Button(
+                                    onClick = {
+
+                                        if (currentQuestionIndex == 0) {
+                                            QuizViewModel.resetScore(user.toString())
+                                        }
+
+                                        if (currentQuestion != null) {
+                                            if (currentQuestion.answer.equals("OptionB")) {
+                                                user?.let { QuizViewModel.updateScore(it) }
+                                            }
+                                        }
+                                        if (currentQuestionIndex == questions.size - 1) {
+                                            navController.navigate("Scores")
+                                        }
+                                        currentQuestionIndex++
+                                    },
+                                    modifier = Modifier
+                                        .width(buttonWidth)
+                                        .height(100.dp)
+                                        .background(
+                                            color = Green,
+                                            shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
+                                        ),
+                                    colors = ButtonDefaults.buttonColors(
+                                        backgroundColor = Green, // Set the background color as per your requirement
+
+                                    )
+
+
+                                ) {
+                                    currentQuestion?.optionB?.let {
+                                        Text(
+                                            text = it,
+                                            style = TextStyle(
+                                                fontSize = 15.sp,
+                                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                                fontWeight = FontWeight(400),
+                                                color = Color(0xFFFFFFFF),
+                                                letterSpacing = 0.3.sp,
+                                            ),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
                                 }
                             }
 
-                            Button(
-                                onClick = {
-
-                                    if (currentQuestionIndex == 0) {
-                                        QuizViewModel.resetScore(user.toString())
-                                    }
-
-                                    if (currentQuestion != null) {
-                                        if(currentQuestion.answer.equals("OptionB")){
-                                            user?.let { QuizViewModel.updateScore(it) }
-                                        }
-                                    }
-                                    if (currentQuestionIndex == questions.size -1) {
-                                        navController.navigate("Scores")
-                                    }
-                                    currentQuestionIndex++
-                                          },
+                            Row(
                                 modifier = Modifier
-                                    .width(buttonWidth)
-                                    .height(100.dp)
-                                    .background(
-                                        color = Green,
-                                        shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
-                                    ),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = Green, // Set the background color as per your requirement
-
-                                )
-
-
+                                    .fillMaxWidth()
+                                    .padding(start = 10.dp, end = 10.dp)
                             ) {
-                                currentQuestion?.optionB?.let {
-                                    Text(
-                                        text = it,
-                                        style = TextStyle(
-                                            fontSize = 15.sp,
-                                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                            fontWeight = FontWeight(400),
-                                            color = Color(0xFFFFFFFF),
-                                            letterSpacing = 0.3.sp,
+
+                                Button(
+                                    onClick = {
+
+                                        if (currentQuestionIndex == 0) {
+                                            QuizViewModel.resetScore(user.toString())
+                                        }
+
+                                        if (currentQuestion != null) {
+                                            if (currentQuestion.answer.equals("OptionC")) {
+                                                user?.let { QuizViewModel.updateScore(it) }
+                                            }
+                                        }
+                                        if (currentQuestionIndex == questions.size - 1) {
+                                            navController.navigate("Scores")
+                                        }
+                                        currentQuestionIndex++
+                                    },
+                                    modifier = Modifier
+                                        .width(buttonWidth)
+                                        .height(100.dp)
+                                        .background(
+                                            color = Yellow,
+                                            shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
                                         ),
-                                        textAlign = TextAlign.Center
+                                    colors = ButtonDefaults.buttonColors(
+                                        backgroundColor = Yellow, // Set the background color as per your requirement
+
                                     )
+
+
+                                ) {
+                                    currentQuestion?.optionC?.let {
+                                        Text(
+                                            text = it,
+                                            style = TextStyle(
+                                                fontSize = 15.sp,
+                                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                                fontWeight = FontWeight(400),
+                                                color = Color(0xFFFFFFFF),
+                                                letterSpacing = 0.3.sp,
+                                            ),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
                                 }
-                            }
-                        }
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 10.dp, end = 10.dp)
-                        ) {
+                                Button(
+                                    onClick = {
 
-                            Button(
-                                onClick = {
-
-                                    if (currentQuestionIndex == 0) {
-                                        QuizViewModel.resetScore(user.toString())
-                                    }
-
-                                    if (currentQuestion != null) {
-                                        if(currentQuestion.answer.equals("OptionC")){
-                                            user?.let { QuizViewModel.updateScore(it) }
+                                        if (currentQuestionIndex == 0) {
+                                            QuizViewModel.resetScore(user.toString())
                                         }
-                                    }
-                                    if (currentQuestionIndex == questions.size -1) {
-                                        navController.navigate("Scores")
-                                    }
-                                    currentQuestionIndex++
-                                          },
-                                modifier = Modifier
-                                    .width(buttonWidth)
-                                    .height(100.dp)
-                                    .background(
-                                        color = Yellow,
-                                        shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
-                                    ),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = Yellow, // Set the background color as per your requirement
 
-                                )
-
-
-                            ) {
-                                currentQuestion?.optionC?.let {
-                                    Text(
-                                        text = it,
-                                        style = TextStyle(
-                                            fontSize = 15.sp,
-                                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                            fontWeight = FontWeight(400),
-                                            color = Color(0xFFFFFFFF),
-                                            letterSpacing = 0.3.sp,
-                                        ),
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-
-                            Button(
-                                onClick = {
-
-                                    if (currentQuestionIndex == 0) {
-                                        QuizViewModel.resetScore(user.toString())
-                                    }
-
-                                    if (currentQuestion != null) {
-                                        if(currentQuestion.answer.equals("OptionD")){
-                                            user?.let { QuizViewModel.updateScore(it) }
+                                        if (currentQuestion != null) {
+                                            if (currentQuestion.answer.equals("OptionD")) {
+                                                user?.let { QuizViewModel.updateScore(it) }
+                                            }
                                         }
-                                    }
 
-                                    if (currentQuestionIndex == questions.size -1) {
-                                        navController.navigate("Scores")
-                                    }
-                                    currentQuestionIndex++
-                                          },
-                                modifier = Modifier
-                                    .width(buttonWidth)
-                                    .height(100.dp)
-                                    .background(
-                                        color = Blue,
-                                        shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
-                                    ),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = Blue, // Set the background color as per your requirement
-
-                                )
-
-
-                            ) {
-                                currentQuestion?.optionD?.let {
-                                    Text(
-                                        text = it,
-                                        style = TextStyle(
-                                            fontSize = 15.sp,
-                                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                            fontWeight = FontWeight(400),
-                                            color = Color(0xFFFFFFFF),
-                                            letterSpacing = 0.3.sp,
+                                        if (currentQuestionIndex == questions.size - 1) {
+                                            navController.navigate("Scores")
+                                        }
+                                        currentQuestionIndex++
+                                    },
+                                    modifier = Modifier
+                                        .width(buttonWidth)
+                                        .height(100.dp)
+                                        .background(
+                                            color = Blue,
+                                            shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
                                         ),
-                                        textAlign = TextAlign.Center
+                                    colors = ButtonDefaults.buttonColors(
+                                        backgroundColor = Blue, // Set the background color as per your requirement
+
                                     )
+
+
+                                ) {
+                                    currentQuestion?.optionD?.let {
+                                        Text(
+                                            text = it,
+                                            style = TextStyle(
+                                                fontSize = 15.sp,
+                                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                                fontWeight = FontWeight(400),
+                                                color = Color(0xFFFFFFFF),
+                                                letterSpacing = 0.3.sp,
+                                            ),
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
+
+
                 }
-
-
             }
         }
     }

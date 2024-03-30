@@ -151,6 +151,16 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+
+    suspend fun getAllUsers(type : String) : List<UserData?>? {
+        try {
+            return firestoreRepository.getAllUser(type)
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en getCurrentUser", e)
+            return null
+        }
+    }
+
     fun initRecipientUserId(userId: String) {
         _recipientUserId.value = userId
     }

@@ -81,17 +81,17 @@ fun ChildProfileScreen(
     loginViewModel: LoginViewModel = viewModel(),
     navController: NavController
 ){
-    Log.i("CHILDID", childId)
 
     var child by remember { mutableStateOf<Child?>(null) }
     var parents by remember { mutableStateOf<List<Parent?>>(emptyList()) }
-
+    var currentUser by remember { mutableStateOf<String?>(null) }
     val UserViewModel : UserViewModel = hiltViewModel()
 
     val userState = remember { mutableStateOf<UserData?>(null) }
 
     LaunchedEffect(UserViewModel) {
         val user = UserViewModel.getUserById(childId)
+        currentUser = UserViewModel.getCurrentUser()
         userState.value = user
     }
 
@@ -177,7 +177,7 @@ fun ChildProfileScreen(
     }
 
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileImage(
+        UserViewModel.getProfileEspecificImage(childId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -285,22 +285,26 @@ fun ChildProfileScreen(
 
 
                 val configuration = LocalConfiguration.current
-                val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
 
-
-
-                val imageUrl = userState.value?.profilePictureUrl ?: "https://i.imgur.com/w3UEu8o.jpeg"
                 AsyncImage(
-                    model = imageUrl,
+                    model = imageUrlState.value,
                     contentDescription = "Profile Picture",
                     modifier = Modifier
-                        .size(if (imageUrl.startsWith("http")) 100.dp else 50.dp) // Aumenta el tamaño si es una URL
+                        .size(150.dp)
                         .border(
                             BorderStroke(4.dp, SolidColor(if (child?.GoOutAlone == true) Green else Red)),
                             CircleShape
                         )
                         .padding(4.dp)
-                        .clip(CircleShape),
+                        .clip(CircleShape)
+                    .clickable {
+                    // TODO: Acciones al hacer clic en la imagen
+
+                        if(currentUser == child?.ID){
+                            showImagePickerDialog = true
+                        }
+
+                },
                     contentScale = ContentScale.Crop
                 )
 
@@ -347,22 +351,25 @@ fun ChildProfileScreen(
                     )
                 }
 
+                if(currentUser == child?.ID){
+                    Text(
+                        text = "LogOut",
+                        style = TextStyle(
+                            fontSize = 30.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF000000),
+                            letterSpacing = 0.9.sp,
+                            textAlign = TextAlign.Center
+                        ), modifier = Modifier
+                            .padding(start = 15.dp, top = 10.dp)
+                            .fillMaxWidth()
+                            .clickable { loginViewModel.signOut()
+                                navController.navigate("login")}
+                    )
+                }
 
-                Text(
-                    text = "LogOut",
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF000000),
-                        letterSpacing = 0.9.sp,
-                        textAlign = TextAlign.Center
-                    ), modifier = Modifier
-                        .padding(start = 15.dp, top = 10.dp)
-                        .fillMaxWidth()
-                        .clickable { loginViewModel.signOut()
-                            navController.navigate("login")}
-                )
+
 
 
                 Row() {

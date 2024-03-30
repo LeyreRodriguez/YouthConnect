@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -180,25 +181,25 @@ class FirestoreRepositoryImpl @Inject constructor(
 
 
     override suspend fun getAllNews(): List<News?> {
-
-        return try{
-            firebaseFirestore.collection("News")
+        return try {
+            val querySnapshot = firebaseFirestore.collection("News")
+                .orderBy("Date", Query.Direction.DESCENDING) // Ordena por el campo "Date"
                 .get()
                 .await()
-                .documents
-                .map { document ->
-                    News(
-                        id = document.getString("id") ?: "",
-                        Title = document.getString("Title") ?: "",
-                        Description = document.getString("Description") ?: "",
-                        Image = document.getString("Image") ?: ""
-                    )
-                }
-        }catch (e: Exception) {
+
+            querySnapshot.documents.map { document ->
+                News(
+                    id = document.getString("id") ?: "",
+                    Title = document.getString("Title") ?: "",
+                    Description = document.getString("Description") ?: "",
+                    Image = document.getString("Image") ?: "",
+                    Date = document.getString("Date") ?: "" // Obtén el valor del campo "Date"
+                )
+            }
+        } catch (e: Exception) {
             Log.e("FirestoreRepository", "getNews failed with $e")
             emptyList()
         }
-
     }
 
     override suspend fun getNewsById(newsId: String): News? {
@@ -211,22 +212,17 @@ class FirestoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun addNews(news : News) {
+    override suspend fun addNews(news: News) {
         val randomDocumentId = UUID.randomUUID().toString()
-
         val documentRef: DocumentReference = firebaseFirestore.collection("News").document(randomDocumentId)
-
         // Realiza la consulta para obtener el documento
         documentRef.get()
             .addOnSuccessListener { document ->
 
-                    firebaseFirestore.collection("News")
-                        .document(randomDocumentId)
-                        .set(news)
-
-
+                firebaseFirestore.collection("News")
+                    .document(randomDocumentId)
+                    .set(news)
             }
-
     }
 
     override suspend fun findDocument(userId: String): String? {
@@ -300,9 +296,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override suspend fun getCurrentInstructorById(instructorID: String): Instructor? {
         return try {
-            Log.i("UWU", instructorID)
             val document = firebaseFirestore.collection("Instructor").document(instructorID).get().await()
-            Log.i("AWA", document.data.toString())
             Instructor(
                 FullName = document.getString("fullName") ?: "",
                 ID = document.getString("id") ?: "",
@@ -524,6 +518,42 @@ class FirestoreRepositoryImpl @Inject constructor(
         return allUsers
     }
 
+
+    override suspend fun getAllUser(userType: String): List<UserData> {
+        val allUsers: MutableList<UserData> = mutableListOf()
+        try {
+            val colecciones = if (userType == "Instructor") {
+                listOf("Child", "Parents","Instructor")
+            } else {
+                listOf("Instructor")
+            }
+
+            for (coleccion in colecciones) {
+                try {
+                    val querySnapshot = firebaseFirestore.collection(coleccion).get().await()
+                    allUsers.addAll(querySnapshot.documents.mapNotNull { document ->
+                        val userId = document.getString("id") ?: ""
+                        if (userId != "00000000A") { // Verifica si el ID no es Admin
+                            UserData(
+                                userId = userId,
+                                userName = document.getString("fullName") ?: ""
+                            )
+                        } else {
+                            null // Retorna null si es la cuenta que deseas excluir
+                        }
+                    })
+                } catch (e: FirebaseFirestoreException) {
+                    // Manejar excepciones si es necesario
+                    Log.e("FirestoreRepository", "getAllUsers failed with $e")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "getAllUsers failed with $e")
+        }
+
+        return allUsers
+    }
+
     override suspend fun getChatId(chatId : String): String? {
         return try {
             val querySnapshot = firebaseFirestore.collection(Constants.MESSAGES).get().await()
@@ -650,7 +680,6 @@ class FirestoreRepositoryImpl @Inject constructor(
             }
         }
 
-        // Si no se encuentra en ninguna colección
         return ""
     }
 

@@ -224,8 +224,9 @@ class UserViewModel @Inject constructor(
 
     fun getProfileEspecificImage(email: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         viewModelScope.launch {
+
+            Log.i("USER", email)
             val userId = email
-            Log.i("JAJA", email)
             if (userId != null) {
                 try {
                     val url = firebaseStorage.getProfileImageUrl(userId)

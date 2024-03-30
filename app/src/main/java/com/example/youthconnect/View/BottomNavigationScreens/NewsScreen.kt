@@ -148,7 +148,21 @@ fun NewsScreen(
 
             Row (modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(15.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically){
+
+
+                if (user.toString().isNotEmpty()) {
+                    userImage(user = user.toString(), navController = navController , documentExists.value)
+                }
+
+
+            }
+
+            Row (modifier = Modifier
+                .fillMaxWidth(),
+             //   .padding(20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically){
                 Text(
@@ -162,13 +176,6 @@ fun NewsScreen(
                     ), modifier = Modifier
                         .padding(start = 15.dp, top = 10.dp )
                 )
-
-
-
-
-                if (user.toString().isNotEmpty()) {
-                     userImage(user = user.toString(), navController = navController , documentExists.value)
-                }
 
 
             }
@@ -224,7 +231,7 @@ fun NewsScreen(
                     }
 
                     if (showDialog) {
-                        AddNews(onDismiss = { showDialog = false })
+                        AddNews(onDismiss = { showDialog = false }, navController = navController)
                     }
 
 

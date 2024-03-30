@@ -67,11 +67,11 @@ import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
+import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ViewModel.signUpViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,25 +83,24 @@ fun SearchView(
 ) {
     var isTextFieldEmpty by remember { mutableStateOf(true) }
 
-
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
         TextField(
             value = state.value,
-            onValueChange = {value->
+            onValueChange = {value ->
                 state.value = value
                 isTextFieldEmpty = value.text.isEmpty()
             },
-            modifier
-                //.fillMaxWidth()
+            modifier = Modifier
+                .weight(1f) // Para que el TextField ocupe todo el espacio disponible
                 .padding(10.dp)
                 .clip(RoundedCornerShape(30.dp))
                 .border(2.dp, Color.DarkGray, RoundedCornerShape(30.dp)),
-
-
             placeholder = {
                 Text(text = placeHolder)
             },
-
-
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.White
             ),
@@ -110,7 +109,6 @@ fun SearchView(
             textStyle = TextStyle(
                 color = Color.Black, fontSize = 20.sp
             ),
-
             trailingIcon = {
                 if (!isTextFieldEmpty) {
                     Icon(
@@ -127,19 +125,21 @@ fun SearchView(
                 }
             }
         )
-
-
-
-
+    }
 }
-
 @Composable
-fun ChildListScreen(navController : NavController, instructorID: String){
+fun ChildListScreen(navController : NavHostController, instructorID: String){
 
     val UserViewModel : UserViewModel = hiltViewModel()
     var childs by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
+
+
+    var user by remember { mutableStateOf<String?>("") }
+
+    val documentExists = remember { mutableStateOf("-1") }
+    var result by remember { mutableStateOf<String?>("") }
 
 
 
@@ -148,6 +148,12 @@ fun ChildListScreen(navController : NavController, instructorID: String){
             childs = UserViewModel.getAllChildren()
             instructor = UserViewModel.getCurrentInstructorById(instructorID)
             myKids = UserViewModel.getChildByInstructorId(instructorID)
+            user = UserViewModel.getCurrentUser()
+            result = user?.let { UserViewModel.findDocument(it) }
+
+            if (result != null) {
+                documentExists.value = result.toString()
+            }
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
@@ -184,8 +190,20 @@ fun ChildListScreen(navController : NavController, instructorID: String){
 
 
             Column(modifier = Modifier.fillMaxHeight()) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(10.dp)) {
+
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(30.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically){
+
+                    if (user.toString().isNotEmpty()) {
+                        userImage(user = user.toString(), navController = navController , documentExists.value)
+                    }
+
+
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally){
                     Text(
                         text = "Children list",
                         style = TextStyle(

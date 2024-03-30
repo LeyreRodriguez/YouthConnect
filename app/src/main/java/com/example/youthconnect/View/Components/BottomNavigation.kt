@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.youthconnect.Model.Sealed.ItemsBottomBar
+import com.example.youthconnect.ui.theme.Blue
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import com.example.youthconnect.ui.theme.Yellow
@@ -36,7 +37,7 @@ fun BottomNavigation(
                     icon = {
                         Icon( imageVector = item.icon,
                             contentDescription = item.title,
-                            tint = if (item.title == "News") Red else if (item.title == "Quiz") Green else Yellow // Cambia el color del icono seleccionado
+                            tint = if (item.title == "News") Red else if (item.title == "Quiz") Green else if (item.title == "Chat") Yellow else Blue // Cambia el color del icono seleccionado
                         )
                     },
                     label = {

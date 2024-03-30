@@ -86,6 +86,7 @@ fun ParentsProfileScreen(parentId : String,
 ) {
 
     var parent by remember { mutableStateOf<Parent?>(null) }
+    var currentUser by remember { mutableStateOf<String?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
 
     val UserViewModel : UserViewModel = hiltViewModel()
@@ -94,6 +95,7 @@ fun ParentsProfileScreen(parentId : String,
         try {
             parent = UserViewModel.getCurrentUserById(parentId)
             children = UserViewModel.getChildByParentsId(parentId)
+            currentUser = UserViewModel.getCurrentUser()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -172,7 +174,7 @@ fun ParentsProfileScreen(parentId : String,
     }
 
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileImage(
+        UserViewModel.getProfileEspecificImage(parentId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -301,7 +303,10 @@ fun ParentsProfileScreen(parentId : String,
                             .clip(CircleShape)
                             .clickable {
                                 // TODO: Acciones al hacer clic en la imagen
-                                showImagePickerDialog = true
+                                if(currentUser == parent?.ID){
+                                    showImagePickerDialog = true
+                                }
+
                             },
                         contentScale = ContentScale.Crop
                     )
@@ -329,22 +334,25 @@ fun ParentsProfileScreen(parentId : String,
 
                 Column ( modifier = Modifier.fillMaxWidth()
                 ){
-                    Text(
-                        text = "LogOut",
-                        style = TextStyle(
-                            fontSize = 30.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                            textAlign = TextAlign.Center
-                        ), modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                            .fillMaxWidth()
+                    if(currentUser == parent?.ID){
+                        Text(
+                            text = "LogOut",
+                            style = TextStyle(
+                                fontSize = 30.sp,
+                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFF000000),
+                                letterSpacing = 0.9.sp,
+                                textAlign = TextAlign.Center
+                            ), modifier = Modifier
+                                .padding(start = 15.dp, top = 10.dp)
+                                .fillMaxWidth()
 
-                            .clickable { loginViewModel.signOut()
-                            navController.navigate("firstScreens")}
-                    )
+                                .clickable { loginViewModel.signOut()
+                                    navController.navigate("firstScreens")}
+                        )
+                    }
+
                     Text(
                         text = "My kids",
                         style = TextStyle(
