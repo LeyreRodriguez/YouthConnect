@@ -10,6 +10,7 @@ import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
 import com.example.youthconnect.Model.Object.UserData
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -47,7 +48,7 @@ class ChatViewModel @Inject constructor(
     /**
      * Generar un ID único para una conversación entre dos usuarios
      */
-    private fun generateChatId(user1Id: String, user2Id: String): String {
+     fun generateChatId(user1Id: String, user2Id: String): String {
         return if (user1Id < user2Id) {
             "$user1Id-$user2Id"
         } else {
@@ -68,25 +69,22 @@ class ChatViewModel @Inject constructor(
     fun addMessage(recipientUserId: String) {
         val message: String = _message.value ?: throw IllegalArgumentException("message empty")
         if (message.isNotEmpty()) {
-
-            val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
-                ?: ""
+            val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase() ?: ""
             val chatId = generateChatId(currentUserId, recipientUserId)
-            Firebase.firestore.collection(Constants.MESSAGES).document().set(
-                hashMapOf(
-                    Constants.MESSAGE to message,
-                    Constants.SENT_BY to currentUserId,
-                    Constants.SENT_ON to System.currentTimeMillis(),
-                    "chatId" to chatId,
-                    "seen" to false
-                )
-            ).addOnSuccessListener {
-                _message.value = ""
-                loadMessages(chatId)
 
-            }
+            // Establecer seen como false para el mensaje enviado
+            val messageData = hashMapOf(
+                Constants.MESSAGE to message,
+                Constants.SENT_BY to currentUserId,
+                Constants.SENT_ON to System.currentTimeMillis(),
+                "chatId" to chatId,
+                "seen" to false
+            )
 
-
+            Firebase.firestore.collection(Constants.MESSAGES).document().set(messageData)
+                .addOnSuccessListener {
+                    _message.value = ""
+                }
         }
     }
 
@@ -95,7 +93,7 @@ class ChatViewModel @Inject constructor(
     /**
      * Cargar mensajes para un chat específico
      */
-    private fun loadMessages(chatId : String) {
+    private fun loadMessages(chatId: String) {
         val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase() ?: ""
 
         Firebase.firestore.collection(Constants.MESSAGES)
@@ -115,13 +113,8 @@ class ChatViewModel @Inject constructor(
                         val sentBy = data[Constants.SENT_BY].toString()
                         val isCurrentUser = currentUserId == sentBy
                         data[Constants.IS_CURRENT_USER] =
-                            Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
-                                    ?: "" == data[Constants.SENT_BY].toString()
+                            Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase() ?: "" == sentBy
 
-                        if (!isCurrentUser) {
-                            // Actualizar el campo 'seen' solo si el usuario actual no es el remitente
-                            doc.reference.update("seen", true)
-                        }
                         list.add(data)
                     }
                 }
@@ -132,23 +125,33 @@ class ChatViewModel @Inject constructor(
 
 
     /**
+     * Marcar un mensaje como visto
+     */
+    fun markMessagesAsSeen(chatId: String) {
+        // Obtener una referencia a la colección de mensajes para la conversación específica
+        val messagesCollection = Firebase.firestore.collection(Constants.MESSAGES)
+
+        // Marcar todos los mensajes en la conversación como vistos
+        messagesCollection.whereEqualTo("chatId", chatId).get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    // Actualizar el estado "seen" del mensaje a true
+                    messagesCollection.document(document.id).update("seen", true)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e(Constants.TAG, "Error al marcar mensajes como vistos", e)
+            }
+    }
+
+
+
+
+    /**
      * Update the list after getting the details from firestore
      */
     private fun updateMessages(list: MutableList<Map<String, Any>>) {
         _messages.value = list.asReversed()
-    }
-
-
-    /**
-     * PONERLO SOLO EN USER VIEW MODEL
-     */
-    suspend fun getAllUsers() : List<UserData?>? {
-        try {
-            return firestoreRepository.getAllUser()
-        } catch (e: Exception) {
-            Log.e("Firestore", "Error en getCurrentUser", e)
-            return null
-        }
     }
 
 

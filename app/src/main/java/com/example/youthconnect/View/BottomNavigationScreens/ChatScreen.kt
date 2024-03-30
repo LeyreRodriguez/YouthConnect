@@ -153,11 +153,13 @@ fun HomeScreen(
                         it?.userName?.contains(searchedText, ignoreCase = true) ?: false
                     }, key = { it?.userId ?: "" }) { item ->
                         if (item != null) {
-                            val hasUnseenMessages = ChatViewModel.getUnseenMessages().value.orEmpty().isNotEmpty()
+
                             UserEachRow(
                                 person = item,
                                 unseenMessages = unseenMessages
                             ) {
+
+                                ChatViewModel.markMessagesAsSeen(ChatViewModel.generateChatId(item.userId,user))
                                 navHostController.navigate("chatscreen/${item.userId}")
                             }
                         }
@@ -180,9 +182,6 @@ fun UserEachRow(
     unseenMessages: List<String>,
     onClick: () -> Unit
 ) {
-
-    Log.i("list", unseenMessages.toString())
-
 
     val UserViewModel : UserViewModel = hiltViewModel()
     val imageUrlState = remember { mutableStateOf("") }

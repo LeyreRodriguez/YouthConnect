@@ -13,13 +13,25 @@
       </Target>
     </targetSelectedWithDropDown>
     <timeTargetWasSelectedWithDropDown value="2024-03-23T12:56:47.217102700Z" />
+    <multipleDevicesSelectedInDropDown value="true" />
+    <runningDeviceTargetsSelectedWithDialog>
+      <Target>
+        <type value="RUNNING_DEVICE_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\leyre\.android\avd\Pixel_7_Pro_API_30.avd" />
+          </Key>
+        </deviceKey>
+      </Target>
+    </runningDeviceTargetsSelectedWithDialog>
     <targetsSelectedWithDialog>
       <Target>
         <type value="QUICK_BOOT_TARGET" />
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\leyre\.android\avd\Pixel_7_API_30.avd" />
+            <value value="C:\Users\leyre\.android\avd\Pixel_7_Pro_API_30.avd" />
           </Key>
         </deviceKey>
       </Target>
@@ -28,7 +40,7 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\leyre\.android\avd\Pixel_7_Pro_API_30.avd" />
+            <value value="C:\Users\leyre\.android\avd\Pixel_7_Pro_API_30_2.avd" />
           </Key>
         </deviceKey>
       </Target>

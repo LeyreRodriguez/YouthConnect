@@ -533,7 +533,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                     val querySnapshot = firebaseFirestore.collection(coleccion).get().await()
                     allUsers.addAll(querySnapshot.documents.mapNotNull { document ->
                         val userId = document.getString("id") ?: ""
-                        if (userId != "00000000A") { // Verifica si el ID no es Admin
+                        if (userId != "00000000A" && userId != getCurrentUser()) { // Verifica si el ID no es Admin
                             UserData(
                                 userId = userId,
                                 userName = document.getString("fullName") ?: ""
