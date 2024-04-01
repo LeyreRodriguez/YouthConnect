@@ -1,8 +1,7 @@
-package com.example.youthconnect.View.BottomNavigationScreens
+package com.example.youthconnect.View.OverlaysAndMore
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -51,11 +50,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -73,6 +70,7 @@ import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
+import com.example.youthconnect.View.BottomNavigationScreens.userImage
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ViewModel.signUpViewModel
 import com.example.youthconnect.ui.theme.Green
@@ -536,7 +534,6 @@ fun CustomDropdownMenu(
     var stroke by remember { mutableStateOf(1) }
     var selectedOption by remember(defaultSelected) { mutableStateOf(defaultSelected) }
 
-    Log.e("SELECTED", selectedOption)
 
     Box(
         modifier = modifier

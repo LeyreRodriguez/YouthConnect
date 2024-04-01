@@ -1,4 +1,4 @@
-package com.example.youthconnect.View.BottomNavigationScreens
+package com.example.youthconnect.View.OverlaysAndMore
 
 import android.annotation.SuppressLint
 import android.net.Uri
@@ -37,14 +37,11 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.youthconnect.Model.Constants.ALL_IMAGES
 import com.example.youthconnect.Model.Enum.NavScreen
-import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.News
-import com.example.youthconnect.Model.Object.Parent
-import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.Model.Sealed.Response
+import com.example.youthconnect.View.Authentication.CustomOutlinedTextField
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import java.util.UUID
 
 

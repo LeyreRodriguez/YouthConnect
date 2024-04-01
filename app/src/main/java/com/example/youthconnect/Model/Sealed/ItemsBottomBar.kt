@@ -8,14 +8,13 @@ import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.youthconnect.Model.Enum.NavScreen
-import com.example.youthconnect.Model.Sealed.ItemsBottomBar.ChatBottom.userType
+
 
 
 sealed class ItemsBottomBar(
     val icon: ImageVector,
     val title: String,
-    val ruta: String,
-    val userType: String? = null // Nuevo parámetro userType
+    val ruta: String
 ){
 
     object NewsBottom : ItemsBottomBar

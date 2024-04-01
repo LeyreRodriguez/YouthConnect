@@ -31,8 +31,6 @@ import java.io.ByteArrayOutputStream
 
 class DisplayQRCode {
 
-
-
      fun generateQRCode(text: String): Bitmap? {
         val width = 400
         val height = 400
@@ -55,43 +53,6 @@ class DisplayQRCode {
     }
 
 
-
-
-    fun generateQRCodeAndUpload(text: String) {
-        val qrBitmap = generateQRCode(text)
-        qrBitmap?.let {
-            // Crear un ByteArray de la imagen en formato JPEG
-            val outputStream = ByteArrayOutputStream()
-            qrBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-            val data = outputStream.toByteArray()
-
-            // Referencia al Firebase Storage
-            val storage = Firebase.storage
-            val storageRef = storage.reference
-
-            // Nombre del archivo en el Storage (puedes cambiarlo si lo deseas)
-            val fileName = text
-
-            // Referencia al archivo en el Storage
-            val fileRef = storageRef.child(fileName)
-
-            // Subir el archivo al Storage
-            val uploadTask = fileRef.putBytes(data)
-
-            // Manejar el éxito o el fallo de la carga
-            uploadTask.addOnSuccessListener {
-                // La imagen se cargó exitosamente
-                fileRef.downloadUrl.addOnSuccessListener { uri ->
-                    val downloadUrl = uri.toString()
-                    // Haz lo que necesites con la URL de descarga (p. ej., guardarla en la base de datos)
-                }.addOnFailureListener {
-                    // Manejar errores al obtener la URL de descarga
-                }
-            }.addOnFailureListener {
-                // Manejar fallos en la carga de la imagen
-            }
-        }
-    }
 
 
 

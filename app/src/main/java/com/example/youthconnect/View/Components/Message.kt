@@ -1,33 +1,21 @@
-package com.example.youthconnect.View.BottomNavigationScreens
+package com.example.youthconnect.View.Components
 
 
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.youthconnect.ui.theme.Blue
-import com.example.youthconnect.ui.theme.Red
 
 
 import androidx.compose.material.Card
-import androidx.compose.ui.Alignment.Companion.BottomCenter
 import com.example.youthconnect.ui.theme.Blue50
 import com.example.youthconnect.ui.theme.Red50
 

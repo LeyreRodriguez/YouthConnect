@@ -1,4 +1,4 @@
-package com.example.youthconnect.View.BottomNavigationScreens
+package com.example.youthconnect.View.Authentication
 
 import android.util.Patterns
 import android.widget.Toast

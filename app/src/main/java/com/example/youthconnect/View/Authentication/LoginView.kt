@@ -1,6 +1,5 @@
-package com.example.youthconnect.View.BottomNavigationScreens
+package com.example.youthconnect.View.Authentication
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
