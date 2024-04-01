@@ -245,6 +245,7 @@ fun ParentsProfileScreen(parentId : String,
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
+            /*
             Canvas(
                 modifier = Modifier.fillMaxSize(),
                 onDraw = {
@@ -271,6 +272,8 @@ fun ParentsProfileScreen(parentId : String,
                 }
             )
 
+
+             */
             Column(
                 modifier = Modifier
                     .padding(15.dp)

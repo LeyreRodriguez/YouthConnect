@@ -90,6 +90,9 @@ fun InstructorProfileScreen(instructorId : String,
                             loginViewModel : LoginViewModel = viewModel()
 ) {
 
+
+    Log.e("USERe", instructorId)
+
     val UserViewModel : UserViewModel = hiltViewModel()
    // val ProfileViewModel : profileViewModel = hiltViewModel()
     var instructor by remember { mutableStateOf<Instructor?>(null) }
@@ -252,6 +255,7 @@ fun InstructorProfileScreen(instructorId : String,
             Box(
                 modifier = Modifier.fillMaxSize(),
             ) {
+                /*
                 Canvas(
                     modifier = Modifier.fillMaxSize(),
                     onDraw = {
@@ -278,6 +282,8 @@ fun InstructorProfileScreen(instructorId : String,
                     }
                 )
 
+
+                 */
                 if(currentUser == instructor?.ID) {
 
                     Image(
@@ -430,50 +436,35 @@ fun InstructorProfileScreen(instructorId : String,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
 
-
-                            val context = LocalContext.current
-
-
-
-
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_qr_code_scanner_24),
-                                contentDescription = "icon",
-                                contentScale = ContentScale.Crop,
+                            AsyncImage(
+                                model = "https://media.istockphoto.com/id/1358621997/vector/qr-code-smartphone-scanner-linear-icon-vector-illustration.jpg?s=612x612&w=0&k=20&c=ePiWZHIbseW9GwmM498rRKC_Dvk8IsKv41nqnC8iZhQ=",
+                                contentDescription = "Scan Qr",
                                 modifier = Modifier
                                     .size(120.dp)
-                                    .padding(10.dp)
-                                    .clickable {
+                                    .padding(14.dp)
 
-                                        //context.startActivity(Intent(context, QrScan::class.java))
+                                    .clip(CircleShape)
+                                    .clickable {
                                         navController.navigate("qr")
-
-
-                                    }
-                                    .background(Color(0xFFD9D9D9), CircleShape)
-
-                                    .padding(4.dp)
-                                    .clip(CircleShape)
-
+                                    },
+                                contentScale = ContentScale.Crop
                             )
 
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_format_list_bulleted_24),
-                                contentDescription = "icon",
-                                contentScale = ContentScale.Crop,
+
+                            AsyncImage(
+                                model = "https://static.vecteezy.com/system/resources/previews/006/692/364/original/list-icon-template-black-color-editable-list-icon-symbol-flat-sign-isolated-on-white-background-simple-logo-illustration-for-graphic-and-web-design-free-vector.jpg",
+                                contentDescription = "Child List",
                                 modifier = Modifier
                                     .size(120.dp)
-                                    .padding(10.dp)
-                                    .clickable {
+                                    .padding(14.dp)
 
-
-                                        navController.navigate(NavScreen.ChildList.name + "/${instructorId}")
-                                    }
-                                    .background(Color(0xFFD9D9D9), CircleShape)
-                                    .padding(4.dp)
                                     .clip(CircleShape)
-
+                                    .clickable {
+                                        navController.navigate(NavScreen.ChildList.name + "/${instructorId}")
+                                    },
+                                contentScale = ContentScale.Crop
                             )
+
                         }
                     }
 

@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -76,6 +77,7 @@ import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ViewModel.signUpViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
+import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -262,7 +264,7 @@ fun MyChildren(navController: NavController, child: Child) {
 
     val SignUpViewModel: signUpViewModel = hiltViewModel()
     val UserViewModel: UserViewModel = hiltViewModel()
-    var isChecked by remember { mutableStateOf(false) }
+    var isChecked by remember { mutableStateOf(child.RollCall?.contains(LocalDate.now().toString()) == true) }
 
 
 
@@ -293,11 +295,6 @@ fun MyChildren(navController: NavController, child: Child) {
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
-
-//
-  //  LaunchedEffect(key1 = child.ID, key2 = myKids) {
-    //    isChecked = myKids.any { it?.ID == child.ID }
-    //}
 
 
     val imageUrlState = remember { mutableStateOf("") }
@@ -359,18 +356,21 @@ fun MyChildren(navController: NavController, child: Child) {
 
             if (documentExists.value == "0" && currentRoute != NavScreen.ChildList.name +"/{instructorID}") {
 
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = { newCheckedState ->
-                        isChecked = newCheckedState
-                        if (instructorID != null) {
-                            SignUpViewModel.rollCall(child, newCheckedState)
-                        }
-                    },
-                    modifier = Modifier.padding(end = 8.dp)
-                )
 
-            }
+                    Checkbox(
+                        checked = isChecked,
+                        onCheckedChange = { newCheckedState ->
+                            isChecked = newCheckedState
+                            if (instructorID != null) {
+                                SignUpViewModel.rollCall(child, newCheckedState)
+                            }
+                        },
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+
+
+
 
         }
     }
@@ -463,13 +463,28 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
             ) {
                 Text(text = child.FullName,  fontWeight = FontWeight.Bold)
                 if (expanded.value) {
-                    Text(text = "Instructor: ")
-                    val mcontext = LocalContext.current
-                    instructor?.let {
-                        CustomDropdownMenu(instructorsList, it.FullName, Color.DarkGray, onSelected = { selectedOption ->
-                            UserViewModel.changeInstructor(child, instructorID)
-                        })
-                    }
+
+
+                        Text(text = "Instructor: ", fontWeight = FontWeight.Bold )
+
+                        if(child.InstructorID.isNullOrEmpty()){
+                            //Text("There is not instructor assigned to this child")
+
+                                CustomDropdownMenu(instructorsList, "", Color.DarkGray, onSelected = { selectedOption ->
+                                    UserViewModel.changeInstructor(child, instructorID)
+                                })
+
+                        }else{
+                            instructor?.let {
+                                CustomDropdownMenu(instructorsList, it.FullName, Color.DarkGray, onSelected = { selectedOption ->
+                                    UserViewModel.changeInstructor(child, instructorID)
+                                })
+                            }
+                        }
+
+
+
+
                     if(child.FaithGroups){
                         Text(text = "Belongs to faith groups")
                     }else{
@@ -481,7 +496,15 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
                     }else{
                         Text(text = "Does not belong to school")
                     }
-                    child.Observations?.let { Text(text = it) }
+
+                    Text(text = "Observations: ", fontWeight = FontWeight.Bold )
+
+                    if(child.Observations.isNullOrEmpty()){
+                        Text("There are not observations")
+                    }else{
+                        child.Observations?.let { Text(text = it) }
+                    }
+
 
                 }
             }
@@ -513,13 +536,10 @@ fun CustomDropdownMenu(
     var stroke by remember { mutableStateOf(1) }
     var selectedOption by remember(defaultSelected) { mutableStateOf(defaultSelected) }
 
+    Log.e("SELECTED", selectedOption)
+
     Box(
         modifier = modifier
-            .padding(8.dp)
-            .border(
-                BorderStroke(stroke.dp, color),
-                shape = RoundedCornerShape(4.dp)
-            )
             .clickable {
                 expand = !expand
                 stroke = if (expand) 2 else 1
@@ -527,14 +547,26 @@ fun CustomDropdownMenu(
         contentAlignment = Alignment.Center
     ) {
 
-        Text(
-            text = selectedOption,
-            color = color,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
-        )
+        Row(modifier = Modifier.fillMaxWidth()){
+            Text(
+                text = if (selectedOption.isNullOrEmpty()) "There is not instructor \nto this child" else selectedOption,
+                color = color,
+            )
+
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown ,
+                contentDescription = "Expand",
+                tint = Color.DarkGray,
+                modifier = Modifier
+                    .clickable {
+                        expand = !expand
+                        stroke = if (expand) 2 else 1
+                    }
+                    //.padding(12.dp)
+            )
+        }
+
+
 
         DropdownMenu(
             expanded = expand,
@@ -549,9 +581,9 @@ fun CustomDropdownMenu(
             ),
             modifier = Modifier
                 .background(Color.White)
-                .padding(2.dp)
-                .fillMaxWidth(.4f)
         ) {
+
+
             list.forEachIndexed { index, item ->
                 DropdownMenuItem(
                     text = {

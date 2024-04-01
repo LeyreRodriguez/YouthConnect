@@ -123,6 +123,7 @@ fun QuizScreen( navController: NavHostController,
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
+        /*
         Canvas(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
@@ -148,6 +149,8 @@ fun QuizScreen( navController: NavHostController,
                 )
             }
         )
+
+         */
         var showDialog by remember { mutableStateOf(false) }
 
         Box(
@@ -178,7 +181,7 @@ fun QuizScreen( navController: NavHostController,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
             ) {
-
+/*
                 Row (modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp),
@@ -191,6 +194,8 @@ fun QuizScreen( navController: NavHostController,
 
 
                 }
+
+ */
                 Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
 
                 Text(

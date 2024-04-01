@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,18 +54,18 @@ import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 
 @Composable
-fun NewsDetails(newsId : String,
-                modifier : Modifier = Modifier.background(color = Color.White)
+fun NewsDetails(
+    newsId: String,
+    modifier: Modifier = Modifier.background(color = Color.White)
 ) {
 
-    val NewsViewModel : NewsViewModel = hiltViewModel()
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val NewsViewModel: NewsViewModel = hiltViewModel()
+    val UserViewModel: UserViewModel = hiltViewModel()
     var news by remember { mutableStateOf<News?>(null) }
     val imageUrlState = remember { mutableStateOf("") }
 
     LaunchedEffect(NewsViewModel) {
         try {
-
             news = NewsViewModel.getNewsById(newsId)
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
@@ -82,40 +83,10 @@ fun NewsDetails(newsId : String,
         )
     }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
+    LazyColumn(
+        modifier = modifier.fillMaxSize().padding(15.dp)
     ) {
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-            onDraw = {
-                // Dibuja un rectángulo blanco como fondo
-                drawRect(Color.White)
-
-                // Define el pincel para el borde con el gradiente del Brush
-                val borderBrush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFFE15554),
-                        Color(0xFF3BB273),
-                        Color(0xFFE1BC29),
-                        Color(0xFF4D9DE0)
-                    )
-                )
-
-                // Dibuja el borde con el pincel definido
-                drawRect(
-                    brush = borderBrush,
-                    topLeft = Offset(0f, 0f),
-                    size = Size(size.width, size.height),
-                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                )
-            }
-        )
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(15.dp)
-        ) {
-
+        item {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -136,10 +107,7 @@ fun NewsDetails(newsId : String,
                             .padding(start = 15.dp, top = 10.dp)
                     )
                 }
-
             }
-
-
 
             val configuration = LocalConfiguration.current
             val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
@@ -169,13 +137,6 @@ fun NewsDetails(newsId : String,
                         .padding(start = 15.dp, top = 10.dp)
                 )
             }
-
-
         }
-
-
     }
-
-
 }
-

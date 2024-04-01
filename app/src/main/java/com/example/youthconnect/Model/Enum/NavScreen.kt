@@ -5,4 +5,5 @@ enum class NavScreen {
     QuizScreen,
     ChatScreen,
     ChildList,
+    Profile
 }

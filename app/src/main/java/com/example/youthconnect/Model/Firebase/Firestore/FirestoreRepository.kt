@@ -49,6 +49,7 @@ interface FirestoreRepository {
 
     suspend fun addInstructorToChild(child: Child, instructorID: String)
     suspend fun rollCall(child: Child)
+    suspend fun notRollCall(child: Child)
     suspend fun getRollCall(childId: String) : List<String>?
     suspend fun removeInstructorFromChild(child: Child, instructorID: String)
 

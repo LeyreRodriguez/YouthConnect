@@ -115,7 +115,7 @@ fun NewsScreen(
     ) {
 
 
-
+/*
         Canvas(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
@@ -141,11 +141,11 @@ fun NewsScreen(
                 )
             }
         )
-
+*/
 
         Column( horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(15.dp)) {
-
+/*
             Row (modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp),
@@ -159,6 +159,8 @@ fun NewsScreen(
 
 
             }
+
+ */
 
             Row (modifier = Modifier
                 .fillMaxWidth(),

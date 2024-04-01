@@ -269,6 +269,8 @@ fun ChildProfileScreen(
     Box(
             modifier = modifier.fillMaxSize(),
         ) {
+
+        /*
             Canvas(
                 modifier = Modifier.fillMaxSize(),
                 onDraw = {
@@ -294,6 +296,8 @@ fun ChildProfileScreen(
                     )
                 }
             )
+
+         */
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

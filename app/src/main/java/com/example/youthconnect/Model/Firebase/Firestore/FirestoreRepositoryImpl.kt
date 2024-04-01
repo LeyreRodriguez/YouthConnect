@@ -459,7 +459,6 @@ class FirestoreRepositoryImpl @Inject constructor(
         val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.ID)
         val today = LocalDate.now().toString()
 
-        Log.i("TODAy", today)
 
         documentRef.get()
             .addOnSuccessListener { document ->
@@ -492,6 +491,37 @@ class FirestoreRepositoryImpl @Inject constructor(
                 }
             }
 
+    }
+
+    override suspend fun notRollCall(child: Child) {
+        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.ID)
+        val today = LocalDate.now().toString()
+
+        documentRef.get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val rollCallList = document.get("rollCall") as? List<String> ?: emptyList()
+
+                    val newRollCallList = rollCallList.filter { it != today }
+
+                    val updates = hashMapOf<String, Any>(
+                        "rollCall" to newRollCallList
+                    )
+
+                    documentRef.update(updates)
+                        .addOnSuccessListener {
+                            // La actualización fue exitosa
+                            Log.i("Actualizacion", "completada")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.i("Actualizacion", "no completada")
+                        }
+
+                    val data = document.data
+                } else {
+                    // Documento no encontrado
+                }
+            }
     }
 
 

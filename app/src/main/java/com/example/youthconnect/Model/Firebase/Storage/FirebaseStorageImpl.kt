@@ -12,6 +12,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.tasks.await
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -85,7 +86,7 @@ class FirebaseStorageImpl @Inject constructor(
                 "Description" to news.Description,
                 "Title" to news.Title,
                 "id" to news.id,
-                "Date" to Instant.now().toString()
+                "Date" to LocalDate.now().toString()
             )).await()
             Response.Success(true)
         }catch (e:Exception){

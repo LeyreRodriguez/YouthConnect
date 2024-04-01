@@ -109,11 +109,9 @@ class signUpViewModel @Inject constructor(
 
         viewModelScope.launch {
             if (isChecked) {
-
-                // Si el checkbox está marcado, agrega al instructor al niño
                 firestoreRepository.rollCall(child)
-
-                //     _updatedState.value = true
+            }else{
+                firestoreRepository.notRollCall(child)
             }
         }
     }

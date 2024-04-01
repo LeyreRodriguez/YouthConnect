@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
@@ -26,6 +27,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +53,8 @@ import androidx.navigation.navArgument
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Firebase.Authentication.GoogleAuthUiClient
+import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
+import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildListScreen
 import com.example.youthconnect.View.BottomNavigationScreens.ChildProfileScreen
@@ -77,6 +82,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
 
+
     private var textResult = mutableStateOf("")
 
     private val barCodeLauncher = registerForActivityResult(ScanContract()) { result ->
@@ -93,11 +99,7 @@ class MainActivity : ComponentActivity() {
         options.setCameraId(0)
         options.setBeepEnabled(false)
         options.setOrientationLocked(false)
-
         barCodeLauncher.launch(options)
-
-
-
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -123,8 +125,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-    val db = Firebase.firestore
 
     public val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
@@ -203,13 +203,48 @@ class MainActivity : ComponentActivity() {
 
 
                     composable("qr") {
-                        checkCameraPermission(this@MainActivity )
-                        val mcontext = LocalContext.current
-                        if ( textResult.value.isNotEmpty()) {
-                            //  QrScannerScreen(navController,textResult.value)
 
+                        BackHandler {
+                            // Si se presiona el botón "Atrás" mientras la cámara está abierta,
+                            // navegar de vuelta a la pantalla de noticias
+                            /*
+                            navController.navigate(NavScreen.NewsScreen.name) {
+                                // Esto limpia el back stack para que no haya múltiples instancias de
+                                // la pantalla de escaneo QR en la pila de navegación
+                                popUpTo(NavScreen.NewsScreen.name) {
+                                    inclusive = true
+                                }
+                            }
+
+                             */
+                            navController.popBackStack()
+                        }
+
+                        checkCameraPermission(this@MainActivity )
+                        if ( textResult.value.isNotEmpty()) {
                             QrScannerScreen(textResult.value, navController)
-                        } }
+                        }
+                        /*
+                        LaunchedEffect(textResult.value) {
+                            if (textResult.value.isEmpty()) {
+                                navController.navigate(NavScreen.NewsScreen.name) {
+                                    // Limpia el back stack para evitar múltiples instancias de la pantalla de escaneo QR
+                                    popUpTo(NavScreen.NewsScreen.name) {
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                        }
+
+                         */
+
+                        LaunchedEffect(textResult.value) {
+                            if (textResult.value.isEmpty()) {
+                                // Navegar de vuelta a la pantalla anterior si no hay texto de resultado
+                                navController.popBackStack()
+                            }
+                        }
+                    }
                 }
                 navigation(
                     startDestination = NavScreen.NewsScreen.name,
@@ -269,6 +304,71 @@ class MainActivity : ComponentActivity() {
                             ) {
                                // ChatScreen()
                                 HomeScreen(navController)
+                            }
+
+
+                        }
+
+                    }
+
+
+
+                    composable(NavScreen.Profile.name){
+
+                        val UserViewModel : UserViewModel = hiltViewModel()
+                        var user by remember { mutableStateOf<String?>("") }
+                        var userType by remember { mutableStateOf<String?>("") }
+
+                        LaunchedEffect(key1 = Unit){
+                            user = UserViewModel.getCurrentUser()
+                            userType = user?.let { it1 -> UserViewModel.getUserType(it1) }
+                        }
+                        Log.i("USERa", user.toString())
+                        Log.i("USERTYPEa", userType.toString())
+                        Scaffold(
+                            bottomBar = {
+                                BottomNavigation(navController)
+                            }
+                        ) {padding->
+                            Box(
+                                modifier = Modifier
+                                    .padding(padding)
+                                    .fillMaxSize()
+                            ) {
+                                userType?.let { type ->
+                                    when (type) {
+                                        "Child" -> {
+                                            user?.let { childId ->
+                                                ChildProfileScreen(
+                                                    childId = childId,
+                                                    navController = navController
+                                                )
+                                            }
+                                        }
+
+                                        "Parents" -> {
+                                            user?.let { parentId ->
+                                                ParentsProfileScreen(
+                                                    parentId = parentId,
+                                                    navController = navController
+                                                )
+                                            }
+                                        }
+
+                                        "Instructor" -> {
+                                            user?.let { instructorId ->
+                                                InstructorProfileScreen(
+                                                    instructorId = instructorId,
+                                                    navController = navController
+                                                )
+                                            }
+                                        }
+
+                                        else -> {
+                                            // Manejar caso por defecto o error
+                                        }
+                                    }
+                                }
                             }
 
 
@@ -458,9 +558,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun QrScannerScreen( childId : String, navController: NavController){
-    val mcontext = LocalContext.current
-    Log.i("OWO", childId)
-
 
     val UserViewModel : UserViewModel = hiltViewModel()
 
@@ -485,7 +582,6 @@ fun QrScannerScreen( childId : String, navController: NavController){
                 .fillMaxWidth()
                 .height(56.dp)
                 .clip(RoundedCornerShape(8.dp))
-            //   .background(Color(0xFF00FF00))
         ) {
             Text(
                 text = "Escanear otro QR",
@@ -508,7 +604,6 @@ fun QrScannerScreen( childId : String, navController: NavController){
                 .fillMaxWidth()
                 .height(56.dp)
                 .clip(RoundedCornerShape(8.dp))
-            //   .background(Color(0xFF00FF00))
         ) {
             Text(
                 text = childId,

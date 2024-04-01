@@ -109,6 +109,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
+        /*
         Canvas(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
@@ -135,6 +136,8 @@ fun HomeScreen(
             }
         )
 
+
+         */
 
 
         Column(modifier = Modifier.fillMaxHeight()) {

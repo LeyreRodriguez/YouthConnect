@@ -24,7 +24,8 @@ fun BottomNavigation(
     val menu_items = listOf(
         ItemsBottomBar.NewsBottom,
         ItemsBottomBar.QuizBottom,
-        ItemsBottomBar.ChatBottom
+        ItemsBottomBar.ChatBottom,
+        ItemsBottomBar.ProfileBottom
     )
 
     BottomAppBar {
