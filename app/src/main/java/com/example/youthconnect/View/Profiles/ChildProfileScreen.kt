@@ -28,8 +28,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.PermIdentity
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Park
+import androidx.compose.material.icons.outlined.PersonAdd
+import androidx.compose.material.icons.outlined.QrCode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -62,9 +67,11 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Object.Child
+import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
+import com.example.youthconnect.View.Authentication.CustomOutlinedTextField
 import com.example.youthconnect.View.OverlaysAndMore.SeeRollCall
 import com.example.youthconnect.View.QR.DisplayQRCode
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -76,7 +83,8 @@ fun ChildProfileScreen(
     childId: String,
     modifier: Modifier = Modifier.background(color = Color.White),
     loginViewModel: LoginViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    onDismiss: (() -> Unit)? = null
 ){
 
     var child by remember { mutableStateOf<Child?>(null) }
@@ -399,7 +407,7 @@ fun ChildProfileScreen(
 
                 if(currentUser == child?.ID){
                     Text(
-                        text = "LogOut",
+                        text = "Salir",
                         style = TextStyle(
                             fontSize = 30.sp,
                             fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -425,7 +433,7 @@ fun ChildProfileScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                         Text(
-                            text = "Parents",
+                            text = "Padres",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -450,7 +458,7 @@ fun ChildProfileScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                         Text(
-                            text = "Telephone",
+                            text = "Número de teléfono",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -478,7 +486,7 @@ fun ChildProfileScreen(
                 if (documentExists.value == "0") {
 
                     OutlinedButton(onClick = { showDialog = true }) {
-                        Text("See roll call")
+                        Text("Ver lista de asistencia")
                     }
 
                 }

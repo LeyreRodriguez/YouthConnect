@@ -62,7 +62,6 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
         selectedUri?.let {
             imageUri = it // Actualizar la URI de la imagen seleccionada
             newsViewModel.addNewsToStorage(selectedUri, id) // Podrías mover esta llamada al ViewModel si es necesario
-            Log.e("FOTO2", selectedUri.toString())
         }
     }
 
@@ -78,14 +77,14 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
                     CustomOutlinedTextField(
                         value = title,
                         onValueChange = { title = it },
-                        label = "Title",
+                        label = "Titulo",
                         leadingIconImageVector = Icons.Default.Title
                     )
 
                     CustomOutlinedTextField(
                         value = description,
                         onValueChange = { description = it },
-                        label = "Description",
+                        label = "Descripcion",
                         leadingIconImageVector = Icons.Default.Description
                     )
 
@@ -93,7 +92,7 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
                     Button(
                         onClick = { galleryLauncher.launch(ALL_IMAGES) }
                     ) {
-                        Text("Select Image")
+                        Text("Seleccionar imagen")
                     }
 
                     // Mostrar la imagen seleccionada
@@ -116,7 +115,6 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
                 onClick = {
                     val news = News(id, title, description)
 
-                    Log.i("NEWS", news.toString())
                     newsViewModel.getNewsImageFromDatabase()
 
                     // Check if the image upload was successful
@@ -134,14 +132,14 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
                     //onDismiss()
                 }
             ) {
-                Text("Confirm")
+                Text("Confirmar")
             }
         },
         dismissButton = {
             TextButton(
                 onClick = { onDismiss() }
             ) {
-                Text("Dismiss")
+                Text("Cancelar")
             }
         }
     )
@@ -167,12 +165,10 @@ fun SeeRollCall(onDismiss: () -> Unit, childId : String ) {
     }
 
 
-    Log.i("ROLLCALL", rollCall.toString())
-
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icons.Outlined.Checklist },
-        title = { Text(text = "Assisted days") },
+        title = { Text(text = "Dias asistidos a grupos de fe") },
         text = {
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -189,7 +185,7 @@ fun SeeRollCall(onDismiss: () -> Unit, childId : String ) {
                     onDismiss()
                 }
             ) {
-                Text("Confirm")
+                Text("Confirmar")
             }
         }
     )

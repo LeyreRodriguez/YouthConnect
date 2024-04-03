@@ -20,7 +20,7 @@ sealed class ItemsBottomBar(
     object NewsBottom : ItemsBottomBar
         (
         Icons.Outlined.Newspaper ,
-        "News",
+        "Noticias",
         NavScreen.NewsScreen.name
     )
 
@@ -40,7 +40,7 @@ sealed class ItemsBottomBar(
 
     object ProfileBottom : ItemsBottomBar(
         Icons.Outlined.PersonOutline,
-        "Profile",
+        "Perfil",
         NavScreen.Profile.name
     )
 

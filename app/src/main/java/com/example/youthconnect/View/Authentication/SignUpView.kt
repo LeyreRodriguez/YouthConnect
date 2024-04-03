@@ -121,13 +121,13 @@ fun SignUpView( navController: NavController) {
     val mcontext = LocalContext.current
 
 
-    val validateParentFullNameError = "Please, input a a valid name"
-    val validateParentIDError = "The format of the ID doesn´t seem right"
-    val validateParentPhoneNumberError = "The format of the phone number doesn´t seem right"
-    val validateParentPasswordError = "Must mix capital and non-capital letters, a number, special character and minimun length of 8"
-    val validateChildFullNameError = "Please, input a valid ID"
-    val validateChildIDError = "The format of the ID doesn´t seem right"
-    val validateChildPasswordError = "Must mix capital and non-capital letters, a number, special character and minimun length of 8"
+    val validateParentFullNameError = "Por favor, introduce un nombre válido"
+    val validateParentIDError =  "El formato del DNI no es adecuado"
+    val validateParentPhoneNumberError = "El formato del número de teléfono no es adecuado"
+    val validateParentPasswordError = "Debe mezclar letras mayusculas y minusculas, numeros, caracteres especiales y tener una logitud minima de 8 caracteres"
+    val validateChildFullNameError = "Por favor, introduce un DNI válido"
+    val validateChildIDError = "El formato del DNI no es adecuado"
+    val validateChildPasswordError = "Debe mezclar letras mayusculas y minusculas, numeros, caracteres especiales y tener una logitud minima de 8 caracteres"
 
     fun validateData(parentFullName: String,
                      parentID: String,
@@ -189,7 +189,7 @@ fun SignUpView( navController: NavController) {
 
             navController.navigate(NavScreen.NewsScreen.name)
         }else{
-            Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT).show()
+            Toast.makeText(mcontext,"Por favor, revisa los campos", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -244,7 +244,7 @@ fun SignUpView( navController: NavController) {
                     verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.padding(vertical = 20.dp)){
                     Text(
-                        text = "Signup",
+                        text = "Registrarse",
                         style = TextStyle(
                             fontSize = 40.sp,
                             fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -266,7 +266,7 @@ fun SignUpView( navController: NavController) {
                                 CustomOutlinedTextField(
                                     value = childFullName,
                                     onValueChange = {childFullName = it},
-                                    label = "Child's full name",
+                                    label = "Nombre completo del niño/niña",
                                     showError = !validateChildFullName,
                                     errorMessage = validateChildFullNameError  ,
                                     leadingIconImageVector = Icons.Default.PermIdentity,
@@ -286,7 +286,7 @@ fun SignUpView( navController: NavController) {
                                 CustomOutlinedTextField(
                                     value = childID,
                                     onValueChange = {childID = it },
-                                    label = "Child's ID",
+                                    label = "DNI del niño/niña",
                                     showError = !validateChildID,
                                     errorMessage = validateChildIDError ,
                                     leadingIconImageVector = Icons.Default.CreditCard ,
@@ -303,7 +303,7 @@ fun SignUpView( navController: NavController) {
                                 CustomOutlinedTextField(
                                     value = childPassword,
                                     onValueChange = {childPassword = it },
-                                    label = "Child's Password",
+                                    label = "Contraseña del niño/niña",
                                     showError = !validateChildPassword,
                                     errorMessage =validateChildPasswordError ,
                                     isPasswordField = true,
@@ -320,13 +320,13 @@ fun SignUpView( navController: NavController) {
                                 )
                             }
                             item {
-                                CustomRadioButton(belongsToSchool, onBelongsToSchool = { belongsToSchool = it }, "Belongs to the school?")
+                                CustomRadioButton(belongsToSchool, onBelongsToSchool = { belongsToSchool = it }, "¿Pertenece al colegio?")
                             }
                             item {
                                 CustomOutlinedTextField(
                                     value = parentFullName,
                                     onValueChange = {parentFullName = it},
-                                    label = "Parent's full name",
+                                    label = "Nombre completo del padre/madre/tutor",
                                     showError = !validateParentFullName,
                                     errorMessage = validateParentFullNameError ,
                                     leadingIconImageVector = Icons.Default.PermIdentity ,
@@ -343,7 +343,7 @@ fun SignUpView( navController: NavController) {
                                 CustomOutlinedTextField(
                                     value = parentID,
                                     onValueChange = {parentID = it},
-                                    label = "Parent's ID",
+                                    label = "DNI del padre/madre/tutor",
                                     showError = !validateParentID,
                                     errorMessage = validateParentIDError ,
                                     leadingIconImageVector = Icons.Default.CreditCard ,
@@ -360,7 +360,7 @@ fun SignUpView( navController: NavController) {
                                 CustomOutlinedTextField(
                                     value = parentPhoneNumber,
                                     onValueChange = {parentPhoneNumber = it},
-                                    label = "Parent's Phone Number",
+                                    label = "Número de teléfono del padre/madre/tutor",
                                     showError = !validateParentPhoneNumber,
                                     errorMessage = validateParentPhoneNumberError ,
                                     leadingIconImageVector = Icons.Default.Phone ,
@@ -377,7 +377,7 @@ fun SignUpView( navController: NavController) {
                                 CustomOutlinedTextField(
                                     value = password,
                                     onValueChange = {password = it},
-                                    label = "Password",
+                                    label = "Contraseña del padre/madre/tutor",
                                     showError = !validateParentPassword,
                                     errorMessage = validateParentPasswordError ,
                                     isPasswordField = true,
@@ -394,16 +394,16 @@ fun SignUpView( navController: NavController) {
                                 )
                             }
                             item {
-                                CustomRadioButton(faithGroups,  { faithGroups = it }, "Do you want to enroll\nyour child in faith groups?")
+                                CustomRadioButton(faithGroups,  { faithGroups = it }, "¿Quieres apuntar a \n tu hijo/hija en grupos de fe?")
                             }
                             item {
-                                CustomRadioButton(goOutAlone, { goOutAlone = it }, "Can the child go out alone?")
+                                CustomRadioButton(goOutAlone, { goOutAlone = it }, "¿Puede tu hijo/hija salir solo del centro?")
                             }
                             item {
                                 OutlinedTextField(
                                     value = observations ?: "",
                                     onValueChange = {observations = it },
-                                    label = { Text("Observations") },
+                                    label = { Text("Observaciones") },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 10.dp)
@@ -423,7 +423,7 @@ fun SignUpView( navController: NavController) {
                                 .shadow(elevation = 14.dp)
                         ) {
                             Text(
-                                text = "Sign up",
+                                text = "Registrarse",
                                 style = TextStyle(
                                     fontSize = 20.sp,
                                     fontFamily = FontFamily.Default,
@@ -598,7 +598,7 @@ fun CoursesSelectionScreen(childCourse: String, onChildCourseChange : (Course) -
         modifier = Modifier
             .fillMaxWidth()
             .clickable { expanded = true },
-        label = { Text("Select a course") },
+        label = { Text("Selecciona un curso") },
         readOnly = true,
         trailingIcon = {
             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,

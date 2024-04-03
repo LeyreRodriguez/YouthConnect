@@ -156,7 +156,7 @@ fun AddQuestions (onDismiss: () -> Unit){
                         selectedAnswer = ""
                     }
                 ) {
-                    Text("Confirm")
+                    Text("Confirmar")
                 }
             },
             dismissButton = {
@@ -165,7 +165,7 @@ fun AddQuestions (onDismiss: () -> Unit){
                         onDismiss()
                     }
                 ) {
-                    Text("Dismiss")
+                    Text("Cancelar")
                 }
             }
         )

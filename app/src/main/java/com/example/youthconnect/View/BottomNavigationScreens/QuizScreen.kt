@@ -71,7 +71,7 @@ fun QuizScreen( navController: NavHostController,
 
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp.dp
-    val buttonWidth = screenWidthDp / 2
+    val buttonWidth = screenWidthDp / 2 - 10.dp
 
     val documentExists = remember { mutableStateOf("-1") }
     var result by remember { mutableStateOf<String?>("") }
@@ -240,6 +240,7 @@ fun QuizScreen( navController: NavHostController,
                             modifier = Modifier.fillMaxWidth()
 
                         ) {
+                            val colors = listOf(Red, Green, Yellow, Blue).shuffled()
 
                             Row(
                                 modifier = Modifier
@@ -270,11 +271,11 @@ fun QuizScreen( navController: NavHostController,
                                         .width(buttonWidth)
                                         .height(100.dp)
                                         .background(
-                                            color = Red,
+                                            color = colors[0],
                                             shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
                                         ),
                                     colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = Red, // Set the background color as per your requirement
+                                        backgroundColor = colors[0], // Set the background color as per your requirement
 
                                     )
 
@@ -315,11 +316,11 @@ fun QuizScreen( navController: NavHostController,
                                         .width(buttonWidth)
                                         .height(100.dp)
                                         .background(
-                                            color = Green,
+                                            color = colors[1],
                                             shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
                                         ),
                                     colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = Green, // Set the background color as per your requirement
+                                        backgroundColor = colors[1], // Set the background color as per your requirement
 
                                     )
 
@@ -368,11 +369,11 @@ fun QuizScreen( navController: NavHostController,
                                         .width(buttonWidth)
                                         .height(100.dp)
                                         .background(
-                                            color = Yellow,
+                                            color = colors[2],
                                             shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
                                         ),
                                     colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = Yellow, // Set the background color as per your requirement
+                                        backgroundColor = colors[2], // Set the background color as per your requirement
 
                                     )
 
@@ -415,11 +416,11 @@ fun QuizScreen( navController: NavHostController,
                                         .width(buttonWidth)
                                         .height(100.dp)
                                         .background(
-                                            color = Blue,
+                                            color = colors[3],
                                             shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
                                         ),
                                     colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = Blue, // Set the background color as per your requirement
+                                        backgroundColor = colors[3], // Set the background color as per your requirement
 
                                     )
 
@@ -578,7 +579,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
             0f // O cualquier otro valor predeterminado que desees en caso de división por cero
         }
 
-        Log.e("porcentajeAciertos", porcentajeAciertos.toString())
+
 
         val imagen = when {
             porcentajeAciertos.toDouble() == 1.0 -> R.drawable.mas_ochenta

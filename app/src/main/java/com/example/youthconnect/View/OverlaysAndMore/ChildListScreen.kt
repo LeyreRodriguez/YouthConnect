@@ -166,6 +166,8 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
+
+            /*
             Canvas(
                 modifier = Modifier.fillMaxSize(),
                 onDraw = {
@@ -193,8 +195,10 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
             )
 
 
-            Column(modifier = Modifier.fillMaxHeight()) {
+             */
 
+            Column(modifier = Modifier.fillMaxHeight()) {
+/*
                 Row (modifier = Modifier
                     .fillMaxWidth()
                     .padding(30.dp),
@@ -207,9 +211,11 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
 
 
                 }
+
+ */
                 Column(horizontalAlignment = Alignment.CenterHorizontally){
                     Text(
-                        text = "Children list",
+                        text = "Lista de niños",
                         style = TextStyle(
                             fontSize = 30.sp,
                             fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -222,7 +228,7 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
 
                     val textState = remember { mutableStateOf(TextFieldValue(""))}
 
-                    SearchView(state= textState, placeHolder= "Search here...", modifier = Modifier)
+                    SearchView(state= textState, placeHolder= "Buscar aqui...", modifier = Modifier)
 
                     val searchedText = textState.value.text
 
@@ -232,7 +238,6 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
                             it?.FullName?.contains(searchedText, ignoreCase = true) ?: false
                         }, key = { it?.ID ?: "" }) { item ->
                             if (item != null) {
-                               // MyChildren(navController = navController, item)
                                 Greeting(navController = navController, item)
                             }
                         }
@@ -463,7 +468,7 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
                 if (expanded.value) {
 
 
-                        Text(text = "Instructor: ", fontWeight = FontWeight.Bold )
+                        Text(text = "Animador: ", fontWeight = FontWeight.Bold )
 
                         if(child.InstructorID.isNullOrEmpty()){
                             //Text("There is not instructor assigned to this child")
@@ -484,21 +489,21 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
 
 
                     if(child.FaithGroups){
-                        Text(text = "Belongs to faith groups")
+                        Text(text = "Pertenece a grupos de fe")
                     }else{
-                        Text(text = "Does not belong to a faith group")
+                        Text(text = "No pertenece a grupos de fe")
                     }
 
                     if(child.BelongsToSchool){
-                        Text(text = "Belongs to school")
+                        Text(text = "Pertenece al colegio")
                     }else{
-                        Text(text = "Does not belong to school")
+                        Text(text = "No pertenece al colegio")
                     }
 
-                    Text(text = "Observations: ", fontWeight = FontWeight.Bold )
+                    Text(text = "Obervaciones: ", fontWeight = FontWeight.Bold )
 
                     if(child.Observations.isNullOrEmpty()){
-                        Text("There are not observations")
+                        Text("No hay observaciones")
                     }else{
                         child.Observations?.let { Text(text = it) }
                     }
@@ -511,7 +516,7 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
             ) {
                 Icon(
                     if (expanded.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                    contentDescription = if (expanded.value) "Show less" else "Show more"
+                    contentDescription = if (expanded.value) "Mostrar menos" else "Mostrar mas"
                 )
             }
         }
@@ -546,7 +551,7 @@ fun CustomDropdownMenu(
 
         Row(modifier = Modifier.fillMaxWidth()){
             Text(
-                text = if (selectedOption.isNullOrEmpty()) "There is not instructor \nto this child" else selectedOption,
+                text = if (selectedOption.isNullOrEmpty()) "No hay animador asignado \na este niño" else selectedOption,
                 color = color,
             )
 

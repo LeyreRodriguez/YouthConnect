@@ -341,7 +341,7 @@ fun ParentsProfileScreen(parentId : String,
                     }
 
                     Text(
-                        text = "My kids",
+                        text = "Mis hijos/hijas",
                         style = TextStyle(
                             fontSize = 30.sp,
                             fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),

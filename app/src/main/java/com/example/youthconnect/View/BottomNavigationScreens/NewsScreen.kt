@@ -161,7 +161,7 @@ fun NewsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically){
                 Text(
-                    text = "Schedule",
+                    text = "Horario",
                     style = TextStyle(
                         fontSize = 40.sp,
                         fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -176,7 +176,7 @@ fun NewsScreen(
             }
 
             Text(
-                text = "Fridays\n16:00 - 20:00",
+                text = "Viernes\n16:00 - 20:00",
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -195,7 +195,7 @@ fun NewsScreen(
 
 
                 Text(
-                    text = "Last News",
+                    text = "Últimas noticias",
                     style = TextStyle(
                         fontSize = 40.sp,
                         fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),

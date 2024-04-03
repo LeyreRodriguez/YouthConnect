@@ -18,8 +18,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,8 +37,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -65,6 +69,7 @@ import com.example.youthconnect.View.BottomNavigationScreens.QuizScreen
 import com.example.youthconnect.View.BottomNavigationScreens.Scores
 import com.example.youthconnect.View.Authentication.SignUpView
 import com.example.youthconnect.View.Components.BottomNavigation
+import com.example.youthconnect.View.OverlaysAndMore.AddInstructor
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.journeyapps.barcodescanner.ScanContract
@@ -127,6 +132,7 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -198,40 +204,19 @@ class MainActivity : ComponentActivity() {
 
 
                     composable("qr") {
+                        var showDialog by remember { mutableStateOf(false)  }
 
                         BackHandler {
-                            // Si se presiona el botón "Atrás" mientras la cámara está abierta,
-                            // navegar de vuelta a la pantalla de noticias
-                            /*
-                            navController.navigate(NavScreen.NewsScreen.name) {
-                                // Esto limpia el back stack para que no haya múltiples instancias de
-                                // la pantalla de escaneo QR en la pila de navegación
-                                popUpTo(NavScreen.NewsScreen.name) {
-                                    inclusive = true
-                                }
-                            }
-
-                             */
                             navController.popBackStack()
                         }
+
 
                         checkCameraPermission(this@MainActivity )
                         if ( textResult.value.isNotEmpty()) {
                             QrScannerScreen(textResult.value, navController)
                         }
-                        /*
-                        LaunchedEffect(textResult.value) {
-                            if (textResult.value.isEmpty()) {
-                                navController.navigate(NavScreen.NewsScreen.name) {
-                                    // Limpia el back stack para evitar múltiples instancias de la pantalla de escaneo QR
-                                    popUpTo(NavScreen.NewsScreen.name) {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-                        }
 
-                         */
+
 
                         LaunchedEffect(textResult.value) {
                             if (textResult.value.isEmpty()) {
@@ -318,8 +303,7 @@ class MainActivity : ComponentActivity() {
                             user = UserViewModel.getCurrentUser()
                             userType = user?.let { it1 -> UserViewModel.getUserType(it1) }
                         }
-                        Log.i("USERa", user.toString())
-                        Log.i("USERTYPEa", userType.toString())
+
                         Scaffold(
                             bottomBar = {
                                 BottomNavigation(navController)
@@ -561,13 +545,13 @@ fun QrScannerScreen( childId : String, navController: NavController){
             UserViewModel.changeState(childId)
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
+            Log.e("Firestore", "Error en QR", e)
         }
     }
 
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center){
+        verticalArrangement = Arrangement.SpaceEvenly ){
         Button(
             onClick = {
                 navController.navigate("qr")
@@ -611,5 +595,12 @@ fun QrScannerScreen( childId : String, navController: NavController){
             )
         }
     }
+
+
+
+
+
+
+
 
 }

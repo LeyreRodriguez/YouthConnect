@@ -105,7 +105,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
             }
         }else{
 
-            Toast.makeText(mcontext,"Please, review fields", Toast.LENGTH_SHORT).show()
+            Toast.makeText(mcontext,"Por favor, revise los campos", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -132,7 +132,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
             Image(
                 painter = painterResource(id = R.drawable.kids_login),
-                contentDescription = "image description",
+                contentDescription = "Descripcion de la imagen",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -162,7 +162,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                     .padding(10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,) {
                     Text(
-                        text = "Log-in",
+                        text = "Iniciar sesión",
                         style = TextStyle(
                             fontSize = 40.sp,
                             fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -183,9 +183,9 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                             CustomOutlinedTextField(
                                 value = ID,
                                 onValueChange = { ID = it },
-                                label = "ID",
+                                label = "DNI",
                                 showError = !validateUserID,
-                                errorMessage = "The format of the ID doesn´t seem right",
+                                errorMessage = "El formato del DNI no es correcto",
                                 leadingIconImageVector = Icons.Default.PermIdentity,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Text,
@@ -200,9 +200,9 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                             CustomOutlinedTextField(
                                 value = password,
                                 onValueChange = { password = it },
-                                label = "Password",
+                                label = "Contraseña",
                                 showError = !validateUserPassword,
-                                errorMessage = "Must mix capital and non-capital letters, a number, special character and minimun length of 8",
+                                errorMessage = "Debe mezclar letras mayusculas y minusculas, numeros, caracteres especiales y tener una logitud minima de 8 caracteres",
                                 isPasswordField = true,
                                 isPasswordVisible = isPasswordVisible,
                                 onVisibilityChange = { isPasswordVisible = it },
@@ -240,7 +240,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
                         ) {
                             Text(
-                                text = "Login",
+                                text = "Iniciar sesión",
                                 style = TextStyle(
                                     fontSize = 20.sp,
                                     fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -255,7 +255,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
                         Row (modifier = Modifier.align(Alignment.CenterHorizontally)){
                             Text(
-                                text = "Don't you have an account? ",
+                                text = "¿No tienes cuenta? Registrate aquí",
                                 style = TextStyle(
                                     fontSize = 15.sp,
                                     fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -266,7 +266,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                             )
 
                             ClickableText(
-                                text = AnnotatedString("Sign up"),
+                                text = AnnotatedString("Registrarse"),
                                 onClick = {
                                     //mcontext.startActivity(Intent(mcontext,SignUp::class.java))
                                     navController.navigate("signup")

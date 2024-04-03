@@ -80,7 +80,7 @@ fun InstructorProfileScreen(instructorId : String,
 ) {
 
 
-    Log.e("USERe", instructorId)
+
 
     val UserViewModel : UserViewModel = hiltViewModel()
    // val ProfileViewModel : profileViewModel = hiltViewModel()
@@ -94,7 +94,7 @@ fun InstructorProfileScreen(instructorId : String,
             instructor = UserViewModel.getCurrentInstructorById(instructorId)
             children = UserViewModel.getChildByInstructorId(instructorId)
             currentUser = UserViewModel.getCurrentUser()
-            Log.i("InstructorProfileScreen", "Instructor: $instructor, Children: $children")
+
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching data", e)
         }
@@ -371,7 +371,7 @@ fun InstructorProfileScreen(instructorId : String,
                     ){
                         if(currentUser == instructor?.ID){
                             Text(
-                                text = "LogOut",
+                                text = "Salir",
                                 style = TextStyle(
                                     fontSize = 30.sp,
                                     fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -390,9 +390,9 @@ fun InstructorProfileScreen(instructorId : String,
 
 
                         Text(
-                            text = "My kids",
+                            text = "Asistencia de grupos de fe",
                             style = TextStyle(
-                                fontSize = 30.sp,
+                                fontSize = 20.sp,
                                 fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
                                 fontWeight = FontWeight(400),
                                 color = Color(0xFF000000),
@@ -434,7 +434,11 @@ fun InstructorProfileScreen(instructorId : String,
 
                                     .clip(CircleShape)
                                     .clickable {
+
+
                                         navController.navigate("qr")
+
+
                                     },
                                 contentScale = ContentScale.Crop
                             )

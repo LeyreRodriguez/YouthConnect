@@ -41,7 +41,7 @@ fun AddInstructor (onDismiss: () -> Unit){
             Icons.Outlined.PersonAdd
         },
         title = {
-            Text(text = "Insert a new instructor")
+            Text(text = "Inserta un nuevo animador")
         },
         text = {
 
@@ -52,7 +52,7 @@ fun AddInstructor (onDismiss: () -> Unit){
                         value = InstructorFullName,
                         onValueChange = { InstructorFullName = it },
 
-                        label = "Instructor Full Name",
+                        label = "Nombre completo del animador",
                         leadingIconImageVector = Icons.Default.PermIdentity
 
                     )
@@ -61,7 +61,7 @@ fun AddInstructor (onDismiss: () -> Unit){
                         value = InstructorID,
                         onValueChange = { InstructorID = it },
 
-                        label = "Instructor ID",
+                        label = "DNI del animador",
 
                         leadingIconImageVector = Icons.Default.CreditCard
 
@@ -72,7 +72,7 @@ fun AddInstructor (onDismiss: () -> Unit){
                         onValueChange = { InstructorPassword = it },
                         isPasswordVisible = isChildPasswordVisible,
                         onVisibilityChange = { isChildPasswordVisible = it },
-                        label = "Instructor Password",
+                        label = "Contraseña del animador",
                         isPasswordField = true,
                         leadingIconImageVector = Icons.Default.Password,
 
@@ -103,7 +103,7 @@ fun AddInstructor (onDismiss: () -> Unit){
                     InstructorPassword=""
                 }
             ) {
-                Text("Confirm")
+                Text("Confirmar")
             }
         },
         dismissButton = {
@@ -112,7 +112,7 @@ fun AddInstructor (onDismiss: () -> Unit){
                     onDismiss()
                 }
             ) {
-                Text("Dismiss")
+                Text("Cancelar")
             }
         }
     )

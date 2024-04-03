@@ -99,36 +99,6 @@ fun HomeScreen(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        /*
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-            onDraw = {
-                // Dibuja un rectángulo blanco como fondo
-                drawRect(Color.White)
-
-                // Define el pincel para el borde con el gradiente del Brush
-                val borderBrush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFFE15554),
-                        Color(0xFF3BB273),
-                        Color(0xFFE1BC29),
-                        Color(0xFF4D9DE0)
-                    )
-                )
-
-                // Dibuja el borde con el pincel definido
-                drawRect(
-                    brush = borderBrush,
-                    topLeft = Offset(0f, 0f),
-                    size = Size(size.width, size.height),
-                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                )
-            }
-        )
-
-
-         */
-
 
         Column(modifier = Modifier.fillMaxHeight()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,7 +106,7 @@ fun HomeScreen(
 
                 val textState = remember { mutableStateOf(TextFieldValue(""))}
 
-                SearchView(state= textState, placeHolder= "Search here...", modifier = Modifier)
+                SearchView(state= textState, placeHolder= "Buscar aqui...", modifier = Modifier)
 
                 val searchedText = textState.value.text
 
@@ -204,7 +174,7 @@ fun UserEachRow(
 
             AsyncImage(
                 model = imageUrlState.value,
-                contentDescription = "Profile Picture",
+                contentDescription = "Foto de perfil",
                 modifier = Modifier
                     .size(50.dp)
 
@@ -216,7 +186,7 @@ fun UserEachRow(
             if (person.userId in unseenMessages) {
                 Icon(
                     imageVector = Icons.Outlined.MarkEmailUnread,
-                    contentDescription = "Recieved",
+                    contentDescription = "Recibido",
                     tint = Red,
                     modifier = Modifier.size(20.dp)
                 )
@@ -332,7 +302,7 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
                     },
                     label = {
                         Text(
-                            "Type Your Message"
+                            "Escribe tu mensaje"
                         )
                     },
                     maxLines = 5,
@@ -352,7 +322,7 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Send,
-                                contentDescription = "Send Button",
+                                contentDescription = "Boton de enviar",
                                 tint = Violet
                             )
                         }
@@ -421,14 +391,14 @@ fun Recipient(userData: UserData, navController : NavController){
 
                 AsyncImage(
                     model = imageUrlState.value,
-                    contentDescription = "Profile Picture",
+                    contentDescription = "Foto de perfil",
                     modifier = Modifier
                         .size(50.dp)
                         .border(
                             BorderStroke(4.dp, remember {
                                 Brush.sweepGradient(
                                     listOf(
-                                        Green, com.example.youthconnect.ui.theme.Red
+                                        Green,Red
                                     )
                                 )
                             }),
