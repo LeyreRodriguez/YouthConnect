@@ -83,7 +83,7 @@ class UserViewModel @Inject constructor(
 
 
     suspend fun findDocument(userId : String) : String?{
-        Log.e("USER", userId)
+
         try {
 
             document = firestoreRepository.findDocument(userId)
@@ -129,6 +129,19 @@ class UserViewModel @Inject constructor(
 
 
             allChild = firestoreRepository.getChildByInstructorId(instructorId)
+
+            return allChild
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en getChildByInstructorId", e)
+            return emptyList()
+        }
+    }
+
+    suspend fun getChildByInstructorIdThatIsInSchool(instructorId: String): List<Child?> {
+        try {
+
+            allChild = firestoreRepository.getChildByInstructorIdThatIsInSchool(instructorId)
 
             return allChild
 
@@ -308,18 +321,27 @@ class UserViewModel @Inject constructor(
 
     suspend fun getRollState(childId :String) : List<String>?{
         val collection = firestoreRepository.getRollCall(childId)
-        Log.i("Collection", collection.toString())
         return collection
     }
 
 
     fun changeInstructor(child :Child, instructorID: String){
 
-
         viewModelScope.launch {
                 firestoreRepository.addInstructorToChild(child, instructorID)
 
         }
     }
+
+    fun updateUser( user : Any){
+        try {
+            firestoreRepository.updateUser(user)
+
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en changeState", e)
+
+        }
+    }
+
 
 }

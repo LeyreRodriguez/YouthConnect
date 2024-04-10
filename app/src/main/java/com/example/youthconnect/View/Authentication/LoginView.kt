@@ -255,7 +255,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
                         Row (modifier = Modifier.align(Alignment.CenterHorizontally)){
                             Text(
-                                text = "¿No tienes cuenta? Registrate aquí",
+                                text = "¿No tienes cuenta? ",
                                 style = TextStyle(
                                     fontSize = 15.sp,
                                     fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
@@ -266,7 +266,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                             )
 
                             ClickableText(
-                                text = AnnotatedString("Registrarse"),
+                                text = AnnotatedString("Registrate aqui"),
                                 onClick = {
                                     //mcontext.startActivity(Intent(mcontext,SignUp::class.java))
                                     navController.navigate("signup")

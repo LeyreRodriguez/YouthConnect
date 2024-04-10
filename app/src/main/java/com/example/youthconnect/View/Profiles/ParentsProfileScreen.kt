@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +24,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,6 +60,7 @@ import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.R
+import com.example.youthconnect.View.OverlaysAndMore.ModifyUsers
 import com.example.youthconnect.View.OverlaysAndMore.MyChildren
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ui.theme.Green
@@ -75,11 +80,19 @@ fun ParentsProfileScreen(parentId : String,
 
     val UserViewModel : UserViewModel = hiltViewModel()
 
+    var editUser by remember { mutableStateOf(false)  }
+
+    var currentUserType by remember { mutableStateOf("") }
+
+
+
+
     LaunchedEffect(UserViewModel) {
         try {
             parent = UserViewModel.getCurrentUserById(parentId)
             children = UserViewModel.getChildByParentsId(parentId)
             currentUser = UserViewModel.getCurrentUser()
+            currentUserType = currentUser?.let { UserViewModel.getUserType(it).toString() }.toString()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -229,35 +242,6 @@ fun ParentsProfileScreen(parentId : String,
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
-            /*
-            Canvas(
-                modifier = Modifier.fillMaxSize(),
-                onDraw = {
-                    // Dibuja un rectángulo blanco como fondo
-                    drawRect(Color.White)
-
-                    // Define el pincel para el borde con el gradiente del Brush
-                    val borderBrush = Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFFE15554),
-                            Color(0xFF3BB273),
-                            Color(0xFFE1BC29),
-                            Color(0xFF4D9DE0)
-                        )
-                    )
-
-                    // Dibuja el borde con el pincel definido
-                    drawRect(
-                        brush = borderBrush,
-                        topLeft = Offset(0f, 0f),
-                        size = Size(size.width, size.height),
-                        style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                    )
-                }
-            )
-
-
-             */
             Column(
                 modifier = Modifier
                     .padding(15.dp)
@@ -297,20 +281,47 @@ fun ParentsProfileScreen(parentId : String,
                             },
                         contentScale = ContentScale.Crop
                     )
+                    Row(verticalAlignment = Alignment.CenterVertically){
+                        parent?.FullName?.let {
+                            Text(
+                                text = it,
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                    fontWeight = FontWeight(400),
+                                    color = Color(0xFF000000),
+                                    letterSpacing = 0.9.sp,
+                                ), modifier = Modifier
+                                    .padding(start = 15.dp, top = 10.dp)
+                            )
+                        }
 
-                    parent?.FullName?.let {
-                        Text(
-                            text = it,
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
-                                letterSpacing = 0.9.sp,
-                            ), modifier = Modifier
-                                .padding(start = 15.dp, top = 10.dp)
-                        )
+                        if(currentUserType == "Instructor"){
+                            Icon(
+                                imageVector = Icons.Outlined.Edit ,
+                                contentDescription = "Edit",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .clickable {
+                                        editUser = true
+                                    }
+                            )
+                        }
+
+                        if (editUser) {
+                            parent?.let {
+                                ModifyUsers(onDismiss = { editUser = false },
+                                    it, navController
+                                )
+                            }
+                        }
+
+
                     }
+
+
+
 
 
 
@@ -323,7 +334,7 @@ fun ParentsProfileScreen(parentId : String,
                 ){
                     if(currentUser == parent?.ID){
                         Text(
-                            text = "LogOut",
+                            text = "Salir",
                             style = TextStyle(
                                 fontSize = 30.sp,
                                 fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),

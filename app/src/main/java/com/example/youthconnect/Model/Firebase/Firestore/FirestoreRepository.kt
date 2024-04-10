@@ -22,6 +22,7 @@ interface FirestoreRepository {
     suspend fun getAllChildren(): List<Child?>
 
     suspend fun getChildByInstructorId(instructorID: String) : List<Child?>
+    suspend fun getChildByInstructorIdThatIsInSchool(instructorId: String): List<Child?>
 
     suspend fun getCurrentChildById(childId : String) : Child?
 
@@ -73,6 +74,7 @@ interface FirestoreRepository {
 
     fun getScore(coleccion: String, idDocumento: String): String
 
+    fun updateUser(user : Any)
 
 
 }

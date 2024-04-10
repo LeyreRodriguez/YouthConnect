@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,7 +37,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.outlined.ChildCare
+import androidx.compose.material.icons.outlined.FamilyRestroom
 import androidx.compose.material.icons.outlined.MarkEmailUnread
+import androidx.compose.material.icons.outlined.School
 import androidx.compose.material3.Card
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +53,7 @@ import com.example.youthconnect.Model.Object.UserData
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.composed
@@ -160,6 +166,15 @@ fun UserEachRow(
         )
     }
 
+    var userType by remember { mutableStateOf("") }
+    var currentUserType by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        userType = UserViewModel.getUserType(person.userId).toString()
+        currentUserType = UserViewModel.getCurrentUser()
+            ?.let { UserViewModel.getUserType(it).toString() }.toString()
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -167,48 +182,149 @@ fun UserEachRow(
             .padding(4.dp)
 
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
 
-            AsyncImage(
-                model = imageUrlState.value,
-                contentDescription = "Foto de perfil",
+        Row (modifier = Modifier.fillMaxSize()){
+            Row(
                 modifier = Modifier
-                    .size(50.dp)
+                    .padding(16.dp),//.fillMaxWidth(), //
+               // horizontalArrangement = Arrangement.SpaceBetween
+            ) {
 
-                    .padding(4.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
+                AsyncImage(
+                    model = imageUrlState.value,
+                    contentDescription = "Foto de perfil",
+                    modifier = Modifier
+                        .size(50.dp)
 
-            if (person.userId in unseenMessages) {
-                Icon(
-                    imageVector = Icons.Outlined.MarkEmailUnread,
-                    contentDescription = "Recibido",
-                    tint = Red,
-                    modifier = Modifier.size(20.dp)
+                        .padding(4.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
+
+                if (person.userId in unseenMessages) {
+                    Icon(
+                        imageVector = Icons.Outlined.MarkEmailUnread,
+                        contentDescription = "Recibido",
+                        tint = Red,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                val userName = person.userName ?: ""
+                val maxWordsPerLine = 3 // Máximo de palabras por línea
+
+                val lines = mutableListOf<String>()
+                var currentLine = ""
+                var wordsCount = 0
+
+                userName.split(" ").forEach { word ->
+                    if (wordsCount < maxWordsPerLine) {
+                        currentLine += "$word "
+                        wordsCount++
+                    } else {
+                        lines.add(currentLine.trim())
+                        currentLine = "$word "
+                        wordsCount = 1
+                    }
+                }
+
+                if (currentLine.isNotEmpty()) {
+                    lines.add(currentLine.trim())
+                }
+
+                val cleanedLines = lines.filter { it.isNotBlank() }
+
+
+                if (lines.size >= 2){
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        //modifier = Modifier.fillMaxSize() // Para ocupar todo el espacio disponible
+                    ) {
+
+                        cleanedLines.forEach { line ->
+                            Text(
+                                text = line,
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                    color = Color.Black
+                                ),
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                                //    maxLines = 2 // Define el máximo de líneas permitidas
+                            )
+                            // Añadir un Spacer para ocupar el espacio restante
+                            // Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                } else {
+                    person.userName?.let {
+                        Text(
+                            text = it,
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                color = Color.Black
+                            ),
+                            modifier = Modifier
+                                .padding(start = 10.dp)
+                                .align(CenterVertically),
+
+                            //    maxLines = 2 // Define el máximo de líneas permitidas
+                        )
+                    }
+                }
+
+
+
             }
 
-            Text(
-                text = person.userName ?: "",
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = Color.Black
-                ),
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .align(CenterVertically)
-            )
-
-
-
-
-
+            Row( horizontalArrangement =  Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxSize(),
+            ){
+                if (currentUserType == "Instructor"){
+                    when (userType) {
+                        "Child" -> {
+                            Icon(
+                                imageVector = Icons.Outlined.ChildCare ,
+                                contentDescription = "Child",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .size(35.dp)
+                                    .align(CenterVertically)
+                                    .padding(4.dp)
+                            )
+                        }
+                        "Parents" -> {
+                            Icon(
+                                imageVector = Icons.Outlined.FamilyRestroom ,
+                                contentDescription = "Parents",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .size(35.dp)
+                                    .align(CenterVertically)
+                                    .padding(4.dp)
+                            )
+                        }
+                        "Instructor" -> {
+                            Icon(
+                                imageVector = Icons.Outlined.School ,
+                                contentDescription = "Instructor",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .size(35.dp)
+                                    .align(CenterVertically)
+                                    .padding(4.dp)
+                            )
+                        }
+                    }
+                }
+            }
         }
+
+
+
 
 
     }
@@ -398,7 +514,7 @@ fun Recipient(userData: UserData, navController : NavController){
                             BorderStroke(4.dp, remember {
                                 Brush.sweepGradient(
                                     listOf(
-                                        Green,Red
+                                        Green, Red
                                     )
                                 )
                             }),
@@ -422,6 +538,10 @@ fun Recipient(userData: UserData, navController : NavController){
                     .weight(1f),
                 textAlign = TextAlign.Start
             )
+
+
+
+
 
         }
     }

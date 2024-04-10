@@ -185,7 +185,7 @@ fun SeeRollCall(onDismiss: () -> Unit, childId : String ) {
                     onDismiss()
                 }
             ) {
-                Text("Confirmar")
+                Text("Cerrar")
             }
         }
     )

@@ -66,11 +66,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.youthconnect.Model.Enum.Course
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
 import com.example.youthconnect.View.BottomNavigationScreens.userImage
+import com.example.youthconnect.View.Components.CustomDropdownMenu
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ViewModel.signUpViewModel
 import com.example.youthconnect.ui.theme.Green
@@ -274,10 +276,8 @@ fun MyChildren(navController: NavController, child: Child) {
     var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var instructorID by remember { mutableStateOf("") }
 
-    val documentExists = remember { mutableStateOf("-1") }
-    var result by remember { mutableStateOf<String?>("") }
-    var showDialog by remember { mutableStateOf(false)  }
     var user by remember { mutableStateOf<String?>("") }
+    var userType by remember { mutableStateOf<String>("")}
 
 
 
@@ -286,14 +286,13 @@ fun MyChildren(navController: NavController, child: Child) {
             instructorID = UserViewModel.getCurrentUser().toString()
 
             myKids = instructorID?.let { UserViewModel.getChildByInstructorId(it) }!!
-           // myKids = UserViewModel.getAllChildren()
+
 
             user = UserViewModel.getCurrentUser()
-            result = user?.let { UserViewModel.findDocument(it) }
 
-            if (result != null) {
-                documentExists.value = result.toString()
-            }
+
+
+            userType = user?.let { UserViewModel.getUserType(it).toString() }.toString()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -357,8 +356,8 @@ fun MyChildren(navController: NavController, child: Child) {
 
             val currentRoute = navController.currentBackStackEntry?.destination?.route
 
-            if (documentExists.value == "0" && currentRoute != NavScreen.ChildList.name +"/{instructorID}") {
 
+            if (currentRoute != NavScreen.ChildList.name +"/{instructorID}" && userType == "Instructor") {
 
                     Checkbox(
                         checked = isChecked,
@@ -524,91 +523,3 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
 }
 
 
-
-
-@Composable
-fun CustomDropdownMenu(
-    list: List<Instructor?>, // Menu Options
-    defaultSelected: String, // Default Selected Option on load
-    color: Color, // Color
-    modifier: Modifier = Modifier, // Modifier
-    onSelected: (String) -> Unit, // Pass the Selected Option
-) {
-    var selectedIndex by remember { mutableStateOf(0) }
-    var expand by remember { mutableStateOf(false) }
-    var stroke by remember { mutableStateOf(1) }
-    var selectedOption by remember(defaultSelected) { mutableStateOf(defaultSelected) }
-
-
-    Box(
-        modifier = modifier
-            .clickable {
-                expand = !expand
-                stroke = if (expand) 2 else 1
-            },
-        contentAlignment = Alignment.Center
-    ) {
-
-        Row(modifier = Modifier.fillMaxWidth()){
-            Text(
-                text = if (selectedOption.isNullOrEmpty()) "No hay animador asignado \na este niño" else selectedOption,
-                color = color,
-            )
-
-            Icon(
-                imageVector = Icons.Default.ArrowDropDown ,
-                contentDescription = "Expand",
-                tint = Color.DarkGray,
-                modifier = Modifier
-                    .clickable {
-                        expand = !expand
-                        stroke = if (expand) 2 else 1
-                    }
-                    //.padding(12.dp)
-            )
-        }
-
-
-
-        DropdownMenu(
-            expanded = expand,
-            onDismissRequest = {
-                expand = false
-                stroke = 1
-            },
-            properties = PopupProperties(
-                focusable = false,
-                dismissOnBackPress = true,
-                dismissOnClickOutside = true,
-            ),
-            modifier = Modifier
-                .background(Color.White)
-        ) {
-
-
-            list.forEachIndexed { index, item ->
-                DropdownMenuItem(
-                    text = {
-                        if (item != null) {
-                            Text(
-                                text = item.FullName,
-                                color = color,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    },
-                    onClick = {
-                        selectedIndex = index
-                        if (item != null) {
-                            selectedOption = item.FullName
-                        }
-                        onSelected(selectedOption)
-                        expand = false
-                        stroke = 1
-                    })
-
-            }
-        }
-    }
-}

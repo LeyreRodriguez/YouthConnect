@@ -80,6 +80,7 @@ import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.R
+import com.example.youthconnect.View.Components.CustomDropdownMenu
 import com.example.youthconnect.ViewModel.signUpViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -281,6 +282,8 @@ fun SignUpView( navController: NavController) {
                             }
                             item {
                                 CoursesSelectionScreen(childCourse, { childCourse = it.name})
+
+
                             }
                             item {
                                 CustomOutlinedTextField(
@@ -543,10 +546,9 @@ fun CustomRadioButton(belongsToSchool: Boolean,
                       onBelongsToSchool : (Boolean) -> Unit, question : String){
     val yes = remember { mutableStateOf(belongsToSchool) }
     val no = remember { mutableStateOf(!belongsToSchool) }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val text = question
         Text(
@@ -558,30 +560,34 @@ fun CustomRadioButton(belongsToSchool: Boolean,
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
         )
-        Column(
-            modifier = Modifier.wrapContentSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            RadioButton(selected = yes.value,
-                onClick = {
-                    yes.value = true
-                    no.value = false
-                    onBelongsToSchool(yes.value)
-                })
-            Text(text = "Yes", fontSize = 18.sp)
+        Row(verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.Center){
+            Column(
+                modifier = Modifier.wrapContentSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                RadioButton(selected = yes.value,
+                    onClick = {
+                        yes.value = true
+                        no.value = false
+                        onBelongsToSchool(yes.value)
+                    })
+                Text(text = "Yes", fontSize = 18.sp)
+            }
+            Column(
+                modifier = Modifier.wrapContentSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                RadioButton(
+                    selected = no.value ,
+                    onClick = {
+                        yes.value = false
+                        no.value = true
+                        onBelongsToSchool(no.value) })
+                Text(text = "No", fontSize = 18.sp)
+            }
         }
-        Column(
-            modifier = Modifier.wrapContentSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            RadioButton(
-                selected = no.value ,
-                onClick = {
-                    yes.value = false
-                    no.value = true
-                    onBelongsToSchool(no.value) })
-            Text(text = "No", fontSize = 18.sp)
-        }
+
     }
 }
 

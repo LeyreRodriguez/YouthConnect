@@ -28,7 +28,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,6 +67,7 @@ import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 
 import com.example.youthconnect.R
+import com.example.youthconnect.View.OverlaysAndMore.ModifyUsers
 import com.example.youthconnect.View.OverlaysAndMore.AddInstructor
 import com.example.youthconnect.View.OverlaysAndMore.MyChildren
 import com.example.youthconnect.ui.theme.Green
@@ -88,12 +92,19 @@ fun InstructorProfileScreen(instructorId : String,
     var currentUser by remember { mutableStateOf<String?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var showDialog by remember { mutableStateOf(false)  }
+    var editUser by remember { mutableStateOf(false)  }
+
+    var currentUserType by remember { mutableStateOf("") }
+
+
 
     LaunchedEffect(UserViewModel) {
         try {
             instructor = UserViewModel.getCurrentInstructorById(instructorId)
-            children = UserViewModel.getChildByInstructorId(instructorId)
+            children = UserViewModel.getChildByInstructorIdThatIsInSchool(instructorId)
             currentUser = UserViewModel.getCurrentUser()
+
+            currentUserType = currentUser?.let { UserViewModel.getUserType(it).toString() }.toString()
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching data", e)
@@ -103,7 +114,6 @@ fun InstructorProfileScreen(instructorId : String,
     val context = LocalContext.current
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var showImagePickerDialog by remember { mutableStateOf(false) }
-
 
     val imageUrlState = remember { mutableStateOf("") }
 
@@ -244,35 +254,7 @@ fun InstructorProfileScreen(instructorId : String,
             Box(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                /*
-                Canvas(
-                    modifier = Modifier.fillMaxSize(),
-                    onDraw = {
-                        // Dibuja un rectángulo blanco como fondo
-                        drawRect(Color.White)
 
-                        // Define el pincel para el borde con el gradiente del Brush
-                        val borderBrush = Brush.horizontalGradient(
-                            listOf(
-                                Color(0xFFE15554),
-                                Color(0xFF3BB273),
-                                Color(0xFFE1BC29),
-                                Color(0xFF4D9DE0)
-                            )
-                        )
-
-                        // Dibuja el borde con el pincel definido
-                        drawRect(
-                            brush = borderBrush,
-                            topLeft = Offset(0f, 0f),
-                            size = Size(size.width, size.height),
-                            style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                        )
-                    }
-                )
-
-
-                 */
                 if(currentUser == instructor?.ID) {
 
                     Image(
@@ -347,21 +329,47 @@ fun InstructorProfileScreen(instructorId : String,
                             contentScale = ContentScale.Crop
                         )
 
-                        instructor?.FullName?.let {
+                        Row(verticalAlignment = Alignment.CenterVertically){
+                            instructor?.FullName?.let {
 
-                            Text(
-                                text = it,
-                                style = TextStyle(
-                                    fontSize = 20.sp,
-                                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                    fontWeight = FontWeight(400),
-                                    color = Color(0xFF000000),
-                                    letterSpacing = 0.9.sp,
-                                    textAlign = TextAlign.Center
-                                ), modifier = Modifier
-                                    .padding(start = 15.dp, top = 10.dp)
-                            )
+                                Text(
+                                    text = it,
+                                    style = TextStyle(
+                                        fontSize = 20.sp,
+                                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                        fontWeight = FontWeight(400),
+                                        color = Color(0xFF000000),
+                                        letterSpacing = 0.9.sp,
+                                        textAlign = TextAlign.Center
+                                    ), modifier = Modifier
+                                        .padding(start = 15.dp, top = 10.dp)
+                                )
+                            }
+
+                            if(currentUserType == "Instructor"){
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit ,
+                                    contentDescription = "Edit",
+                                    tint = Color.Black,
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .clickable {
+                                            editUser = true
+                                    }
+                                )
+                            }
+
+                            if (editUser) {
+                                instructor?.let {
+                                    ModifyUsers(onDismiss = { editUser = false },
+                                        it, navController
+                                    )
+                                }
+                            }
+
+
                         }
+
 
                     }
 
@@ -382,8 +390,10 @@ fun InstructorProfileScreen(instructorId : String,
                                 ), modifier = Modifier
                                     .padding(start = 15.dp, top = 10.dp)
                                     .fillMaxWidth()
-                                    .clickable { loginViewModel.signOut()
-                                        navController.navigate("login")}
+                                    .clickable {
+                                        loginViewModel.signOut()
+                                        navController.navigate("login")
+                                    }
                             )
                         }
 
@@ -403,6 +413,7 @@ fun InstructorProfileScreen(instructorId : String,
                         )
 
 
+                        Log.e("CHILDREN", children.toString())
 
                         LazyColumn(modifier = Modifier
                             .padding(vertical = 4.dp)

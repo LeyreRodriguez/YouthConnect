@@ -541,7 +541,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
         Spacer(modifier = Modifier.height(26.dp)) // Espaciador vertical
 
         Text(
-            text = "SCORES",
+            text = "Puntuacion",
             style = TextStyle(
                 fontSize = 30.sp,
                 fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),

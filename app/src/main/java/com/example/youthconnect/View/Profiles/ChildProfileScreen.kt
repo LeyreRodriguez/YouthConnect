@@ -28,13 +28,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.Password
-import androidx.compose.material.icons.filled.PermIdentity
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Park
-import androidx.compose.material.icons.outlined.PersonAdd
-import androidx.compose.material.icons.outlined.QrCode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -67,11 +63,10 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Object.Child
-import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
-import com.example.youthconnect.View.Authentication.CustomOutlinedTextField
+import com.example.youthconnect.View.OverlaysAndMore.ModifyUsers
 import com.example.youthconnect.View.OverlaysAndMore.SeeRollCall
 import com.example.youthconnect.View.QR.DisplayQRCode
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -99,9 +94,18 @@ fun ChildProfileScreen(
     var showDialog by remember { mutableStateOf(false)  }
     var user by remember { mutableStateOf<String?>("") }
 
+    var editUser by remember { mutableStateOf(false)  }
+
+    var currentUserType by remember { mutableStateOf("") }
+
+
+
+
+
     LaunchedEffect(UserViewModel) {
         val user = UserViewModel.getUserById(childId)
         currentUser = UserViewModel.getCurrentUser()
+        currentUserType = currentUser?.let { UserViewModel.getUserType(it).toString() }.toString()
         userState.value = user
     }
 
@@ -267,34 +271,6 @@ fun ChildProfileScreen(
             modifier = modifier.fillMaxSize(),
         ) {
 
-        /*
-            Canvas(
-                modifier = Modifier.fillMaxSize(),
-                onDraw = {
-                    // Dibuja un rectángulo blanco como fondo
-                    drawRect(Color.White)
-
-                    // Define el pincel para el borde con el gradiente del Brush
-                    val borderBrush = Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFFE15554),
-                            Color(0xFF3BB273),
-                            Color(0xFFE1BC29),
-                            Color(0xFF4D9DE0)
-                        )
-                    )
-
-                    // Dibuja el borde con el pincel definido
-                    drawRect(
-                        brush = borderBrush,
-                        topLeft = Offset(0f, 0f),
-                        size = Size(size.width, size.height),
-                        style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                    )
-                }
-            )
-
-         */
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -351,6 +327,33 @@ fun ChildProfileScreen(
                         )
                     }
 
+
+
+                        if(currentUserType == "Instructor"){
+                            Icon(
+                                imageVector = Icons.Outlined.Edit ,
+                                contentDescription = "Edit",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .clickable {
+                                        editUser = true
+                                    }
+                            )
+                        }
+
+                        if (editUser) {
+                            child?.let {
+                                ModifyUsers(onDismiss = { editUser = false },
+                                    it, navController
+                                )
+                            }
+                        }
+
+
+
+
+
                     if (child?.State ?: "" == false){
                         Icon(
                             imageVector = Icons.Outlined.Park ,
@@ -386,11 +389,6 @@ fun ChildProfileScreen(
                         )
                     }
 
-
-
-
-
-
                 child?.Observations?.let {
                     Text(
                         text = it,
@@ -404,6 +402,15 @@ fun ChildProfileScreen(
                             .padding(start = 15.dp, top = 10.dp)
                     )
                 }
+
+
+
+
+
+
+
+
+
 
                 if(currentUser == child?.ID){
                     Text(
@@ -458,7 +465,7 @@ fun ChildProfileScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                         Text(
-                            text = "Número de teléfono",
+                            text = "Teléfono",
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),

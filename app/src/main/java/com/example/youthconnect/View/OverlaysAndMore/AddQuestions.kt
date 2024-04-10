@@ -53,7 +53,7 @@ fun AddQuestions (onDismiss: () -> Unit){
                         CustomOutlinedTextField(
                             value = Question,
                             onValueChange = { Question = it },
-                            label = "Question",
+                            label = "Pregunta",
                             leadingIconImageVector = Icons.Default.QuestionMark
                         )
 
@@ -70,7 +70,7 @@ fun AddQuestions (onDismiss: () -> Unit){
                             CustomOutlinedTextField(
                                 value = AnswerA,
                                 onValueChange = { AnswerA = it },
-                                label = "First Answer",
+                                label = "Primera opcion",
                                 leadingIconImageVector = Icons.Default.QuestionAnswer
                             )
                         }
@@ -88,7 +88,7 @@ fun AddQuestions (onDismiss: () -> Unit){
                             CustomOutlinedTextField(
                                 value = AnswerB,
                                 onValueChange = { AnswerB = it },
-                                label = "Second Answer",
+                                label = "Segunda opcion",
                                 leadingIconImageVector = Icons.Default.QuestionAnswer
                             )
                         }
@@ -105,7 +105,7 @@ fun AddQuestions (onDismiss: () -> Unit){
                             CustomOutlinedTextField(
                                 value = AnswerC,
                                 onValueChange = { AnswerC = it },
-                                label = "Third Answer",
+                                label = "Tercera opcion",
                                 leadingIconImageVector = Icons.Default.QuestionAnswer
                             )
                         }
@@ -122,7 +122,7 @@ fun AddQuestions (onDismiss: () -> Unit){
                             CustomOutlinedTextField(
                                 value = AnswerD,
                                 onValueChange = { AnswerD = it },
-                                label = "Fourth Answer",
+                                label = "Cuarta opcion",
                                 leadingIconImageVector = Icons.Default.QuestionAnswer
                             )
                         }

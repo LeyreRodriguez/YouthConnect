@@ -133,6 +133,37 @@ class FirestoreRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getChildByInstructorIdThatIsInSchool(instructorId: String): List<Child?> {
+        return try {
+            firebaseFirestore.collection("Child")
+                .whereEqualTo("instructorID", instructorId)
+                .whereEqualTo("state", true)
+                .get()
+                .await()
+                .documents
+                .map { document ->
+                    Child(
+                        FullName = document.getString("fullName") ?: "",
+                        ID = document.getString("id") ?: "",
+                        Course = document.getString("course") ?: "",
+                        Password = document.getString("password") ?: "",
+                        BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                        FaithGroups = document.getBoolean("faithGroups") ?: false,
+                        GoOutAlone = document.getBoolean("goOutAlone") ?: false,
+                        Observations = document.getString("observations") ?: "",
+                        ParentID = document.get("parentID") as? List<String> ?: emptyList(),
+                        InstructorID = document.getString("instructorID") ?: "",
+                        State = document.getBoolean("state") ?: false,
+                        Score = document.getLong("score")?.toInt() ?: null,
+                        RollCall = document.get("rollCall") as? List<String> ?: emptyList()
+                    )
+                }
+        } catch (e: Exception) {
+            Log.e("FirestoreRepository", "getChildByInstructorId failed with $e")
+            emptyList()
+        }
+    }
+
     override suspend fun getChildByParentsId(parentID : String) : List<Child?>{
         return try {
             firebaseFirestore.collection("Child")
@@ -857,6 +888,34 @@ class FirestoreRepositoryImpl @Inject constructor(
         } catch (e: InterruptedException) {
             // Manejar excepciones
             throw Exception("Interrupción mientras se esperaba el resultado.")
+        }
+    }
+
+    override fun updateUser(user : Any){
+        when(user){
+            is Child -> {
+                val childRef = firebaseFirestore.collection("Child").document(user.ID)
+                childRef.update("belongsToSchool", user.BelongsToSchool)
+                childRef.update("course", user.Course)
+                childRef.update("faithGroups", user.FaithGroups)
+                childRef.update("fullName", user.FullName)
+                childRef.update("goOutAlone", user.GoOutAlone)
+                childRef.update("observations", user.Observations)
+                childRef.update("password", user.Password)
+
+            } is Parent -> {
+                val parentRef = firebaseFirestore.collection("Parents").document(user.ID)
+
+                parentRef.update("fullName", user.FullName)
+                parentRef.update("password", user.Password)
+                parentRef.update("phoneNumber", user.PhoneNumber)
+
+            } is Instructor -> {
+                val instructorRef = firebaseFirestore.collection("Instructor").document(user.ID)
+                println( user.FullName)
+                instructorRef.update("fullName", user.FullName)
+                instructorRef.update("password", user.Password)
+            }
         }
     }
 
