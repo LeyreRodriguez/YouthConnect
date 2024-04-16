@@ -91,6 +91,8 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
     implementation("com.google.firebase:firebase-database:20.3.0")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:3.11.2")
+    testImplementation("org.mockito:mockito-inline:3.11.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
@@ -106,8 +108,7 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
 
     //Iconos extendidos
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
@@ -145,6 +146,7 @@ dependencies {
     //Navigation
     implementation ("androidx.compose.material:material:1.4.2")
     implementation ("com.google.dagger:hilt-android:2.48.1")
+    androidTestImplementation("org.testng:testng:6.9.6")
     kapt ("com.google.dagger:hilt-compiler:2.48.1")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")

@@ -108,52 +108,8 @@ fun NewsScreen(
     ) {
 
 
-/*
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-            onDraw = {
-                // Dibuja un rectángulo blanco como fondo
-                drawRect(Color.White)
-
-                // Define el pincel para el borde con el gradiente del Brush
-                val borderBrush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFFE15554),
-                        Color(0xFF3BB273),
-                        Color(0xFFE1BC29),
-                        Color(0xFF4D9DE0)
-                    )
-                )
-
-                // Dibuja el borde con el pincel definido
-                drawRect(
-                    brush = borderBrush,
-                    topLeft = Offset(0f, 0f),
-                    size = Size(size.width, size.height),
-                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                )
-            }
-        )
-*/
-
         Column( horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(15.dp)) {
-/*
-            Row (modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically){
-
-
-                if (user.toString().isNotEmpty()) {
-                    userImage(user = user.toString(), navController = navController , documentExists.value)
-                }
-
-
-            }
-
- */
 
             Row (modifier = Modifier
                 .fillMaxWidth(),
