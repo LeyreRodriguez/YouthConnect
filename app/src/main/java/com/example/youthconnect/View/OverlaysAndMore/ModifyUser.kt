@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PermIdentity
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.outlined.Edit
@@ -38,83 +37,82 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
 
     val userViewModel: UserViewModel = hiltViewModel()
 
-    var FullName by remember { mutableStateOf("") }
+    var fullName by remember { mutableStateOf("") }
 
 
 
-    var ParentFullName by remember { mutableStateOf("") }
+    var parentFullName by remember { mutableStateOf("") }
 
 
-    var ChildFullName by remember { mutableStateOf("") }
+    var childFullName by remember { mutableStateOf("") }
 
-    var Course  by remember { mutableStateOf("") }
-    var BelongsToSchool  by remember { mutableStateOf(false) }
-    var FaithGroups  by remember { mutableStateOf(false) }
-    var GoOutAlone  by remember { mutableStateOf(false) }
-    var Observations  by remember { mutableStateOf("") }
-    var Telephone by remember { mutableStateOf("")}
-    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    var course  by remember { mutableStateOf("") }
+    var belongsToSchool  by remember { mutableStateOf(false) }
+    var faithGroups  by remember { mutableStateOf(false) }
+    var goOutAlone  by remember { mutableStateOf(false) }
+    var observations  by remember { mutableStateOf("") }
+    var telephone by remember { mutableStateOf("")}
     val listState = rememberLazyListState()
 
     if (item is Instructor){
-         FullName = item.FullName
+         fullName = item.fullName
 
     } else if (item is Child){
-         ChildFullName = item.FullName
+         childFullName = item.fullName
 
-         Course = item.Course
-         BelongsToSchool = item.BelongsToSchool
-         FaithGroups  = item.FaithGroups
-         GoOutAlone = item.GoOutAlone
-         Observations  = item.Observations.toString()
+         course = item.course
+         belongsToSchool = item.belongsToSchool
+         faithGroups  = item.faithGroups
+         goOutAlone = item.goOutAlone
+         observations  = item.observations.toString()
     } else if (item is Parent){
-         ParentFullName =item.FullName
+         parentFullName =item.fullName
 
-         Telephone = item.PhoneNumber
+         telephone = item.phoneNumber
 
     }
 
 
-    //INSTRUCTOR
+
 
     var editedFullName by remember {
-        mutableStateOf((item as? Instructor)?.FullName ?: "")
+        mutableStateOf((item as? Instructor)?.fullName ?: "")
     }
     var editedPassword by remember {
-        mutableStateOf((item as? Instructor)?.Password ?: "")
+        mutableStateOf((item as? Instructor)?.password ?: "")
     }
 
     //PARENTS
 
     var editedParentsFullName by remember {
-        mutableStateOf((item as? Parent)?.FullName ?: "")
+        mutableStateOf((item as? Parent)?.fullName ?: "")
     }
     var editedParentsPassword by remember {
-        mutableStateOf((item as? Parent)?.Password ?: "")
+        mutableStateOf((item as? Parent)?.password ?: "")
     }
     var editedParentsPhoneNumber by remember {
-        mutableStateOf((item as? Parent)?.PhoneNumber ?: "")
+        mutableStateOf((item as? Parent)?.phoneNumber ?: "")
     }
 
     //CHILD
 
     var editedChildFullName by remember {
-        mutableStateOf((item as? Child)?.FullName ?: "")
+        mutableStateOf((item as? Child)?.fullName ?: "")
     }
     var editedChildPassword by remember {
-        mutableStateOf((item as? Child)?.Password ?: "")
+        mutableStateOf((item as? Child)?.password ?: "")
     }
     var editedFaithGroups by remember {
-        mutableStateOf((item as? Child)?.FaithGroups ?: false)
+        mutableStateOf((item as? Child)?.faithGroups ?: false)
     }
     var editedBelongsToSchool by remember {
-        mutableStateOf((item as? Child)?.BelongsToSchool ?: false)
+        mutableStateOf((item as? Child)?.belongsToSchool ?: false)
     }
     var editedGoOutAlone by remember {
-        mutableStateOf((item as? Child)?.GoOutAlone ?: false)
+        mutableStateOf((item as? Child)?.goOutAlone ?: false)
     }
     var editedObservations by remember {
-        mutableStateOf((item as? Child)?.Observations ?: "")
+        mutableStateOf((item as? Child)?.observations ?: "")
     }
 
     AlertDialog(
@@ -156,7 +154,7 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
                             )
 
 
-                            CoursesSelectionScreen(Course, { Course = it.name})
+                            CoursesSelectionScreen(course, { course = it.name})
 
                             CustomRadioButton(editedBelongsToSchool, onBelongsToSchool = { editedBelongsToSchool = it }, "¿Pertenece al colegio?")
 
@@ -210,37 +208,37 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
 
                             userViewModel.updateUser(
                                 item.copy(
-                                    FullName = editedFullName
+                                    fullName = editedFullName
                                 )
 
                             )
 
-                            navController.navigate("instructor_profile_screen/${item.ID}")
+                            navController.navigate("instructor_profile_screen/${item.id}")
 
                         }
                         is Parent -> {
                             userViewModel.updateUser(
                                 item.copy(
-                                    FullName = editedParentsFullName,
-                                    PhoneNumber = editedParentsPhoneNumber
+                                    fullName = editedParentsFullName,
+                                    phoneNumber = editedParentsPhoneNumber
                                 )
                             )
 
-                            navController.navigate("parent_profile_screen/${item.ID}")
+                            navController.navigate("parent_profile_screen/${item.id}")
 
                         }
                         is Child -> {
                             userViewModel.updateUser(
                                 item.copy(
-                                    FullName = editedChildFullName,
-                                    BelongsToSchool = editedBelongsToSchool,
-                                    GoOutAlone = editedGoOutAlone,
-                                    FaithGroups = editedFaithGroups,
-                                    Observations = editedObservations
+                                    fullName = editedChildFullName,
+                                    belongsToSchool = editedBelongsToSchool,
+                                    goOutAlone = editedGoOutAlone,
+                                    faithGroups = editedFaithGroups,
+                                    observations = editedObservations
                                 )
                             )
 
-                            navController.navigate(" child_profile_screen/${item.ID}")
+                            navController.navigate(" child_profile_screen/${item.id}")
 
                         }
                     }

@@ -66,7 +66,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
     val focusManager = LocalFocusManager.current
 
 
-    var ID by remember {mutableStateOf("") }
+    var id by remember {mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
 
@@ -88,19 +88,19 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
     }
 
 
-    fun validate(ID : String, password : String) : Boolean{
+    fun validate(id : String, password : String) : Boolean{
         val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%$^&+=./\\\\_-]).{8,}".toRegex()
-        val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
+        val idRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
 
-        validateUserID = ID.matches(IDRegex)
+        validateUserID = id.matches(idRegex)
         validateUserPassword = password.matches(passwordRegex)
 
         return validateUserID && validateUserPassword
     }
 
-    fun register(ID : String, password : String){
-        if (validate(ID, password) or (ID == "00000000A" && password == "admin")){
-            loginViewModel.signInWithEmail(ID + "@youthconnect.com", password) {
+    fun register(id : String, password : String){
+        if (validate(id, password) or (id == "00000000A" && password == "admin")){
+            loginViewModel.signInWithEmail(id + "@youthconnect.com", password) {
                 navController.navigate(NavScreen.NewsScreen.name)
             }
         }else{
@@ -123,7 +123,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
 
         Canvas(
-            modifier = Modifier.fillMaxSize(), // Llena todo el espacio del Box
+            modifier = Modifier.fillMaxSize(),
             onDraw = {
                 drawRect(brush)
             }
@@ -181,8 +181,8 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                     ) {
                         item {
                             CustomOutlinedTextField(
-                                value = ID,
-                                onValueChange = { ID = it },
+                                value = id,
+                                onValueChange = { id = it },
                                 label = "DNI",
                                 showError = !validateUserID,
                                 errorMessage = "El formato del DNI no es correcto",
@@ -227,7 +227,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
                         Button(
                             onClick = {
-                                register(ID, password)
+                                register(id, password)
 
                             },
                             modifier = Modifier

@@ -1,10 +1,10 @@
 package com.example.youthconnect.Model.Object
 
 data class Instructor(
-    val FullName: String,
-    val ID: String,
-    val Password: String,
-    val Score : Int? =  0
+    val fullName: String,
+    val id: String,
+    val password: String,
+    val score : Int? =  0
 
 )
 

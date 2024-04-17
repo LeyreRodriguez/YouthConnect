@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Park
@@ -67,7 +68,6 @@ import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
 import com.example.youthconnect.View.OverlaysAndMore.ModifyUsers
-import com.example.youthconnect.View.OverlaysAndMore.SeeRollCall
 import com.example.youthconnect.View.QR.DisplayQRCode
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ui.theme.Green
@@ -85,7 +85,7 @@ fun ChildProfileScreen(
     var child by remember { mutableStateOf<Child?>(null) }
     var parents by remember { mutableStateOf<List<Parent?>>(emptyList()) }
     var currentUser by remember { mutableStateOf<String?>(null) }
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
 
     val userState = remember { mutableStateOf<UserData?>(null) }
 
@@ -102,19 +102,19 @@ fun ChildProfileScreen(
 
 
 
-    LaunchedEffect(UserViewModel) {
-        val user = UserViewModel.getUserById(childId)
-        currentUser = UserViewModel.getCurrentUser()
-        currentUserType = currentUser?.let { UserViewModel.getUserType(it).toString() }.toString()
+    LaunchedEffect(userViewModel) {
+        val user = userViewModel.getUserById(childId)
+        currentUser = userViewModel.getCurrentUser()
+        currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
         userState.value = user
     }
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            child = UserViewModel.getCurrentChildById(childId)
-            parents = child?.ParentID?.let { UserViewModel.getParentsByParentsID(it) }!!
-            user = UserViewModel.getCurrentUser()
-            result = user?.let { UserViewModel.findDocument(it) }
+            child = userViewModel.getCurrentChildById(childId)
+            parents = child?.parentId?.let { userViewModel.getParentsByParentsID(it) }!!
+            user = userViewModel.getCurrentUser()
+            result = user?.let { userViewModel.findDocument(it) }
 
             if (result != null) {
                 documentExists.value = result.toString()
@@ -135,8 +135,8 @@ fun ChildProfileScreen(
 
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                UserViewModel.getProfileImage(
+            userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                userViewModel.getProfileImage(
                     onSuccess = { fetchedUrl ->
                         imageUrlState.value = fetchedUrl
                         Toast.makeText(
@@ -168,8 +168,8 @@ fun ChildProfileScreen(
         if (success) {
             // Aquí manejas la imagen capturada usando imageUri
             imageUri?.let { uri ->
-                UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                    UserViewModel.getProfileImage(
+                userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                    userViewModel.getProfileImage(
                         onSuccess = { fetchedUrl ->
                             imageUrlState.value = fetchedUrl
                             Toast.makeText(
@@ -198,7 +198,7 @@ fun ChildProfileScreen(
     }
 
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(childId.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(childId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -214,7 +214,7 @@ fun ChildProfileScreen(
         onResult = { isGranted: Boolean ->
             if (isGranted) {
                 // Permiso concedido, proceder con la acción
-                imageUri = UserViewModel.createImageUri(context)
+                imageUri = userViewModel.createImageUri(context)
                 imageUri?.let { uri ->
                     takePictureLauncher.launch(uri)
                 }
@@ -248,7 +248,7 @@ fun ChildProfileScreen(
                     when (PackageManager.PERMISSION_GRANTED) {
                         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
                             // Permiso ya concedido, proceder con la acción
-                            imageUri = UserViewModel.createImageUri(context)
+                            imageUri = userViewModel.createImageUri(context)
                             imageUri?.let { uri ->
                                 takePictureLauncher.launch(uri)
                             }
@@ -291,16 +291,14 @@ fun ChildProfileScreen(
                         .border(
                             BorderStroke(
                                 4.dp,
-                                SolidColor(if (child?.GoOutAlone == true) Green else Red)
+                                SolidColor(if (child?.goOutAlone == true) Green else Red)
                             ),
                             CircleShape
                         )
                         .padding(4.dp)
                         .clip(CircleShape)
                         .clickable {
-                            // TODO: Acciones al hacer clic en la imagen
-
-                            if (currentUser == child?.ID) {
+                            if (currentUser == child?.id) {
                                 showImagePickerDialog = true
                             }
 
@@ -313,7 +311,7 @@ fun ChildProfileScreen(
                     .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center){
-                    child?.FullName?.let {
+                    child?.fullName?.let {
                         Text(
                             text = it,
                             style = TextStyle(
@@ -354,7 +352,7 @@ fun ChildProfileScreen(
 
 
 
-                    if (child?.State ?: "" == false){
+                    if (child?.state ?: "" == false){
                         Icon(
                             imageVector = Icons.Outlined.Park ,
                             contentDescription = "Recieved",
@@ -375,7 +373,7 @@ fun ChildProfileScreen(
 
 
 
-                    child?.Course?.let {
+                    child?.course?.let {
                         Text(
                             text = it,
                             style = TextStyle(
@@ -389,7 +387,7 @@ fun ChildProfileScreen(
                         )
                     }
 
-                child?.Observations?.let {
+                child?.observations?.let {
                     Text(
                         text = it,
                         style = TextStyle(
@@ -412,7 +410,7 @@ fun ChildProfileScreen(
 
 
 
-                if(currentUser == child?.ID){
+                if(currentUser == child?.id){
                     Text(
                         text = "Salir",
                         style = TextStyle(
@@ -454,7 +452,7 @@ fun ChildProfileScreen(
                         //val parentState = listOf<String>("Florencio Rodriguez Rodriguez", "Juani Quintana Monroy")
                         LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
                             items(items = parents) { item ->
-                                item?.FullName?.let { Text(text = it) }
+                                item?.fullName?.let { Text(text = it) }
                             }
                         }
 
@@ -478,7 +476,7 @@ fun ChildProfileScreen(
 
                         LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
                             items(items = parents) { item ->
-                                item?.PhoneNumber?.let { Text(text = it) }
+                                item?.phoneNumber?.let { Text(text = it) }
                             }
                         }
                     }
@@ -541,3 +539,47 @@ fun QRCodeGenerator(text: String, modifier: Modifier = Modifier) {
 
 
 
+@SuppressLint("SuspiciousIndentation")
+@Composable
+fun SeeRollCall(onDismiss: () -> Unit, childId : String ) {
+
+
+    val userViewModel : UserViewModel = hiltViewModel()
+
+    var rollCall by remember { mutableStateOf<List<String>?>(emptyList()) }
+
+
+    LaunchedEffect(userViewModel) {
+        try {
+            rollCall = userViewModel.getRollState(childId)
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error en ChildList", e)
+        }
+    }
+
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icons.Outlined.Checklist },
+        title = { Text(text = "Dias asistidos a grupos de fe") },
+        text = {
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(rollCall!!) { item ->
+                    Text(text = item)
+                }
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.TextButton(
+                onClick = {
+                    onDismiss()
+                }
+            ) {
+                Text("Cerrar")
+            }
+        }
+    )
+}

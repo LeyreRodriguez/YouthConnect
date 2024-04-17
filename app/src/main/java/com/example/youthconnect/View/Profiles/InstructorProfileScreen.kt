@@ -86,8 +86,7 @@ fun InstructorProfileScreen(instructorId : String,
 
 
 
-    val UserViewModel : UserViewModel = hiltViewModel()
-   // val ProfileViewModel : profileViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var currentUser by remember { mutableStateOf<String?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
@@ -98,13 +97,13 @@ fun InstructorProfileScreen(instructorId : String,
 
 
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            instructor = UserViewModel.getCurrentInstructorById(instructorId)
-            children = UserViewModel.getChildByInstructorIdThatIsInSchool(instructorId)
-            currentUser = UserViewModel.getCurrentUser()
+            instructor = userViewModel.getCurrentInstructorById(instructorId)
+            children = userViewModel.getChildByInstructorIdThatIsInSchool(instructorId)
+            currentUser = userViewModel.getCurrentUser()
 
-            currentUserType = currentUser?.let { UserViewModel.getUserType(it).toString() }.toString()
+            currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching data", e)
@@ -119,8 +118,8 @@ fun InstructorProfileScreen(instructorId : String,
 
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                UserViewModel.getProfileImage(
+            userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                userViewModel.getProfileImage(
                     onSuccess = { fetchedUrl ->
                         imageUrlState.value = fetchedUrl
                         Toast.makeText(
@@ -152,8 +151,8 @@ fun InstructorProfileScreen(instructorId : String,
         if (success) {
             // Aquí manejas la imagen capturada usando imageUri
             imageUri?.let { uri ->
-                UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                    UserViewModel.getProfileImage(
+                userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                    userViewModel.getProfileImage(
                         onSuccess = { fetchedUrl ->
                             imageUrlState.value = fetchedUrl
                             Toast.makeText(
@@ -182,7 +181,7 @@ fun InstructorProfileScreen(instructorId : String,
     }
 
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(instructorId.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(instructorId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -198,7 +197,7 @@ fun InstructorProfileScreen(instructorId : String,
         onResult = { isGranted: Boolean ->
             if (isGranted) {
                 // Permiso concedido, proceder con la acción
-                imageUri = UserViewModel.createImageUri(context)
+                imageUri = userViewModel.createImageUri(context)
                 imageUri?.let { uri ->
                     takePictureLauncher.launch(uri)
                 }
@@ -232,7 +231,7 @@ fun InstructorProfileScreen(instructorId : String,
                     when (PackageManager.PERMISSION_GRANTED) {
                         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
                             // Permiso ya concedido, proceder con la acción
-                            imageUri = UserViewModel.createImageUri(context)
+                            imageUri = userViewModel.createImageUri(context)
                             imageUri?.let { uri ->
                                 takePictureLauncher.launch(uri)
                             }
@@ -255,7 +254,7 @@ fun InstructorProfileScreen(instructorId : String,
                 modifier = Modifier.fillMaxSize(),
             ) {
 
-                if(currentUser == instructor?.ID) {
+                if(currentUser == instructor?.id) {
 
                     Image(
                         painter = painterResource(id = R.drawable.baseline_person_add_24),
@@ -323,14 +322,13 @@ fun InstructorProfileScreen(instructorId : String,
                                 .padding(4.dp)
                                 .clip(CircleShape)
                                 .clickable {
-                                    // TODO: Acciones al hacer clic en la imagen
                                     showImagePickerDialog = true
                                 },
                             contentScale = ContentScale.Crop
                         )
 
                         Row(verticalAlignment = Alignment.CenterVertically){
-                            instructor?.FullName?.let {
+                            instructor?.fullName?.let {
 
                                 Text(
                                     text = it,
@@ -377,7 +375,7 @@ fun InstructorProfileScreen(instructorId : String,
                     Column (
                         modifier = Modifier.fillMaxWidth()
                     ){
-                        if(currentUser == instructor?.ID){
+                        if(currentUser == instructor?.id){
                             Text(
                                 text = "Salir",
                                 style = TextStyle(
@@ -429,7 +427,7 @@ fun InstructorProfileScreen(instructorId : String,
 
                     }
 
-                    if(currentUser == instructor?.ID) {
+                    if(currentUser == instructor?.id) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly, // Distribuye las imágenes equitativamente

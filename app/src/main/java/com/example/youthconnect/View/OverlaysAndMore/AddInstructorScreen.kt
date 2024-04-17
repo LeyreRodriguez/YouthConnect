@@ -21,16 +21,16 @@ import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.View.Authentication.CustomOutlinedTextField
-import com.example.youthconnect.ViewModel.signUpViewModel
+import com.example.youthconnect.ViewModel.SignUpViewModel
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun AddInstructor (onDismiss: () -> Unit){
 
-    val signUpViewModel : signUpViewModel = hiltViewModel()
-    var InstructorFullName by remember { mutableStateOf("") }
-    var InstructorID  by remember { mutableStateOf("") }
-    var InstructorPassword  by remember { mutableStateOf("") }
+    val signUpViewModel : SignUpViewModel = hiltViewModel()
+    var instructorFullName by remember { mutableStateOf("") }
+    var instructorId  by remember { mutableStateOf("") }
+    var instructorPassword  by remember { mutableStateOf("") }
     var isChildPasswordVisible by rememberSaveable { mutableStateOf(false) }
     var showMessage by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
@@ -49,8 +49,8 @@ fun AddInstructor (onDismiss: () -> Unit){
                 item{
 
                     CustomOutlinedTextField(
-                        value = InstructorFullName,
-                        onValueChange = { InstructorFullName = it },
+                        value = instructorFullName,
+                        onValueChange = { instructorFullName = it },
 
                         label = "Nombre completo del animador",
                         leadingIconImageVector = Icons.Default.PermIdentity
@@ -58,8 +58,8 @@ fun AddInstructor (onDismiss: () -> Unit){
                     )
 
                     CustomOutlinedTextField(
-                        value = InstructorID,
-                        onValueChange = { InstructorID = it },
+                        value = instructorId,
+                        onValueChange = { instructorId = it },
 
                         label = "DNI del animador",
 
@@ -68,8 +68,8 @@ fun AddInstructor (onDismiss: () -> Unit){
                     )
 
                     CustomOutlinedTextField(
-                        value = InstructorPassword,
-                        onValueChange = { InstructorPassword = it },
+                        value = instructorPassword,
+                        onValueChange = { instructorPassword = it },
                         isPasswordVisible = isChildPasswordVisible,
                         onVisibilityChange = { isChildPasswordVisible = it },
                         label = "Contraseña del animador",
@@ -89,18 +89,18 @@ fun AddInstructor (onDismiss: () -> Unit){
             TextButton(
                 onClick = {
                     val instructor = Instructor(
-                        InstructorFullName,
-                        InstructorID,
-                        InstructorPassword
+                        instructorFullName,
+                        instructorId,
+                        instructorPassword
                     )
 
-                    signUpViewModel.registerUser(instructor.ID, instructor.Password)
+                    signUpViewModel.registerUser(instructor.id, instructor.password)
                     signUpViewModel.addInstructor(instructor)
 
 
-                    InstructorFullName  =""
-                    InstructorID=""
-                    InstructorPassword=""
+                    instructorFullName  =""
+                    instructorId=""
+                    instructorPassword=""
                 }
             ) {
                 Text("Confirmar")

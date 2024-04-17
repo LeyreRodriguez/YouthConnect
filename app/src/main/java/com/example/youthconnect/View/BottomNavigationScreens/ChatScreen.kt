@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,7 +51,6 @@ import com.example.youthconnect.Model.Object.UserData
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.composed
@@ -79,24 +76,24 @@ fun HomeScreen(
     navHostController: NavHostController
 ) {
 
-    val ChatViewModel : ChatViewModel = hiltViewModel()
+    val chatViewModel : ChatViewModel = hiltViewModel()
     var allUsers by remember { mutableStateOf<List<UserData?>>(emptyList()) }
     var user by remember { mutableStateOf<String>("") }
     var userType by remember { mutableStateOf<String>("") }
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
 
     LaunchedEffect(Unit) {
         try {
-            val currentUser = UserViewModel.getCurrentUser().toString()
-            val userTypeResult = UserViewModel.getUserType(currentUser).toString()
+            val currentUser = userViewModel.getCurrentUser().toString()
+            val userTypeResult = userViewModel.getUserType(currentUser).toString()
             user = currentUser
             userType = userTypeResult
-            allUsers = ChatViewModel.getAllUsers(userTypeResult) ?: emptyList()
+            allUsers = chatViewModel.getAllUsers(userTypeResult) ?: emptyList()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
-    val unseenMessagesState = ChatViewModel.getUnseenMessages().observeAsState(initial = emptyList())
+    val unseenMessagesState = chatViewModel.getUnseenMessages().observeAsState(initial = emptyList())
 
     val unseenMessages by remember {
         unseenMessagesState
@@ -128,7 +125,7 @@ fun HomeScreen(
                                 unseenMessages = unseenMessages
                             ) {
 
-                                ChatViewModel.markMessagesAsSeen(ChatViewModel.generateChatId(item.userId,user))
+                                chatViewModel.markMessagesAsSeen(chatViewModel.generateChatId(item.userId,user))
                                 navHostController.navigate("chatscreen/${item.userId}")
                             }
                         }
@@ -152,11 +149,11 @@ fun UserEachRow(
     onClick: () -> Unit
 ) {
 
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
     val imageUrlState = remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -170,9 +167,9 @@ fun UserEachRow(
     var currentUserType by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        userType = UserViewModel.getUserType(person.userId).toString()
-        currentUserType = UserViewModel.getCurrentUser()
-            ?.let { UserViewModel.getUserType(it).toString() }.toString()
+        userType = userViewModel.getUserType(person.userId).toString()
+        currentUserType = userViewModel.getCurrentUser()
+            ?.let { userViewModel.getUserType(it).toString() }.toString()
     }
 
     Card(
@@ -186,8 +183,7 @@ fun UserEachRow(
         Row (modifier = Modifier.fillMaxSize()){
             Row(
                 modifier = Modifier
-                    .padding(16.dp),//.fillMaxWidth(), //
-               // horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(16.dp),
             ) {
 
                 AsyncImage(
@@ -237,8 +233,7 @@ fun UserEachRow(
 
                 if (lines.size >= 2){
                     Column(
-                        verticalArrangement = Arrangement.Center,
-                        //modifier = Modifier.fillMaxSize() // Para ocupar todo el espacio disponible
+                        verticalArrangement = Arrangement.Center
                     ) {
 
                         cleanedLines.forEach { line ->
@@ -251,10 +246,9 @@ fun UserEachRow(
                                 ),
                                 modifier = Modifier
                                     .padding(start = 10.dp)
-                                //    maxLines = 2 // Define el máximo de líneas permitidas
+
                             )
-                            // Añadir un Spacer para ocupar el espacio restante
-                            // Spacer(modifier = Modifier.weight(1f))
+
                         }
                     }
                 } else {
@@ -270,7 +264,6 @@ fun UserEachRow(
                                 .padding(start = 10.dp)
                                 .align(CenterVertically),
 
-                            //    maxLines = 2 // Define el máximo de líneas permitidas
                         )
                     }
                 }
@@ -335,16 +328,6 @@ fun UserEachRow(
 
 
 
-@SuppressLint("UnnecessaryComposedModifier")
-fun Modifier.noRippleEffect(onClick: () -> Unit) = composed {
-    clickable(
-        interactionSource = MutableInteractionSource(),
-        indication = null
-    ) {
-        onClick()
-    }
-}
-
 
 
 @SuppressLint("SuspiciousIndentation")
@@ -352,16 +335,14 @@ fun Modifier.noRippleEffect(onClick: () -> Unit) = composed {
 @Composable
 fun ChatScreen(recipientUserId: String, navHostController: NavController, chatViewModel: ChatViewModel = hiltViewModel()) {
 
-    val UserViewModel : UserViewModel = hiltViewModel()
-   // var user: UserData? = null
+    val userViewModel : UserViewModel = hiltViewModel()
     val userState = remember { mutableStateOf<UserData?>(null) }
 
-    LaunchedEffect(UserViewModel) {
-        val user = UserViewModel.getUserById(recipientUserId)
+    LaunchedEffect(userViewModel) {
+        val user = userViewModel.getUserById(recipientUserId)
 
         userState.value = user
     }
-    Log.i("USER",userState.value?.profilePictureUrl.toString())
 
 
     initRecipientUserId(recipientUserId, chatViewModel)
@@ -458,13 +439,13 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
 @Composable
 fun Recipient(userData: UserData, navController : NavController){
 
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
 
 
 
     val imageUrlState = remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(userData.userId.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(userData.userId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -477,7 +458,7 @@ fun Recipient(userData: UserData, navController : NavController){
     var userType by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        userType = UserViewModel.getUserType(userData.userId).toString()
+        userType = userViewModel.getUserType(userData.userId).toString()
     }
 
 

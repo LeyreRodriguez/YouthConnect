@@ -26,12 +26,12 @@ import com.example.youthconnect.ViewModel.QuizViewModel
 @Composable
 fun AddQuestions (onDismiss: () -> Unit){
 
-    val QuizViewModel : QuizViewModel = hiltViewModel()
-    var Question  by remember { mutableStateOf("") }
-    var AnswerA  by remember { mutableStateOf("") }
-    var AnswerB  by remember { mutableStateOf("") }
-    var AnswerC  by remember { mutableStateOf("") }
-    var AnswerD  by remember { mutableStateOf("") }
+    val quizViewModel : QuizViewModel = hiltViewModel()
+    var question  by remember { mutableStateOf("") }
+    var optionA  by remember { mutableStateOf("") }
+    var optionB  by remember { mutableStateOf("") }
+    var optionC  by remember { mutableStateOf("") }
+    var optionD  by remember { mutableStateOf("") }
     var selectedAnswer by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
@@ -51,8 +51,8 @@ fun AddQuestions (onDismiss: () -> Unit){
                         Text(text = "Escriba primero la pregunta y seguidamente las posibles respuestas, no olvide marcar cual es la respuesta correcta")
 
                         CustomOutlinedTextField(
-                            value = Question,
-                            onValueChange = { Question = it },
+                            value = question,
+                            onValueChange = { question = it },
                             label = "Pregunta",
                             leadingIconImageVector = Icons.Default.QuestionMark
                         )
@@ -68,8 +68,8 @@ fun AddQuestions (onDismiss: () -> Unit){
                                 }
                             )
                             CustomOutlinedTextField(
-                                value = AnswerA,
-                                onValueChange = { AnswerA = it },
+                                value = optionA,
+                                onValueChange = { optionA = it },
                                 label = "Primera opcion",
                                 leadingIconImageVector = Icons.Default.QuestionAnswer
                             )
@@ -86,8 +86,8 @@ fun AddQuestions (onDismiss: () -> Unit){
                             )
 
                             CustomOutlinedTextField(
-                                value = AnswerB,
-                                onValueChange = { AnswerB = it },
+                                value = optionB,
+                                onValueChange = { optionB = it },
                                 label = "Segunda opcion",
                                 leadingIconImageVector = Icons.Default.QuestionAnswer
                             )
@@ -103,8 +103,8 @@ fun AddQuestions (onDismiss: () -> Unit){
                                 }
                             )
                             CustomOutlinedTextField(
-                                value = AnswerC,
-                                onValueChange = { AnswerC = it },
+                                value = optionC,
+                                onValueChange = { optionC = it },
                                 label = "Tercera opcion",
                                 leadingIconImageVector = Icons.Default.QuestionAnswer
                             )
@@ -120,8 +120,8 @@ fun AddQuestions (onDismiss: () -> Unit){
                                 }
                             )
                             CustomOutlinedTextField(
-                                value = AnswerD,
-                                onValueChange = { AnswerD = it },
+                                value = optionD,
+                                onValueChange = { optionD = it },
                                 label = "Cuarta opcion",
                                 leadingIconImageVector = Icons.Default.QuestionAnswer
                             )
@@ -136,23 +136,23 @@ fun AddQuestions (onDismiss: () -> Unit){
             confirmButton = {
                 if (selectedAnswer.isNotEmpty()) {
 
-                    QuizViewModel.addNewQuestion(Question(
+                    quizViewModel.addNewQuestion(Question(
                         answer = selectedAnswer,
-                        optionA = AnswerA,
-                        optionB = AnswerB,
-                        optionC = AnswerC,
-                        optionD = AnswerD,
-                        question = Question
+                        optionA = optionA,
+                        optionB = optionB,
+                        optionC = optionC,
+                        optionD = optionD,
+                        question = question
                     ))
 
                 }
                 TextButton(
                     onClick = {
-                        Question = ""
-                        AnswerA = ""
-                        AnswerB = ""
-                        AnswerC = ""
-                        AnswerD = ""
+                        question = ""
+                        optionA = ""
+                        optionB = ""
+                        optionC = ""
+                        optionD = ""
                         selectedAnswer = ""
                     }
                 ) {

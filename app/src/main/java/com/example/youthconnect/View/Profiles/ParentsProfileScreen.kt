@@ -78,7 +78,7 @@ fun ParentsProfileScreen(parentId : String,
     var currentUser by remember { mutableStateOf<String?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
 
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
 
     var editUser by remember { mutableStateOf(false)  }
 
@@ -87,12 +87,12 @@ fun ParentsProfileScreen(parentId : String,
 
 
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            parent = UserViewModel.getCurrentUserById(parentId)
-            children = UserViewModel.getChildByParentsId(parentId)
-            currentUser = UserViewModel.getCurrentUser()
-            currentUserType = currentUser?.let { UserViewModel.getUserType(it).toString() }.toString()
+            parent = userViewModel.getCurrentUserById(parentId)
+            children = userViewModel.getChildByParentsId(parentId)
+            currentUser = userViewModel.getCurrentUser()
+            currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -108,8 +108,8 @@ fun ParentsProfileScreen(parentId : String,
 
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                UserViewModel.getProfileImage(
+            userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                userViewModel.getProfileImage(
                     onSuccess = { fetchedUrl ->
                         imageUrlState.value = fetchedUrl
                         Toast.makeText(
@@ -141,8 +141,8 @@ fun ParentsProfileScreen(parentId : String,
         if (success) {
             // Aquí manejas la imagen capturada usando imageUri
             imageUri?.let { uri ->
-                UserViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                    UserViewModel.getProfileImage(
+                userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                    userViewModel.getProfileImage(
                         onSuccess = { fetchedUrl ->
                             imageUrlState.value = fetchedUrl
                             Toast.makeText(
@@ -171,7 +171,7 @@ fun ParentsProfileScreen(parentId : String,
     }
 
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(parentId.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(parentId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -187,7 +187,7 @@ fun ParentsProfileScreen(parentId : String,
         onResult = { isGranted: Boolean ->
             if (isGranted) {
                 // Permiso concedido, proceder con la acción
-                imageUri = UserViewModel.createImageUri(context)
+                imageUri = userViewModel.createImageUri(context)
                 imageUri?.let { uri ->
                     takePictureLauncher.launch(uri)
                 }
@@ -221,7 +221,7 @@ fun ParentsProfileScreen(parentId : String,
                     when (PackageManager.PERMISSION_GRANTED) {
                         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
                             // Permiso ya concedido, proceder con la acción
-                            imageUri = UserViewModel.createImageUri(context)
+                            imageUri = userViewModel.createImageUri(context)
                             imageUri?.let { uri ->
                                 takePictureLauncher.launch(uri)
                             }
@@ -273,8 +273,7 @@ fun ParentsProfileScreen(parentId : String,
                             .padding(4.dp)
                             .clip(CircleShape)
                             .clickable {
-                                // TODO: Acciones al hacer clic en la imagen
-                                if(currentUser == parent?.ID){
+                                if(currentUser == parent?.id){
                                     showImagePickerDialog = true
                                 }
 
@@ -282,7 +281,7 @@ fun ParentsProfileScreen(parentId : String,
                         contentScale = ContentScale.Crop
                     )
                     Row(verticalAlignment = Alignment.CenterVertically){
-                        parent?.FullName?.let {
+                        parent?.fullName?.let {
                             Text(
                                 text = it,
                                 style = TextStyle(
@@ -332,7 +331,7 @@ fun ParentsProfileScreen(parentId : String,
 
                 Column ( modifier = Modifier.fillMaxWidth()
                 ){
-                    if(currentUser == parent?.ID){
+                    if(currentUser == parent?.id){
                         Text(
                             text = "Salir",
                             style = TextStyle(

@@ -18,10 +18,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,10 +35,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,19 +65,15 @@ import com.example.youthconnect.View.BottomNavigationScreens.QuizScreen
 import com.example.youthconnect.View.BottomNavigationScreens.Scores
 import com.example.youthconnect.View.Authentication.SignUpView
 import com.example.youthconnect.View.Components.BottomNavigation
-import com.example.youthconnect.View.OverlaysAndMore.AddInstructor
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
-
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-
 
     private var textResult = mutableStateOf("")
 
@@ -92,6 +84,8 @@ class MainActivity : ComponentActivity() {
             textResult.value = result.contents
         }
     }
+
+
     private fun showCamera(){
         val options = ScanOptions()
         options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
@@ -139,6 +133,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+
             NavHost(navController = navController,
                 startDestination = "firstScreens"
             ){
@@ -295,13 +290,13 @@ class MainActivity : ComponentActivity() {
 
                     composable(NavScreen.Profile.name){
 
-                        val UserViewModel : UserViewModel = hiltViewModel()
+                        val userViewModel : UserViewModel = hiltViewModel()
                         var user by remember { mutableStateOf<String?>("") }
                         var userType by remember { mutableStateOf<String?>("") }
 
                         LaunchedEffect(key1 = Unit){
-                            user = UserViewModel.getCurrentUser()
-                            userType = user?.let { it1 -> UserViewModel.getUserType(it1) }
+                            user = userViewModel.getCurrentUser()
+                            userType = user?.let { it1 -> userViewModel.getUserType(it1) }
                         }
 
                         Scaffold(
@@ -538,11 +533,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun QrScannerScreen( childId : String, navController: NavController){
 
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            UserViewModel.changeState(childId)
+            userViewModel.changeState(childId)
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error en QR", e)

@@ -10,7 +10,6 @@ import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
 import com.example.youthconnect.Model.Object.UserData
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

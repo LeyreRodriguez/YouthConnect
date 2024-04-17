@@ -7,8 +7,6 @@ import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
@@ -55,7 +53,7 @@ interface FirestoreRepository {
     suspend fun removeInstructorFromChild(child: Child, instructorID: String)
 
     suspend fun getUser() : UserData?
-    suspend fun getUserById(Id : String ): UserData?
+    suspend fun getUserById(id : String ): UserData?
     suspend fun getAllUser() : List<UserData?>
     suspend fun getAllUser(userType: String): List<UserData>
 

@@ -3,7 +3,6 @@ package com.example.youthconnect.Model.Sealed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Newspaper
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.ui.graphics.vector.ImageVector

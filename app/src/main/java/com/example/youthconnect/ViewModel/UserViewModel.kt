@@ -4,10 +4,10 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
-import androidx.compose.ui.text.toLowerCase
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
 import com.example.youthconnect.Model.Object.Child
@@ -15,11 +15,9 @@ import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -70,9 +68,9 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUserById(ID: String): UserData? {
+    suspend fun getUserById(id: String): UserData? {
         return try {
-            user = firestoreRepository.getUserById(ID)
+            user = firestoreRepository.getUserById(id)
             user
         } catch (e: Exception) {
             Log.e("Firestore", "Error en getUserById", e)
@@ -269,15 +267,13 @@ class UserViewModel @Inject constructor(
     fun getProfileEspecificImage(email: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         viewModelScope.launch {
 
-            Log.i("USER", email)
+            Log.i("USERx", email)
             val userId = email
             if (userId != null) {
                 try {
-                    val url = firebaseStorage.getProfileImageUrl(userId)
-                    onSuccess(url)
+                    onSuccess(firebaseStorage.getProfileImageUrl(userId))
                 } catch (e: Exception) {
-                    val url = "https://i.imgur.com/w3UEu8o.jpeg"
-                    onSuccess(url)
+                    onSuccess(Constants.IMAGE)
                 }
             }
         }

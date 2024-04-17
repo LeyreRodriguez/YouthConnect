@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.PopupProperties
-import com.example.youthconnect.Model.Enum.Course
 import com.example.youthconnect.Model.Object.Instructor
 
 
@@ -91,7 +90,7 @@ fun CustomDropdownMenu(
                     text = {
                         if (item != null) {
                             Text(
-                                text = item.FullName,
+                                text = item.fullName,
                                 color = color,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
@@ -101,7 +100,7 @@ fun CustomDropdownMenu(
                     onClick = {
                         selectedIndex = index
                         if (item != null) {
-                            selectedOption = item.FullName
+                            selectedOption = item.fullName
                         }
                         onSelected(selectedOption)
                         expand = false

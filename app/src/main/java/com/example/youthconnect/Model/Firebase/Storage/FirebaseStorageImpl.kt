@@ -2,7 +2,6 @@ package com.example.youthconnect.Model.Firebase.Storage
 
 
 import android.net.Uri
-import android.util.Log
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Sealed.Response
@@ -11,9 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.tasks.await
-import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 class FirebaseStorageImpl @Inject constructor(
@@ -83,10 +80,10 @@ class FirebaseStorageImpl @Inject constructor(
         return try {
             db.collection("News").document(news.id).set(mapOf(
                 Constants.URL to download,
-                "Description" to news.Description,
-                "Title" to news.Title,
+                "description" to news.description,
+                "title" to news.title,
                 "id" to news.id,
-                "Date" to LocalDate.now().toString()
+                "date" to LocalDate.now().toString()
             )).await()
             Response.Success(true)
         }catch (e:Exception){

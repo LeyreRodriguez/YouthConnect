@@ -21,7 +21,7 @@ import com.example.youthconnect.ui.theme.Yellow
 fun BottomNavigation(
     navController: NavHostController
 ){
-    val menu_items = listOf(
+    val menuItems = listOf(
         ItemsBottomBar.NewsBottom,
         ItemsBottomBar.QuizBottom,
         ItemsBottomBar.ChatBottom,
@@ -30,7 +30,7 @@ fun BottomNavigation(
 
     BottomAppBar {
         NavigationBar {
-            menu_items.forEach{ item ->
+            menuItems.forEach{ item ->
                 val selected = currentRoute(navController) == item.ruta
                 NavigationBarItem(
                     selected = selected,

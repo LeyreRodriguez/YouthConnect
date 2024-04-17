@@ -42,21 +42,25 @@ fun NewsDetails(
     modifier: Modifier = Modifier.background(color = Color.White)
 ) {
 
-    val NewsViewModel: NewsViewModel = hiltViewModel()
-    val UserViewModel: UserViewModel = hiltViewModel()
+
+
+    val newsViewModel: NewsViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
     var news by remember { mutableStateOf<News?>(null) }
     val imageUrlState = remember { mutableStateOf("") }
 
-    LaunchedEffect(NewsViewModel) {
+    LaunchedEffect(newsViewModel) {
         try {
-            news = NewsViewModel.getNewsById(newsId)
+            news = newsViewModel.getNewsById(newsId)
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
 
+
+
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileImage(
+        userViewModel.getProfileImage(
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -77,7 +81,7 @@ fun NewsDetails(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                news?.Title?.let {
+                news?.title?.let {
                     Text(
                         text = it,
                         style = TextStyle(
@@ -94,7 +98,7 @@ fun NewsDetails(
 
             val configuration = LocalConfiguration.current
             val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
-            news?.Image?.let {
+            news?.image?.let {
                 CoilImage(
                     imageUrl = it,
                     contentDescription = null,
@@ -107,7 +111,7 @@ fun NewsDetails(
                 )
             }
 
-            news?.Description?.let {
+            news?.description?.let {
                 Text(
                     text = it,
                     style = TextStyle(

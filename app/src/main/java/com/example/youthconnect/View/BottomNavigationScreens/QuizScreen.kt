@@ -63,8 +63,8 @@ fun QuizScreen( navController: NavHostController,
     modifier : Modifier = Modifier.background(color = Color.White)
 ) {
     var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
-    val QuizViewModel: QuizViewModel = hiltViewModel()
-    val UserViewModel: UserViewModel = hiltViewModel()
+    val quizViewModel: QuizViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
     var user by remember { mutableStateOf<String?>("") }
     var currentQuestionIndex by remember { mutableStateOf(0) }
 
@@ -80,7 +80,7 @@ fun QuizScreen( navController: NavHostController,
     LaunchedEffect(Unit) {
         try {
             withContext(Dispatchers.IO) {
-                questions = QuizViewModel.getAllQuestions()
+                questions = quizViewModel.getAllQuestions()
             }
 
         } catch (e: Exception) {
@@ -93,10 +93,10 @@ fun QuizScreen( navController: NavHostController,
 
 
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            user = UserViewModel.getCurrentUser()
-            result = user?.let { UserViewModel.findDocument(it) }
+            user = userViewModel.getCurrentUser()
+            result = user?.let { userViewModel.findDocument(it) }
 
             if (result != null) {
                 documentExists.value = result.toString()
@@ -252,12 +252,12 @@ fun QuizScreen( navController: NavHostController,
                                     onClick = {
 
                                         if (currentQuestionIndex == 0) {
-                                            QuizViewModel.resetScore(user.toString())
+                                            quizViewModel.resetScore(user.toString())
                                         }
 
                                         if (currentQuestion != null) {
                                             if (currentQuestion.answer.equals("OptionA")) {
-                                                user?.let { QuizViewModel.updateScore(it) }
+                                                user?.let { quizViewModel.updateScore(it) }
                                             }
                                         }
 
@@ -299,12 +299,12 @@ fun QuizScreen( navController: NavHostController,
                                     onClick = {
 
                                         if (currentQuestionIndex == 0) {
-                                            QuizViewModel.resetScore(user.toString())
+                                            quizViewModel.resetScore(user.toString())
                                         }
 
                                         if (currentQuestion != null) {
                                             if (currentQuestion.answer.equals("OptionB")) {
-                                                user?.let { QuizViewModel.updateScore(it) }
+                                                user?.let { quizViewModel.updateScore(it) }
                                             }
                                         }
                                         if (currentQuestionIndex == questions.size - 1) {
@@ -352,12 +352,12 @@ fun QuizScreen( navController: NavHostController,
                                     onClick = {
 
                                         if (currentQuestionIndex == 0) {
-                                            QuizViewModel.resetScore(user.toString())
+                                            quizViewModel.resetScore(user.toString())
                                         }
 
                                         if (currentQuestion != null) {
                                             if (currentQuestion.answer.equals("OptionC")) {
-                                                user?.let { QuizViewModel.updateScore(it) }
+                                                user?.let { quizViewModel.updateScore(it) }
                                             }
                                         }
                                         if (currentQuestionIndex == questions.size - 1) {
@@ -398,12 +398,12 @@ fun QuizScreen( navController: NavHostController,
                                     onClick = {
 
                                         if (currentQuestionIndex == 0) {
-                                            QuizViewModel.resetScore(user.toString())
+                                            quizViewModel.resetScore(user.toString())
                                         }
 
                                         if (currentQuestion != null) {
                                             if (currentQuestion.answer.equals("OptionD")) {
-                                                user?.let { QuizViewModel.updateScore(it) }
+                                                user?.let { quizViewModel.updateScore(it) }
                                             }
                                         }
 
@@ -458,8 +458,8 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
 
 
     var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
-    val QuizViewModel : QuizViewModel = hiltViewModel()
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val quizViewModel : QuizViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
     var user by remember { mutableStateOf<String?>("") }
     var score by remember { mutableStateOf<String?>("") }
 
@@ -471,7 +471,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
     LaunchedEffect(Unit) {
         try {
             withContext(Dispatchers.IO) {
-                questions = QuizViewModel.getAllQuestions()
+                questions = quizViewModel.getAllQuestions()
             }
 
         } catch (e: Exception) {
@@ -481,8 +481,8 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
 
     LaunchedEffect(Unit) {
         try {
-            user = UserViewModel.getCurrentUser()
-            allUsers = UserViewModel.getAllUsers()!!
+            user = userViewModel.getCurrentUser()
+            allUsers = userViewModel.getAllUsers()!!
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
@@ -491,7 +491,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
 
     LaunchedEffect(Unit) {
         try {
-            score = QuizViewModel.getScore(user.toString()).toString()
+            score = quizViewModel.getScore(user.toString()).toString()
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
@@ -626,7 +626,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
 
         Button(
             onClick = {
-                QuizViewModel.resetScore(user.toString())
+                quizViewModel.resetScore(user.toString())
                 navController.navigate(NavScreen.QuizScreen.name)
             },
             modifier = Modifier

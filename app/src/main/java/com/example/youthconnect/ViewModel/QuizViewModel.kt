@@ -5,18 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
 import com.example.youthconnect.Model.Object.Question
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.UUID
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel

@@ -1,6 +1,5 @@
 package com.example.youthconnect.Model.Firebase.Firestore
 
-import android.content.ContentValues.TAG
 import android.util.Log
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.Child
@@ -54,19 +53,19 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             val document = firebaseFirestore.collection("Child").document(childId).get().await()
             Child(
-                FullName = document.getString("fullName") ?: "",
-                ID = document.getString("id") ?: "",
-                Course = document.getString("course") ?: "",
-                Password = document.getString("password") ?: "",
-                BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
-                FaithGroups = document.getBoolean("faithGroups") ?: false,
-                GoOutAlone = document.getBoolean("goOutAlone") ?: false,
-                Observations = document.getString("observations") ?: "",
-                ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                InstructorID = document.getString("instructorID") ?: "",
-                State = document.getBoolean("state") ?: false,
-                Score = document.getLong("score")?.toInt() ?: null,
-                RollCall = document.get("rollCall") as? List<String> ?: emptyList()
+                fullName = document.getString("fullName") ?: "",
+                id = document.getString("id") ?: "",
+                course = document.getString("course") ?: "",
+                password = document.getString("password") ?: "",
+                belongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                faithGroups = document.getBoolean("faithGroups") ?: false,
+                goOutAlone = document.getBoolean("goOutAlone") ?: false,
+                observations = document.getString("observations") ?: "",
+                parentId = document.get("parentID") as? List<String> ?: emptyList(),
+                instructorId = document.getString("instructorID") ?: "",
+                state = document.getBoolean("state") ?: false,
+                score = document.getLong("score")?.toInt() ?: null,
+                rollCall = document.get("rollCall") as? List<String> ?: emptyList()
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -82,19 +81,19 @@ class FirestoreRepositoryImpl @Inject constructor(
                 .documents
                 .map { document ->
                     Child(
-                        FullName = document.getString("fullName") ?: "",
-                        ID = document.getString("id") ?: "",
-                        Course = document.getString("course") ?: "",
-                        Password = document.getString("password") ?: "",
-                        BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
-                        FaithGroups = document.getBoolean("faithGroups") ?: false,
-                        GoOutAlone = document.getBoolean("goOutAlone") ?: false,
-                        Observations = document.getString("observations") ?: "",
-                        ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                        InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("score")?.toInt() ?: null,
-                        RollCall = document.get("rollCall") as? List<String> ?: emptyList()
+                        fullName = document.getString("fullName") ?: "",
+                        id = document.getString("id") ?: "",
+                        course = document.getString("course") ?: "",
+                        password = document.getString("password") ?: "",
+                        belongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                        faithGroups = document.getBoolean("faithGroups") ?: false,
+                        goOutAlone = document.getBoolean("goOutAlone") ?: false,
+                        observations = document.getString("observations") ?: "",
+                        parentId = document.get("parentID") as? List<String> ?: emptyList(),
+                        instructorId = document.getString("instructorID") ?: "",
+                        state = document.getBoolean("state") ?: false,
+                        score = document.getLong("score")?.toInt() ?: null,
+                        rollCall = document.get("rollCall") as? List<String> ?: emptyList()
                     )
                 }
         } catch (e: Exception) {
@@ -112,19 +111,19 @@ class FirestoreRepositoryImpl @Inject constructor(
                 .documents
                 .map { document ->
                     Child(
-                        FullName = document.getString("fullName") ?: "",
-                        ID = document.getString("id") ?: "",
-                        Course = document.getString("course") ?: "",
-                        Password = document.getString("password") ?: "",
-                        BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
-                        FaithGroups = document.getBoolean("faithGroups") ?: false,
-                        GoOutAlone = document.getBoolean("goOutAlone") ?: false,
-                        Observations = document.getString("observations") ?: "",
-                        ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                        InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("score")?.toInt() ?: null,
-                        RollCall = document.get("rollCall") as? List<String> ?: emptyList()
+                        fullName = document.getString("fullName") ?: "",
+                        id = document.getString("id") ?: "",
+                        course = document.getString("course") ?: "",
+                        password = document.getString("password") ?: "",
+                        belongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                        faithGroups = document.getBoolean("faithGroups") ?: false,
+                        goOutAlone = document.getBoolean("goOutAlone") ?: false,
+                        observations = document.getString("observations") ?: "",
+                        parentId = document.get("parentID") as? List<String> ?: emptyList(),
+                        instructorId = document.getString("instructorID") ?: "",
+                        state = document.getBoolean("state") ?: false,
+                        score = document.getLong("score")?.toInt() ?: null,
+                        rollCall = document.get("rollCall") as? List<String> ?: emptyList()
                     )
                 }
         } catch (e: Exception) {
@@ -143,19 +142,19 @@ class FirestoreRepositoryImpl @Inject constructor(
                 .documents
                 .map { document ->
                     Child(
-                        FullName = document.getString("fullName") ?: "",
-                        ID = document.getString("id") ?: "",
-                        Course = document.getString("course") ?: "",
-                        Password = document.getString("password") ?: "",
-                        BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
-                        FaithGroups = document.getBoolean("faithGroups") ?: false,
-                        GoOutAlone = document.getBoolean("goOutAlone") ?: false,
-                        Observations = document.getString("observations") ?: "",
-                        ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                        InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("score")?.toInt() ?: null,
-                        RollCall = document.get("rollCall") as? List<String> ?: emptyList()
+                        fullName = document.getString("fullName") ?: "",
+                        id = document.getString("id") ?: "",
+                        course = document.getString("course") ?: "",
+                        password = document.getString("password") ?: "",
+                        belongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                        faithGroups = document.getBoolean("faithGroups") ?: false,
+                        goOutAlone = document.getBoolean("goOutAlone") ?: false,
+                        observations = document.getString("observations") ?: "",
+                        parentId = document.get("parentID") as? List<String> ?: emptyList(),
+                        instructorId = document.getString("instructorID") ?: "",
+                        state = document.getBoolean("state") ?: false,
+                        score = document.getLong("score")?.toInt() ?: null,
+                        rollCall = document.get("rollCall") as? List<String> ?: emptyList()
                     )
                 }
         } catch (e: Exception) {
@@ -173,19 +172,19 @@ class FirestoreRepositoryImpl @Inject constructor(
                 .documents
                 .map { document ->
                     Child(
-                        FullName = document.getString("fullName") ?: "",
-                        ID = document.getString("id") ?: "",
-                        Course = document.getString("course") ?: "",
-                        Password = document.getString("password") ?: "",
-                        BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
-                        FaithGroups = document.getBoolean("faithGroups") ?: false,
-                        GoOutAlone = document.getBoolean("goOutAlone") ?: false,
-                        Observations = document.getString("observations") ?: "",
-                        ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                        InstructorID = document.getString("instructorID") ?: "",
-                        State = document.getBoolean("state") ?: false,
-                        Score = document.getLong("score")?.toInt() ?: null,
-                        RollCall = document.get("rollCall") as? List<String> ?: emptyList()
+                        fullName = document.getString("fullName") ?: "",
+                        id = document.getString("id") ?: "",
+                        course = document.getString("course") ?: "",
+                        password = document.getString("password") ?: "",
+                        belongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                        faithGroups = document.getBoolean("faithGroups") ?: false,
+                        goOutAlone = document.getBoolean("goOutAlone") ?: false,
+                        observations = document.getString("observations") ?: "",
+                        parentId = document.get("parentID") as? List<String> ?: emptyList(),
+                        instructorId = document.getString("instructorID") ?: "",
+                        state = document.getBoolean("state") ?: false,
+                        score = document.getLong("score")?.toInt() ?: null,
+                        rollCall = document.get("rollCall") as? List<String> ?: emptyList()
                     )
                 }
         } catch (e: Exception) {
@@ -197,19 +196,19 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             val document = firebaseFirestore.collection("Child").document(childId).get().await()
             Child(
-                FullName = document.getString("fullName") ?: "",
-                ID = document.getString("id") ?: "",
-                Course = document.getString("course") ?: "",
-                Password = document.getString("password") ?: "",
-                BelongsToSchool = document.getBoolean("belongsToSchool") ?: false,
-                FaithGroups = document.getBoolean("faithGroups") ?: false,
-                GoOutAlone = document.getBoolean("goOutAlone") ?: false,
-                Observations = document.getString("observations") ?: "",
-                ParentID = document.get("parentID") as? List<String> ?: emptyList(),
-                InstructorID = document.getString("instructorID") ?: "",
-                State = document.getBoolean("state") ?: false,
-                Score = document.getLong("score")?.toInt() ?: null,
-                RollCall = document.get("rollCall") as? List<String> ?: emptyList()
+                fullName = document.getString("fullName") ?: "",
+                id = document.getString("id") ?: "",
+                course = document.getString("course") ?: "",
+                password = document.getString("password") ?: "",
+                belongsToSchool = document.getBoolean("belongsToSchool") ?: false,
+                faithGroups = document.getBoolean("faithGroups") ?: false,
+                goOutAlone = document.getBoolean("goOutAlone") ?: false,
+                observations = document.getString("observations") ?: "",
+                parentId = document.get("parentID") as? List<String> ?: emptyList(),
+                instructorId = document.getString("instructorID") ?: "",
+                state = document.getBoolean("state") ?: false,
+                score = document.getLong("score")?.toInt() ?: null,
+                rollCall = document.get("rollCall") as? List<String> ?: emptyList()
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -221,17 +220,17 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun getAllNews(): List<News?> {
         return try {
             val querySnapshot = firebaseFirestore.collection("News")
-                .orderBy("Date", Query.Direction.DESCENDING) // Ordena por el campo "Date"
+                .orderBy("date", Query.Direction.DESCENDING) // Ordena por el campo "Date"
                 .get()
                 .await()
 
             querySnapshot.documents.map { document ->
                 News(
                     id = document.getString("id") ?: "",
-                    Title = document.getString("Title") ?: "",
-                    Description = document.getString("Description") ?: "",
-                    Image = document.getString("Image") ?: "",
-                    Date = document.getString("Date") ?: "" // Obtén el valor del campo "Date"
+                    title = document.getString("title") ?: "",
+                    description = document.getString("description") ?: "",
+                    image = document.getString("image") ?: "",
+                    date = document.getString("date") ?: "" // Obtén el valor del campo "Date"
                 )
             }
         } catch (e: Exception) {
@@ -252,10 +251,10 @@ class FirestoreRepositoryImpl @Inject constructor(
                 }
                 .map { document ->
                     Instructor(
-                        FullName = document.getString("fullName") ?: "",
-                        ID = document.getString("id") ?: "",
-                        Password = document.getString("password") ?: "",
-                        Score = document.getLong("score")?.toInt() ?: null
+                        fullName = document.getString("fullName") ?: "",
+                        id = document.getString("id") ?: "",
+                        password = document.getString("password") ?: "",
+                        score = document.getLong("score")?.toInt() ?: null
                     )
                 }
         } catch (e: Exception) {
@@ -320,11 +319,11 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             val document = firebaseFirestore.collection("Parents").document(parentID).get().await()
             Parent(
-                FullName = document.getString("fullName") ?: "",
-                ID = document.getString("id") ?: "",
-                Password = document.getString("password") ?: "",
-                PhoneNumber = document.getString("phoneNumber") ?: "",
-                Score = document.getLong("score")?.toInt() ?: null
+                fullName = document.getString("fullName") ?: "",
+                id = document.getString("id") ?: "",
+                password = document.getString("password") ?: "",
+                phoneNumber = document.getString("phoneNumber") ?: "",
+                score = document.getLong("score")?.toInt() ?: null
             )
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
@@ -342,11 +341,11 @@ class FirestoreRepositoryImpl @Inject constructor(
                     .documents
                     .firstOrNull()?.let { document ->
                         Parent(
-                            FullName = document.getString("fullName") ?: "",
-                            ID = document.getString("id") ?: "",
-                            Password = document.getString("password") ?: "",
-                            PhoneNumber = document.getString("phoneNumber") ?: "",
-                            Score = document.getLong("score")?.toInt() ?: null
+                            fullName = document.getString("fullName") ?: "",
+                            id = document.getString("id") ?: "",
+                            password = document.getString("password") ?: "",
+                            phoneNumber = document.getString("phoneNumber") ?: "",
+                            score = document.getLong("score")?.toInt() ?: null
                         )
                     }
             }
@@ -360,10 +359,10 @@ class FirestoreRepositoryImpl @Inject constructor(
         return try {
             val document = firebaseFirestore.collection("Instructor").document(instructorID).get().await()
             Instructor(
-                FullName = document.getString("fullName") ?: "",
-                ID = document.getString("id") ?: "",
-                Password = document.getString("password") ?: "",
-                Score = document.getLong("score")?.toInt() ?: null
+                fullName = document.getString("fullName") ?: "",
+                id = document.getString("id") ?: "",
+                password = document.getString("password") ?: "",
+                score = document.getLong("score")?.toInt() ?: null
             )
           //  document.toObject(Instructor::class.java)
         } catch (e: Exception) {
@@ -380,10 +379,10 @@ class FirestoreRepositoryImpl @Inject constructor(
             if (instructorId != null && instructorId.isNotEmpty()) {
                 val instructorDocument = firebaseFirestore.collection("Instructor").document(instructorId).get().await()
                 Instructor(
-                    FullName = instructorDocument.getString("fullName") ?: "",
-                    ID = instructorDocument.getString("id") ?: "",
-                    Password = instructorDocument.getString("password") ?: "",
-                    Score = instructorDocument.getLong("score")?.toInt() ?: null
+                    fullName = instructorDocument.getString("fullName") ?: "",
+                    id = instructorDocument.getString("id") ?: "",
+                    password = instructorDocument.getString("password") ?: "",
+                    score = instructorDocument.getLong("score")?.toInt() ?: null
                 )
             } else {
                 null
@@ -395,14 +394,14 @@ class FirestoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addChild(child: Child) {
-        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.ID)
+        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.id)
 
         // Realiza la consulta para obtener el documento
         documentRef.get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val currentParentIds = document.get("parentID") as? List<String> ?: emptyList()
-                    val newParentsId = currentParentIds + child.ParentID
+                    val newParentsId = currentParentIds + child.parentId
 
                     val updates = hashMapOf<String, Any>(
                         "parentID" to newParentsId
@@ -425,7 +424,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                     // El documento no existe
 
                     firebaseFirestore.collection("Child")
-                        .document(child.ID)
+                        .document(child.id)
                         .set(child)
 
                 }
@@ -437,7 +436,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 
 
 
-        val documentRef: DocumentReference = firebaseFirestore.collection("Parents").document(parent.ID)
+        val documentRef: DocumentReference = firebaseFirestore.collection("Parents").document(parent.id)
 
         // Realiza la consulta para obtener el documento
         documentRef.get()
@@ -448,7 +447,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                     // El documento no existe
 
                     firebaseFirestore.collection("Parents")
-                        .document(parent.ID)
+                        .document(parent.id)
                         .set(parent)
 
                 }
@@ -459,7 +458,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override suspend fun addInstructor( instructor: Instructor) {
         firebaseFirestore.collection("Instructor")
-            .document(instructor.ID)
+            .document(instructor.id)
             .set(instructor)
 
     }
@@ -480,14 +479,14 @@ class FirestoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addInstructorToChild(child: Child, instructorID: String) {
-        val childDocument = firebaseFirestore.collection("Child").document(child.ID)
+        val childDocument = firebaseFirestore.collection("Child").document(child.id)
         // Actualizar el valor de instructorId en el documento
         childDocument.update("instructorID", instructorID)
 
     }
 
     override suspend fun rollCall(child: Child) {
-        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.ID)
+        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.id)
         val today = LocalDate.now().toString()
 
 
@@ -525,7 +524,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun notRollCall(child: Child) {
-        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.ID)
+        val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.id)
         val today = LocalDate.now().toString()
 
         documentRef.get()
@@ -579,7 +578,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 
 
     override suspend fun removeInstructorFromChild(child: Child, instructorID: String) {
-        val childDocument = firebaseFirestore.collection("Child").document(child.ID)
+        val childDocument = firebaseFirestore.collection("Child").document(child.id)
         // Actualizar el valor de instructorId en el documento
         childDocument.update("instructorID", "")
     }
@@ -596,8 +595,8 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getUserById(Id : String): UserData? {
-        val childRef = firebaseFirestore.collection("Child").document(Id)
+    override suspend fun getUserById(id : String): UserData? {
+        val childRef = firebaseFirestore.collection("Child").document(id)
         var userData: UserData? = null
 
         val childSnapshot = childRef.get().await()
@@ -607,7 +606,7 @@ class FirestoreRepositoryImpl @Inject constructor(
             val profilePictureUrl = userId?.let { getProfilePictureUrl(it) }
             userData = userId?.let { UserData(it, userName, profilePictureUrl) }
         } else {
-            val parentRef = firebaseFirestore.collection("Parents").document(Id)
+            val parentRef = firebaseFirestore.collection("Parents").document(id)
             val parentSnapshot = parentRef.get().await()
             if (parentSnapshot.exists()) {
                 val userId = parentSnapshot.getString("id")
@@ -615,7 +614,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                 val profilePictureUrl = userId?.let { getProfilePictureUrl(it) }
                 userData = userId?.let { UserData(it, userName, profilePictureUrl) }
             } else {
-                val instructorRef = firebaseFirestore.collection("Instructor").document(Id)
+                val instructorRef = firebaseFirestore.collection("Instructor").document(id)
                 val instructorSnapshot = instructorRef.get().await()
                 if (instructorSnapshot.exists()) {
                     val userId = instructorSnapshot.getString("id")
@@ -631,10 +630,11 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     private suspend fun getProfilePictureUrl(userId: String): String? {
         val storageRef = storage.reference.child("users/$userId@youthconnect.com/profile_picture.jpg")
+
         return try {
             storageRef.downloadUrl.await().toString()
         } catch (e: Exception) {
-            null
+            Constants.IMAGE
         }
     }
 
@@ -894,27 +894,27 @@ class FirestoreRepositoryImpl @Inject constructor(
     override fun updateUser(user : Any){
         when(user){
             is Child -> {
-                val childRef = firebaseFirestore.collection("Child").document(user.ID)
-                childRef.update("belongsToSchool", user.BelongsToSchool)
-                childRef.update("course", user.Course)
-                childRef.update("faithGroups", user.FaithGroups)
-                childRef.update("fullName", user.FullName)
-                childRef.update("goOutAlone", user.GoOutAlone)
-                childRef.update("observations", user.Observations)
-                childRef.update("password", user.Password)
+                val childRef = firebaseFirestore.collection("Child").document(user.id)
+                childRef.update("belongsToSchool", user.belongsToSchool)
+                childRef.update("course", user.course)
+                childRef.update("faithGroups", user.faithGroups)
+                childRef.update("fullName", user.fullName)
+                childRef.update("goOutAlone", user.goOutAlone)
+                childRef.update("observations", user.observations)
+                childRef.update("password", user.password)
 
             } is Parent -> {
-                val parentRef = firebaseFirestore.collection("Parents").document(user.ID)
+                val parentRef = firebaseFirestore.collection("Parents").document(user.id)
 
-                parentRef.update("fullName", user.FullName)
-                parentRef.update("password", user.Password)
-                parentRef.update("phoneNumber", user.PhoneNumber)
+                parentRef.update("fullName", user.fullName)
+                parentRef.update("password", user.password)
+                parentRef.update("phoneNumber", user.phoneNumber)
 
             } is Instructor -> {
-                val instructorRef = firebaseFirestore.collection("Instructor").document(user.ID)
-                println( user.FullName)
-                instructorRef.update("fullName", user.FullName)
-                instructorRef.update("password", user.Password)
+                val instructorRef = firebaseFirestore.collection("Instructor").document(user.id)
+                println( user.fullName)
+                instructorRef.update("fullName", user.fullName)
+                instructorRef.update("password", user.password)
             }
         }
     }

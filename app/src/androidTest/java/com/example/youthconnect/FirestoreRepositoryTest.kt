@@ -12,103 +12,102 @@ import com.google.firebase.storage.FirebaseStorage
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
-import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-import kotlinx.coroutines.runBlocking
 
 
 class FirestoreRepositoryTest {
     val child1 = Child(
-        FullName = "Juan Pérez",
-        ID = "00000000A",
-        Course = "4th Grade",
-        Password = "password123",
-        BelongsToSchool = true,
-        FaithGroups = false,
-        GoOutAlone = true,
-        Observations = "Needs extra help with math",
-        ParentID = listOf("parent1ID", "parent2ID"),
-        InstructorID = "instructor1ID",
-        State = true,
-        Score = 85,
-        RollCall = listOf("2024-04-14", "2024-04-15")
+        fullName = "Juan Pérez",
+        id = "00000000A",
+        course = "4th Grade",
+        password = "password123",
+        belongsToSchool = true,
+        faithGroups = false,
+        goOutAlone = true,
+        observations = "Needs extra help with math",
+        parentId = listOf("parent1ID", "parent2ID"),
+        instructorId = "instructor1ID",
+        state = true,
+        score = 85,
+        rollCall = listOf("2024-04-14", "2024-04-15")
     )
 
     val child2 = Child(
-        FullName = "María García",
-        ID = "00000000B",
-        Course = "6th Grade",
-        Password = "securepassword456",
-        BelongsToSchool = true,
-        FaithGroups = true,
-        GoOutAlone = false,
-        Observations = "",
-        ParentID = listOf("parent3ID"),
-        InstructorID = "instructor2ID",
-        State = true,
-        Score = null,
-        RollCall = null
+        fullName = "María García",
+        id = "00000000B",
+        course = "6th Grade",
+        password = "securepassword456",
+        belongsToSchool = true,
+        faithGroups = true,
+        goOutAlone = false,
+        observations = "",
+        parentId = listOf("parent3ID"),
+        instructorId = "instructor2ID",
+        state = true,
+        score = null,
+        rollCall = null
     )
 
     val child3 = Child(
-        FullName = "Carlos López",
-        ID = "00000000C",
-        Course = "2nd Grade",
-        Password = "childpassword789",
-        BelongsToSchool = true,
-        FaithGroups = false,
-        GoOutAlone = true,
-        Observations = "Allergic to peanuts",
-        ParentID = listOf("parent4ID", "parent5ID"),
-        InstructorID = "instructor3ID",
-        State = true,
-        Score = 90,
-        RollCall = listOf("2024-04-14", "2024-04-15")
+        fullName = "Carlos López",
+        id = "00000000C",
+        course = "2nd Grade",
+        password = "childpassword789",
+        belongsToSchool = true,
+        faithGroups = false,
+        goOutAlone = true,
+        observations = "Allergic to peanuts",
+        parentId = listOf("parent4ID", "parent5ID"),
+        instructorId = "instructor3ID",
+        state = true,
+        score = 90,
+        rollCall = listOf("2024-04-14", "2024-04-15")
     )
 
     val instructor1 = Instructor(
-        FullName = "Ana Martínez",
-        ID = "00000001A",
-        Password = "instructorpassword123",
-        Score = 85
+        fullName = "Ana Martínez",
+        id = "00000001A",
+        password = "instructorpassword123",
+        score = 85
     )
 
     val instructor2 = Instructor(
-        FullName = "Pedro Rodríguez",
-        ID = "00000001B",
-        Password = "secureinstructorpassword456",
-        Score = 90
+        fullName = "Pedro Rodríguez",
+        id = "00000001B",
+        password = "secureinstructorpassword456",
+        score = 90
     )
 
     val instructor3 = Instructor(
-        FullName = "María López",
-        ID = "00000001C",
-        Password = "teacherpassword789"
+        fullName = "María López",
+        id = "00000001C",
+        password = "teacherpassword789"
     )
 
     val parent1 = Parent(
-        FullName = "María Sánchez",
-        ID = "00000002A",
-        PhoneNumber = "123-456-7890",
-        Password = "parentpassword123",
-        Score = 85
+        fullName = "María Sánchez",
+        id = "00000002A",
+        phoneNumber = "123-456-7890",
+        password = "parentpassword123",
+        score = 85
     )
 
     val parent2 = Parent(
-        FullName = "Juan Rodríguez",
-        ID = "00000002B",
-        PhoneNumber = "987-654-3210",
-        Password = "secureparentpassword456",
-        Score = 90
+        fullName = "Juan Rodríguez",
+        id = "00000002B",
+        phoneNumber = "987-654-3210",
+        password = "secureparentpassword456",
+        score = 90
     )
 
     val parent3 = Parent(
-        FullName = "Ana Martínez",
-        ID = "00000002C",
-        PhoneNumber = "555-123-4567",
-        Password = "mompassword789"
+        fullName = "Ana Martínez",
+        id = "00000002C",
+        phoneNumber = "555-123-4567",
+        password = "mompassword789"
     )
 
     private lateinit var repository: FirestoreRepository
@@ -123,7 +122,7 @@ class FirestoreRepositoryTest {
                 get() = FirebaseStorage.getInstance()
 
             override suspend fun getCurrentUser(): String? {
-                return child1.ID
+                return child1.id
             }
 
             override suspend fun getChild(childId: String): Child? {
@@ -259,7 +258,7 @@ class FirestoreRepositoryTest {
                 TODO("Not yet implemented")
             }
 
-            override suspend fun getUserById(Id: String): UserData? {
+            override suspend fun getUserById(id: String): UserData? {
                 TODO("Not yet implemented")
             }
 
@@ -312,43 +311,43 @@ class FirestoreRepositoryTest {
         runBlocking {
             var child = repository.getChild("00000000A")
             assertNotNull(child)
-            assertEquals("Juan Pérez", child?.FullName)
-            assertEquals("00000000A", child?.ID)
-            assertEquals("4th Grade", child?.Course)
-            assertEquals("password123", child?.Password)
-            assertTrue(child?.BelongsToSchool!!)
-            assertFalse(child?.FaithGroups!!)
-            assertTrue(child?.GoOutAlone!!)
-            assertEquals("Needs extra help with math", child?.Observations)
-            assertEquals(listOf("parent1ID", "parent2ID"), child?.ParentID)
-            assertEquals("instructor1ID", child?.InstructorID)
-            assertTrue(child?.State!!)
-            assertEquals(85, child?.Score)
-            assertEquals(listOf("2024-04-14", "2024-04-15"), child?.RollCall)
+            assertEquals("Juan Pérez", child?.fullName)
+            assertEquals("00000000A", child?.id)
+            assertEquals("4th Grade", child?.course)
+            assertEquals("password123", child?.password)
+            assertTrue(child?.belongsToSchool!!)
+            assertFalse(child?.faithGroups!!)
+            assertTrue(child?.goOutAlone!!)
+            assertEquals("Needs extra help with math", child?.observations)
+            assertEquals(listOf("parent1ID", "parent2ID"), child?.parentId)
+            assertEquals("instructor1ID", child?.instructorId)
+            assertTrue(child?.state!!)
+            assertEquals(85, child?.score)
+            assertEquals(listOf("2024-04-14", "2024-04-15"), child?.rollCall)
 
             child = repository.getChild("00000000B")
             assertNotNull(child)
-            assertEquals("María García", child?.FullName)
-            assertEquals("00000000B", child?.ID)
-            assertEquals("6th Grade", child?.Course)
-            assertEquals("securepassword456", child?.Password)
-            assertTrue(child?.BelongsToSchool!!)
-            assertTrue(child?.FaithGroups!!)
-            assertFalse(child?.GoOutAlone!!)
-            assertEquals("", child?.Observations)
-            assertEquals(listOf("parent3ID"), child?.ParentID)
-            assertEquals("instructor2ID", child?.InstructorID)
-            assertTrue(child?.State!!)
-            assertEquals(null, child?.Score)
-            assertEquals(null, child?.RollCall)
+            assertEquals("María García", child?.fullName)
+            assertEquals("00000000B", child?.id)
+            assertEquals("6th Grade", child?.course)
+            assertEquals("securepassword456", child?.password)
+            assertTrue(child?.belongsToSchool!!)
+            assertTrue(child?.faithGroups!!)
+            assertFalse(child?.goOutAlone!!)
+            assertEquals("", child?.observations)
+            assertEquals(listOf("parent3ID"), child?.parentId)
+            assertEquals("instructor2ID", child?.instructorId)
+            assertTrue(child?.state!!)
+            assertEquals(null, child?.score)
+            assertEquals(null, child?.rollCall)
 
             // Aquí agregamos un mensaje de depuración
-            if (child?.Score == null) {
-                println("El Score es nulo para el ID ${child?.ID}")
+            if (child?.score == null) {
+                println("El Score es nulo para el ID ${child?.id}")
             }
 
-            if (child?.RollCall == null) {
-                println("RollCall es nulo para el ID ${child?.ID}")
+            if (child?.rollCall == null) {
+                println("RollCall es nulo para el ID ${child?.id}")
             }
         }
     }
@@ -358,17 +357,17 @@ class FirestoreRepositoryTest {
         runBlocking {
             var instructor = repository.getCurrentInstructorById("00000001A")
             assertNotNull(instructor)
-            assertEquals("Ana Martínez", instructor?.FullName)
-            assertEquals("00000001A", instructor?.ID)
-            assertEquals("instructorpassword123", instructor?.Password)
-            assertEquals(85, instructor?.Score)
+            assertEquals("Ana Martínez", instructor?.fullName)
+            assertEquals("00000001A", instructor?.id)
+            assertEquals("instructorpassword123", instructor?.password)
+            assertEquals(85, instructor?.score)
 
             instructor = repository.getCurrentInstructorById("00000001B")
             assertNotNull(instructor)
-            assertEquals("Pedro Rodríguez", instructor?.FullName)
-            assertEquals("00000001B", instructor?.ID)
-            assertEquals("secureinstructorpassword456", instructor?.Password)
-            assertEquals(90, instructor?.Score)
+            assertEquals("Pedro Rodríguez", instructor?.fullName)
+            assertEquals("00000001B", instructor?.id)
+            assertEquals("secureinstructorpassword456", instructor?.password)
+            assertEquals(90, instructor?.score)
         }
     }
 
@@ -377,19 +376,19 @@ class FirestoreRepositoryTest {
         runBlocking {
             var parent = repository.getCurrentUserById("00000002A")
             assertNotNull(parent)
-            assertEquals("María Sánchez", parent?.FullName)
-            assertEquals("00000002A", parent?.ID)
-            assertEquals("123-456-7890", parent?.PhoneNumber)
-            assertEquals("parentpassword123", parent?.Password)
-            assertEquals(85, parent?.Score)
+            assertEquals("María Sánchez", parent?.fullName)
+            assertEquals("00000002A", parent?.id)
+            assertEquals("123-456-7890", parent?.phoneNumber)
+            assertEquals("parentpassword123", parent?.password)
+            assertEquals(85, parent?.score)
 
             parent = repository.getCurrentUserById("00000002B")
             assertNotNull(parent)
-            assertEquals("Juan Rodríguez", parent?.FullName)
-            assertEquals("00000002B", parent?.ID)
-            assertEquals("987-654-3210", parent?.PhoneNumber)
-            assertEquals("secureparentpassword456", parent?.Password)
-            assertEquals(90, parent?.Score)
+            assertEquals("Juan Rodríguez", parent?.fullName)
+            assertEquals("00000002B", parent?.id)
+            assertEquals("987-654-3210", parent?.phoneNumber)
+            assertEquals("secureparentpassword456", parent?.password)
+            assertEquals(90, parent?.score)
         }
     }
 

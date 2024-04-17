@@ -3,11 +3,8 @@ package com.example.youthconnect.View.OverlaysAndMore
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,14 +18,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,12 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -61,20 +51,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.youthconnect.Model.Enum.Course
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
-import com.example.youthconnect.View.BottomNavigationScreens.userImage
 import com.example.youthconnect.View.Components.CustomDropdownMenu
 import com.example.youthconnect.ViewModel.UserViewModel
-import com.example.youthconnect.ViewModel.signUpViewModel
+import com.example.youthconnect.ViewModel.SignUpViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import java.time.LocalDate
@@ -100,7 +87,7 @@ fun SearchView(
                 isTextFieldEmpty = value.text.isEmpty()
             },
             modifier = Modifier
-                .weight(1f) // Para que el TextField ocupe todo el espacio disponible
+                .weight(1f)
                 .padding(10.dp)
                 .clip(RoundedCornerShape(30.dp))
                 .border(2.dp, Color.DarkGray, RoundedCornerShape(30.dp)),
@@ -136,7 +123,7 @@ fun SearchView(
 @Composable
 fun ChildListScreen(navController : NavHostController, instructorID: String){
 
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
     var childs by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
@@ -149,13 +136,13 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
 
 
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            childs = UserViewModel.getAllChildren()
-            instructor = UserViewModel.getCurrentInstructorById(instructorID)
-            myKids = UserViewModel.getChildByInstructorId(instructorID)
-            user = UserViewModel.getCurrentUser()
-            result = user?.let { UserViewModel.findDocument(it) }
+            childs = userViewModel.getAllChildren()
+            instructor = userViewModel.getCurrentInstructorById(instructorID)
+            myKids = userViewModel.getChildByInstructorId(instructorID)
+            user = userViewModel.getCurrentUser()
+            result = user?.let { userViewModel.findDocument(it) }
 
             if (result != null) {
                 documentExists.value = result.toString()
@@ -237,8 +224,8 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
 
                     LazyColumn(modifier = Modifier.padding(10.dp)) {
                         items(items = childs.filter {
-                            it?.FullName?.contains(searchedText, ignoreCase = true) ?: false
-                        }, key = { it?.ID ?: "" }) { item ->
+                            it?.fullName?.contains(searchedText, ignoreCase = true) ?: false
+                        }, key = { it?.id ?: "" }) { item ->
                             if (item != null) {
                                 Greeting(navController = navController, item)
                             }
@@ -267,9 +254,9 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
 @Composable
 fun MyChildren(navController: NavController, child: Child) {
 
-    val SignUpViewModel: signUpViewModel = hiltViewModel()
-    val UserViewModel: UserViewModel = hiltViewModel()
-    var isChecked by remember { mutableStateOf(child.RollCall?.contains(LocalDate.now().toString()) == true) }
+    val signUpViewModel: SignUpViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+    var isChecked by remember { mutableStateOf(child.rollCall?.contains(LocalDate.now().toString()) == true) }
 
 
 
@@ -281,18 +268,18 @@ fun MyChildren(navController: NavController, child: Child) {
 
 
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            instructorID = UserViewModel.getCurrentUser().toString()
+            instructorID = userViewModel.getCurrentUser().toString()
 
-            myKids = instructorID?.let { UserViewModel.getChildByInstructorId(it) }!!
-
-
-            user = UserViewModel.getCurrentUser()
+            myKids = instructorID?.let { userViewModel.getChildByInstructorId(it) }!!
 
 
+            user = userViewModel.getCurrentUser()
 
-            userType = user?.let { UserViewModel.getUserType(it).toString() }.toString()
+
+
+            userType = user?.let { userViewModel.getUserType(it).toString() }.toString()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -301,7 +288,7 @@ fun MyChildren(navController: NavController, child: Child) {
 
     val imageUrlState = remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(child.ID.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(child.id.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -315,7 +302,7 @@ fun MyChildren(navController: NavController, child: Child) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                navController.navigate("child_profile_screen/${child.ID}")
+                navController.navigate("child_profile_screen/${child.id}")
             }
             .padding(4.dp)
     ) {
@@ -333,7 +320,7 @@ fun MyChildren(navController: NavController, child: Child) {
                 modifier = Modifier
                     .size(50.dp)
                     .border(
-                        BorderStroke(4.dp, SolidColor(if (child.GoOutAlone) Green else Red)),
+                        BorderStroke(4.dp, SolidColor(if (child.goOutAlone) Green else Red)),
                         CircleShape
                     )
                     .padding(4.dp)
@@ -342,7 +329,7 @@ fun MyChildren(navController: NavController, child: Child) {
             )
 
             Text(
-                text = child.FullName,
+                text = child.fullName,
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp
@@ -364,7 +351,7 @@ fun MyChildren(navController: NavController, child: Child) {
                         onCheckedChange = { newCheckedState ->
                             isChecked = newCheckedState
                             if (instructorID != null) {
-                                SignUpViewModel.rollCall(child, newCheckedState)
+                                signUpViewModel.rollCall(child, newCheckedState)
                             }
                         },
                         modifier = Modifier.padding(end = 8.dp)
@@ -386,11 +373,10 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
     val expanded = remember { mutableStateOf(false) }
     val extraPadding = if (expanded.value) 10.dp else 0.dp
 
-    val SignUpViewModel: signUpViewModel = hiltViewModel()
-    val UserViewModel: UserViewModel = hiltViewModel()
-    var isChecked by remember { mutableStateOf(false) }
 
-    var expandedMenu by remember { mutableStateOf(false) }
+    val userViewModel: UserViewModel = hiltViewModel()
+
+
 
     var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var instructorID by remember { mutableStateOf("") }
@@ -404,21 +390,21 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
 
 
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            instructorID = UserViewModel.getCurrentUser().toString()
+            instructorID = userViewModel.getCurrentUser().toString()
 
-            myKids = instructorID?.let { UserViewModel.getChildByInstructorId(it) }!!
+            myKids = instructorID?.let { userViewModel.getChildByInstructorId(it) }!!
             // myKids = UserViewModel.getAllChildren()
 
-            user = UserViewModel.getCurrentUser()
-            result = user?.let { UserViewModel.findDocument(it) }
+            user = userViewModel.getCurrentUser()
+            result = user?.let { userViewModel.findDocument(it) }
 
             if (result != null) {
                 documentExists.value = result.toString()
             }
-            instructor = UserViewModel.getInstructorByChildId(child.ID)
-            instructorsList = UserViewModel.getAllInstructors()
+            instructor = userViewModel.getInstructorByChildId(child.id)
+            instructorsList = userViewModel.getAllInstructors()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -426,7 +412,7 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
 
     val imageUrlState = remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileEspecificImage(child.ID.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(child.id.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -439,7 +425,7 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
     Surface(
         //color = MaterialTheme.colorScheme.primary,
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-        onClick = {navController.navigate("child_profile_screen/${child.ID}")}
+        onClick = {navController.navigate("child_profile_screen/${child.id}")}
     ) {
 
         Row(modifier = Modifier.padding(24.dp)) {
@@ -450,7 +436,7 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
                 modifier = Modifier
                     .size(50.dp)
                     .border(
-                        BorderStroke(4.dp, SolidColor(if (child.GoOutAlone) Green else Red)),
+                        BorderStroke(4.dp, SolidColor(if (child.goOutAlone) Green else Red)),
                         CircleShape
                     )
                     .padding(4.dp)
@@ -463,23 +449,23 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
                     .weight(1f)
                     .padding(bottom = extraPadding, start = 10.dp)
             ) {
-                Text(text = child.FullName,  fontWeight = FontWeight.Bold)
+                Text(text = child.fullName,  fontWeight = FontWeight.Bold)
                 if (expanded.value) {
 
 
                         Text(text = "Animador: ", fontWeight = FontWeight.Bold )
 
-                        if(child.InstructorID.isNullOrEmpty()){
+                        if(child.instructorId.isNullOrEmpty()){
                             //Text("There is not instructor assigned to this child")
 
                                 CustomDropdownMenu(instructorsList, "", Color.DarkGray, onSelected = { selectedOption ->
-                                    UserViewModel.changeInstructor(child, instructorID)
+                                    userViewModel.changeInstructor(child, instructorID)
                                 })
 
                         }else{
                             instructor?.let {
-                                CustomDropdownMenu(instructorsList, it.FullName, Color.DarkGray, onSelected = { selectedOption ->
-                                    UserViewModel.changeInstructor(child, instructorID)
+                                CustomDropdownMenu(instructorsList, it.fullName, Color.DarkGray, onSelected = { selectedOption ->
+                                    userViewModel.changeInstructor(child, instructorID)
                                 })
                             }
                         }
@@ -487,13 +473,13 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
 
 
 
-                    if(child.FaithGroups){
+                    if(child.faithGroups){
                         Text(text = "Pertenece a grupos de fe")
                     }else{
                         Text(text = "No pertenece a grupos de fe")
                     }
 
-                    if(child.BelongsToSchool){
+                    if(child.belongsToSchool){
                         Text(text = "Pertenece al colegio")
                     }else{
                         Text(text = "No pertenece al colegio")
@@ -501,10 +487,10 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
 
                     Text(text = "Obervaciones: ", fontWeight = FontWeight.Bold )
 
-                    if(child.Observations.isNullOrEmpty()){
+                    if(child.observations.isNullOrEmpty()){
                         Text("No hay observaciones")
                     }else{
-                        child.Observations?.let { Text(text = it) }
+                        child.observations?.let { Text(text = it) }
                     }
 
 

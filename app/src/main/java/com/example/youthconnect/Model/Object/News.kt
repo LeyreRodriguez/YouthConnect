@@ -2,10 +2,10 @@ package com.example.youthconnect.Model.Object
 
 data class News(
     val id: String = "",
-    val Title: String = "",
-    val Description: String = "",
-    val Image: String? = null,
-    var Date: String? = null
+    val title: String = "",
+    val description: String = "",
+    val image: String? = null,
+    var date: String? = null
 )
 
 

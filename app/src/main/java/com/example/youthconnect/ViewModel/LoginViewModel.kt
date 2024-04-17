@@ -1,7 +1,6 @@
 package com.example.libraryapp.viewModel
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.libraryapp.model.firebaseAuth.SignInResult
@@ -13,8 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import java.util.concurrent.CancellationException
 
 class LoginViewModel: ViewModel() {
 

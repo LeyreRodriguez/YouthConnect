@@ -1,18 +1,18 @@
 package com.example.youthconnect.Model.Object
 
 data class Child(
-    val FullName: String,
-    val ID: String,
-    val Course: String,
-    val Password: String,
-    val BelongsToSchool: Boolean,
-    val FaithGroups: Boolean,
-    val GoOutAlone: Boolean,
-    val Observations: String? = null,
-    val ParentID: List<String>,
-    var InstructorID: String,
-    val State: Boolean,
-    val Score: Int? =  0,
-    val RollCall: List<String>? = emptyList()
+    val fullName: String,
+    val id: String,
+    val course: String,
+    val password: String,
+    val belongsToSchool: Boolean,
+    val faithGroups: Boolean,
+    val goOutAlone: Boolean,
+    val observations: String? = null,
+    val parentId: List<String>,
+    var instructorId: String,
+    val state: Boolean,
+    val score: Int? =  0,
+    val rollCall: List<String>? = emptyList()
 )
 

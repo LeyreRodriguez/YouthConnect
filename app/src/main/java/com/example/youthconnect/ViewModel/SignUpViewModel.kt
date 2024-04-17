@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class signUpViewModel @Inject constructor(
+class SignUpViewModel @Inject constructor(
     private val firestoreRepository: FirestoreRepository
 ): ViewModel(){
 

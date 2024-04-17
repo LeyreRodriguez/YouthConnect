@@ -80,16 +80,14 @@ import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.R
-import com.example.youthconnect.View.Components.CustomDropdownMenu
-import com.example.youthconnect.ViewModel.signUpViewModel
+import com.example.youthconnect.ViewModel.SignUpViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpView( navController: NavController) {
 
-    val signUpViewModel : signUpViewModel = hiltViewModel()
+    val signUpViewModel : SignUpViewModel = hiltViewModel()
 
 
-    //TODO Ver diferencias entre observeAsState() y collectAsState() y entender cual es mejor
     val shouldNavigate by signUpViewModel.navigateToNextScreen.collectAsState()
     val showFirstScreen by signUpViewModel.showFirstScreen2.collectAsState()
 
@@ -139,14 +137,14 @@ fun SignUpView( navController: NavController) {
                      childPassword : String) : Boolean{
         val passwordRegex = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#%\$^&+=./\\\\_-]).{8,}".toRegex()
 
-        val IDRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
+        val idRegex = "^[0-9]{8}[A-Za-z]$".toRegex()
 
         validateParentFullName = parentFullName.isNotBlank()
-        validateParentID = parentID.matches(IDRegex)
+        validateParentID = parentID.matches(idRegex)
         validateParentPhoneNumber = Patterns.PHONE.matcher(parentPhoneNumber).matches()
         validateParentPassword = parentPassword.matches(passwordRegex)
         validateChildFullName = childFullName.isNotBlank()
-        validateChildID = childID.matches(IDRegex)
+        validateChildID = childID.matches(idRegex)
         validateChildPassword = childPassword.matches(passwordRegex)
 
         return validateParentFullName && validateParentID && validateParentPhoneNumber && validateParentPassword && validateChildFullName && validateChildID && validateChildPassword
@@ -226,7 +224,7 @@ fun SignUpView( navController: NavController) {
         contentAlignment = Alignment.TopCenter,
     ) {
         Canvas(
-            modifier = Modifier.fillMaxSize(), // Llena todo el espacio del Box
+            modifier = Modifier.fillMaxSize(),
             onDraw = {
                 drawRect(brush)
             }

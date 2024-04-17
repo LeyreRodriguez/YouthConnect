@@ -73,26 +73,26 @@ fun NewsScreen(
     var news by remember { mutableStateOf<List<News?>>(emptyList()) }
     var user by remember { mutableStateOf<String?>("") }
 
-    val NewsViewModel : NewsViewModel = hiltViewModel()
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val newsViewModel : NewsViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
 
     val documentExists = remember { mutableStateOf("-1") }
     var result by remember { mutableStateOf<String?>("") }
     var showDialog by remember { mutableStateOf(false)  }
 
 
-    LaunchedEffect(NewsViewModel) {
+    LaunchedEffect(newsViewModel) {
         try {
-            news = NewsViewModel.getAllNews()
+            news = newsViewModel.getAllNews()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
 
-    LaunchedEffect(UserViewModel) {
+    LaunchedEffect(userViewModel) {
         try {
-            user = UserViewModel.getCurrentUser()
-            result = user?.let { UserViewModel.findDocument(it) }
+            user = userViewModel.getCurrentUser()
+            result = user?.let { userViewModel.findDocument(it) }
 
             if (result != null) {
                 documentExists.value = result.toString()
@@ -166,7 +166,6 @@ fun NewsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.BottomEnd
                 ){
-
                     RecyclerView(news = news, navController = navController)
 
                     if (documentExists.value == "0") {
@@ -215,13 +214,13 @@ fun userImage(user: String,
               navController: NavHostController,
               documentExists : String){
 
-    val UserViewModel : UserViewModel = hiltViewModel()
+    val userViewModel : UserViewModel = hiltViewModel()
 
 
 
     val imageUrlState = remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        UserViewModel.getProfileImage(
+        userViewModel.getProfileImage(
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -290,7 +289,7 @@ fun ListItem(news: News, navController: NavHostController) {
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            news.Image?.let {
+            news.image?.let {
                 CoilImage(
                     imageUrl = it,
                     contentDescription = null,
@@ -304,7 +303,7 @@ fun ListItem(news: News, navController: NavHostController) {
 
             Column{
                 Text(
-                    text = news.Title,
+                    text = news.title,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
@@ -314,10 +313,10 @@ fun ListItem(news: News, navController: NavHostController) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = if (news.Description.length > 50) {
-                        "${news.Description.take(50)}..."
+                    text = if (news.description.length > 50) {
+                        "${news.description.take(50)}..."
                     } else {
-                        news.Description
+                        news.description
                     }
                 )
 

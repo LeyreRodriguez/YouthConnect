@@ -146,48 +146,5 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
 }
 
 
-@SuppressLint("SuspiciousIndentation")
-@Composable
-fun SeeRollCall(onDismiss: () -> Unit, childId : String ) {
 
-
-    val UserViewModel : UserViewModel = hiltViewModel()
-
-    var rollCall by remember { mutableStateOf<List<String>?>(emptyList()) }
-
-
-    LaunchedEffect(UserViewModel) {
-        try {
-            rollCall = UserViewModel.getRollState(childId)
-        } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
-        }
-    }
-
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = { Icons.Outlined.Checklist },
-        title = { Text(text = "Dias asistidos a grupos de fe") },
-        text = {
-            LazyColumn(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(rollCall!!) { item ->
-                    Text(text = item)
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onDismiss()
-                }
-            ) {
-                Text("Cerrar")
-            }
-        }
-    )
-}
 
