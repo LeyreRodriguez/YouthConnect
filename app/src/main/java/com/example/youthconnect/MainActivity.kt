@@ -180,17 +180,7 @@ class MainActivity : ComponentActivity() {
 
                         LoginView(
                             navController = navController,
-                            state = state,
-                            onSignInClick = {
-                                lifecycleScope.launch {
-                                    val signInIntentSender = googleAuthUiClient.signIn()
-                                    launcher.launch(
-                                        IntentSenderRequest.Builder(
-                                            signInIntentSender ?: return@launch
-                                        ).build()
-                                    )
-                                }
-                            }
+                            state = state
 
                         )
                     }
@@ -419,7 +409,6 @@ class MainActivity : ComponentActivity() {
 
                     }
 
-                //    composable(route = "SpecificChild") { if (startRoute != null) { ChildProfileScreen(childId = startRoute) } }
                     composable(
                         route = "news_details_screen/{newsId}",
                         arguments = listOf(navArgument("newsId") { type = NavType.StringType })

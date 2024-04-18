@@ -121,34 +121,7 @@ fun QuizScreen( navController: NavHostController,
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
-        /*
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-            onDraw = {
-                // Dibuja un rectángulo blanco como fondo
-                drawRect(Color.White)
 
-                // Define el pincel para el borde con el gradiente del Brush
-                val borderBrush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFFE15554),
-                        Color(0xFF3BB273),
-                        Color(0xFFE1BC29),
-                        Color(0xFF4D9DE0)
-                    )
-                )
-
-                // Dibuja el borde con el pincel definido
-                drawRect(
-                    brush = borderBrush,
-                    topLeft = Offset(0f, 0f),
-                    size = Size(size.width, size.height),
-                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                )
-            }
-        )
-
-         */
         var showDialog by remember { mutableStateOf(false) }
 
         Box(
@@ -179,21 +152,8 @@ fun QuizScreen( navController: NavHostController,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
             ) {
-/*
-                Row (modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically){
-
-                    if (user.toString().isNotEmpty()) {
-                        userImage(user = user.toString(), navController = navController , documentExists.value)
-                    }
 
 
-                }
-
- */
                 Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
 
                 Text(
@@ -255,10 +215,10 @@ fun QuizScreen( navController: NavHostController,
                                             quizViewModel.resetScore(user.toString())
                                         }
 
-                                        if (currentQuestion != null) {
-                                            if (currentQuestion.answer.equals("OptionA")) {
+                                        if (currentQuestion != null && currentQuestion.answer.equals("OptionA")) {
+
                                                 user?.let { quizViewModel.updateScore(it) }
-                                            }
+
                                         }
 
                                         if (currentQuestionIndex == questions.size - 1) {
@@ -302,10 +262,10 @@ fun QuizScreen( navController: NavHostController,
                                             quizViewModel.resetScore(user.toString())
                                         }
 
-                                        if (currentQuestion != null) {
-                                            if (currentQuestion.answer.equals("OptionB")) {
+                                        if (currentQuestion != null && currentQuestion.answer.equals("OptionB")) {
+
                                                 user?.let { quizViewModel.updateScore(it) }
-                                            }
+
                                         }
                                         if (currentQuestionIndex == questions.size - 1) {
                                             navController.navigate("Scores")
@@ -355,10 +315,10 @@ fun QuizScreen( navController: NavHostController,
                                             quizViewModel.resetScore(user.toString())
                                         }
 
-                                        if (currentQuestion != null) {
-                                            if (currentQuestion.answer.equals("OptionC")) {
+                                        if (currentQuestion != null && currentQuestion.answer.equals("OptionC")) {
+
                                                 user?.let { quizViewModel.updateScore(it) }
-                                            }
+
                                         }
                                         if (currentQuestionIndex == questions.size - 1) {
                                             navController.navigate("Scores")
@@ -401,10 +361,10 @@ fun QuizScreen( navController: NavHostController,
                                             quizViewModel.resetScore(user.toString())
                                         }
 
-                                        if (currentQuestion != null) {
-                                            if (currentQuestion.answer.equals("OptionD")) {
+                                        if (currentQuestion != null && currentQuestion.answer.equals("OptionD") ) {
+
                                                 user?.let { quizViewModel.updateScore(it) }
-                                            }
+
                                         }
 
                                         if (currentQuestionIndex == questions.size - 1) {

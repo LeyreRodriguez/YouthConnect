@@ -38,7 +38,12 @@ fun BottomNavigation(
                     icon = {
                         Icon( imageVector = item.icon,
                             contentDescription = item.title,
-                            tint = if (item.title == "Noticias") Red else if (item.title == "Quiz") Green else if (item.title == "Chat") Yellow else Blue // Cambia el color del icono seleccionado
+                            tint = when (item.title) {
+                                "Noticias" -> Red
+                                "Quiz" -> Green
+                                "Chat" -> Yellow
+                                else -> Blue
+                            } // Cambia el color del icono seleccionado
                         )
                     },
                     label = {

@@ -60,7 +60,7 @@ import com.example.youthconnect.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavController, state : SignInState, onSignInClick: () -> Unit) {
+fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavController, state : SignInState) {
 
     val mcontext = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -268,7 +268,6 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                             ClickableText(
                                 text = AnnotatedString("Registrate aqui"),
                                 onClick = {
-                                    //mcontext.startActivity(Intent(mcontext,SignUp::class.java))
                                     navController.navigate("signup")
                                 },
                                 style = TextStyle(

@@ -224,7 +224,7 @@ fun userImage(user: String,
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
@@ -235,14 +235,19 @@ fun userImage(user: String,
             .size(50.dp)
             .clickable {
                 Log.e("USER", user)
-                if (documentExists == "0") {
-                    navController.navigate("instructor_profile_screen/${user}")
-                }  else if (documentExists == "1") {
-                    navController.navigate("parent_profile_screen/${user}")
-                } else if (documentExists == "2") {
-                    navController.navigate("child_profile_screen/${user}")
-                } else{
-                    navController.navigate("parent_profile_screen/${user}")
+                when (documentExists) {
+                    "0" -> {
+                        navController.navigate("instructor_profile_screen/${user}")
+                    }
+                    "1" -> {
+                        navController.navigate("parent_profile_screen/${user}")
+                    }
+                    "2" -> {
+                        navController.navigate("child_profile_screen/${user}")
+                    }
+                    else -> {
+                        navController.navigate("parent_profile_screen/${user}")
+                    }
                 }
 
             }

@@ -118,7 +118,7 @@ fun InstructorProfileScreen(instructorId : String,
 
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+            userViewModel.uploadProfileImage(uri, onSuccess = { _ ->
                 userViewModel.getProfileImage(
                     onSuccess = { fetchedUrl ->
                         imageUrlState.value = fetchedUrl
@@ -128,7 +128,7 @@ fun InstructorProfileScreen(instructorId : String,
                             Toast.LENGTH_LONG
                         ).show()
                     },
-                    onFailure = { exception ->
+                    onFailure = { _ ->
                         Toast.makeText(
                             context,
                             "Error al bajar la imagen",
@@ -136,7 +136,7 @@ fun InstructorProfileScreen(instructorId : String,
                         ).show()
                     }
                 )
-            }, onFailure = { exception ->
+            }, onFailure = { _ ->
                 Toast.makeText(
                     context,
                     "Error al subir la imagen",
@@ -161,7 +161,7 @@ fun InstructorProfileScreen(instructorId : String,
                                 Toast.LENGTH_LONG
                             ).show()
                         },
-                        onFailure = { exception ->
+                        onFailure = { _ ->
                             Toast.makeText(
                                 context,
                                 "Error al bajar la imagen",
@@ -169,7 +169,7 @@ fun InstructorProfileScreen(instructorId : String,
                             ).show()
                         }
                     )
-                }, onFailure = { exception ->
+                }, onFailure = { _ ->
                     Toast.makeText(
                         context,
                         "Error al subir la imagen",
@@ -185,7 +185,7 @@ fun InstructorProfileScreen(instructorId : String,
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
@@ -264,7 +264,6 @@ fun InstructorProfileScreen(instructorId : String,
                             .size(80.dp)
                             .padding(15.dp)
                             .clickable {
-                                //navController.navigate(NavScreen.AddInstructor.name)
                                 showDialog = true
                             }
                             .border(

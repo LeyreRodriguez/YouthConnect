@@ -57,143 +57,153 @@ android {
     }
 }
 
+
+val firestore = "24.9.1"
+val auth = "22.2.0"
+val storage = "20.3.0"
+val firebase = "32.5.0"
+val analytics = "21.5.0"
+val scanner = "16.1.0"
+val barcode = "18.3.0"
+val playServicesAuth = "19.2.0"
+val activityCompose = "1.8.0"
+val composeMaterial = "1.2.1"
+val composeMaterial2 = "1.4.2"
+val icons = "1.5.4"
+val hilt = "1.0.0"
+val viewmodelCompose = "2.6.1"
+val viewmodelCompose2 = "2.6.0"
+val navigationCompose = "2.4.1"
+val bom = "2023.03.00"
+val livedata = "1.3.2"
+val camera = "1.0.2"
+val cameraView = "1.0.0-alpha31"
+val ktor = "2.3.6"
+val appCompact = "1.6.1"
+val constraintLayout = "2.1.4"
+val material = "1.10.0"
+val coil = "2.4.0"
+val pager = "0.32.0"
+val permission = "0.31.3-beta"
+val imageCropper = "4.5.0"
+val jUnit = "4.13.2"
+val mockito = "3.11.2"
+val jUnit2 = "1.1.5"
+val espresso = "3.5.1"
+val testng = "6.9.6"
+val zxing = "3.4.1"
+val zxing2 = "4.3.0"
+val ktx = "1.9.0"
+val lifeCycle = "2.6.2"
+val lifeCycle2 = "2.4.0"
+val navigation = "2.7.5"
+val navigationCompose2 = "2.5.3"
+val daggerHilt = "2.48.1"
+val activityCompose2 = "1.5.0"
+val activityKtx= "1.4.0"
+
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.0")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+
+    //Firebase
+    implementation("com.google.firebase:firebase-firestore:$firestore")
+    implementation("com.google.firebase:firebase-auth:$auth")
+    implementation("com.google.firebase:firebase-storage:$storage")
+    implementation("com.google.firebase:firebase-database:$storage")
+    implementation(platform("com.google.firebase:firebase-bom:$firebase"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation ("com.google.firebase:firebase-analytics:$analytics")
+    implementation("com.google.firebase:firebase-messaging")
+
+    //GooglePlay Services
+    implementation("com.google.android.gms:play-services-code-scanner:$scanner")
+    implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:$barcode")
+    implementation("com.google.android.gms:play-services-auth:$playServicesAuth")
+
+
+    //Jetpack Compose
+    implementation("androidx.activity:activity-compose:$activityCompose")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("com.google.firebase:firebase-firestore:24.9.1")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("com.google.firebase:firebase-auth:22.2.0")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("com.google.firebase:firebase-storage:20.3.0")
-    implementation("androidx.wear.compose:compose-material:1.2.1")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.0")
-    implementation("com.google.android.gms:play-services-auth:19.2.0")
-    implementation("com.google.android.material:material:1.10.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.5")
-    implementation("com.google.firebase:firebase-database:20.3.0")
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.mockito:mockito-core:3.11.2")
-    testImplementation("org.mockito:mockito-inline:3.11.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("androidx.wear.compose:compose-material:$composeMaterial")
+    implementation("androidx.compose.material:material-icons-extended:$icons")   //Icons
+    implementation ("androidx.compose.material:material:$composeMaterial2")  //Navigation
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("androidx.hilt:hilt-navigation-compose:$hilt")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$viewmodelCompose")
+    implementation ("androidx.navigation:navigation-compose:$navigationCompose") // Usa la última versión disponible
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:$viewmodelCompose2")
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:$viewmodelCompose2")
+    implementation(platform("androidx.compose:compose-bom:$bom"))
+    implementation("androidx.compose.runtime:runtime-livedata:$livedata")
 
-
-    //Iconos extendidos
-    implementation("androidx.compose.material:material-icons-extended:1.5.4")
-
-
-
-    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
-    implementation("com.google.firebase:firebase-analytics")
-
-
-
-    implementation("io.coil-kt:coil-compose:2.4.0") // Asegúrate de usar la versión más reciente de Coil Compose
-
-
-    // QR
-
-    implementation("com.google.zxing:core:3.4.1")
-
-    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-
-
-    //bar code scanner
-    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
-
-
-    // Jetpack Compose
-    implementation("androidx.activity:activity-compose:1.5.0")
 
     // CameraX
-    implementation ("androidx.camera:camera-camera2:1.0.2")
-    implementation ("androidx.camera:camera-lifecycle:1.0.2")
-    implementation ("androidx.camera:camera-view:1.0.0-alpha31")
+    implementation ("androidx.camera:camera-camera2:$camera")
+    implementation ("androidx.camera:camera-lifecycle:$camera")
+    implementation ("androidx.camera:camera-view:$cameraView")
+
+
+    // Networking
+
+    implementation ("io.ktor:ktor-client-android:$ktor")
+    implementation ("io.ktor:ktor-client-json-jvm:$ktor")
+    implementation ("io.ktor:ktor-client-serialization-jvm:$ktor")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+
+
+    // UI Enchancements
+
+    implementation("androidx.appcompat:appcompat:$appCompact")
+    implementation("androidx.constraintlayout:constraintlayout:$constraintLayout")
+    implementation("com.google.android.material:material:$material")
+    implementation("io.coil-kt:coil-compose:$coil")
+    implementation ("com.google.accompanist:accompanist-pager:$pager")
+    implementation ("com.google.accompanist:accompanist-permissions:$permission")
+    implementation ("com.vanniktech:android-image-cropper:$imageCropper")
+
+
+    // Testing
+    testImplementation("junit:junit:$jUnit")
+    testImplementation("org.mockito:mockito-core:$mockito")
+    testImplementation("org.mockito:mockito-inline:$mockito")
+    androidTestImplementation("androidx.test.ext:junit:$jUnit2")
+    androidTestImplementation("androidx.test.espresso:espresso-core:$espresso")
+    androidTestImplementation(platform("androidx.compose:compose-bom:$bom"))
+    androidTestImplementation("org.testng:testng:$testng")
+
+
+    // QR & Barcode Scanning
+    implementation("com.google.zxing:core:$zxing")
+    implementation("com.journeyapps:zxing-android-embedded:$zxing2")
+
+
+    //AndroidX Core y lifecycle
+
+    implementation("androidx.core:core-ktx:$ktx")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifeCycle")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:$lifeCycle2")
+
+
 
     //Navigation
-    implementation ("androidx.compose.material:material:1.4.2")
-    implementation ("com.google.dagger:hilt-android:2.48.1")
-    androidTestImplementation("org.testng:testng:6.9.6")
-    kapt ("com.google.dagger:hilt-compiler:2.48.1")
 
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:$navigation")
+    implementation("androidx.navigation:navigation-ui-ktx:$navigation")
+    implementation ("androidx.navigation:navigation-compose:$navigationCompose2")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-    implementation ("androidx.navigation:navigation-compose:2.4.1") // Usa la última versión disponible
+    //Dagger Hilt
+    implementation ("com.google.dagger:hilt-android:$daggerHilt")
+    kapt ("com.google.dagger:hilt-compiler:$daggerHilt")
 
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
+    // Activity Compose
 
-    implementation ("androidx.navigation:navigation-compose:2.5.3")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
-
-    implementation ("io.ktor:ktor-client-android:2.3.6")
-    implementation ("io.ktor:ktor-client-json-jvm:2.3.6")
-    implementation ("io.ktor:ktor-client-serialization-jvm:2.3.6")
-    implementation("io.ktor:ktor-server-content-negotiation:2.3.6")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.6")
-
-
-    implementation ("com.google.accompanist:accompanist-pager:0.32.0")
-
-
-//Progress bar
-    implementation ("androidx.activity:activity-ktx:1.4.0")
-
-    implementation ("androidx.activity:activity-ktx:1.4.0")
-
-    implementation ("io.ktor:ktor-client-android:2.3.6")
-    implementation ("io.ktor:ktor-client-json-jvm:2.3.6")
-    implementation ("io.ktor:ktor-client-serialization-jvm:2.3.6")
-    implementation("io.ktor:ktor-server-content-negotiation:2.3.6")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.6")
-
-
-    implementation ("com.google.accompanist:accompanist-pager:0.32.0")
-
-    //Accompanist
-    implementation ("com.google.accompanist:accompanist-permissions:0.31.3-beta")
-    implementation ("com.vanniktech:android-image-cropper:4.5.0")
-
-    implementation("androidx.compose.runtime:runtime-livedata:1.3.2")
-    implementation ("com.google.firebase:firebase-analytics:21.5.0")
-    implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.firebase:firebase-analytics")
-
-
+    implementation("androidx.activity:activity-compose:$activityCompose2")
+    implementation ("androidx.activity:activity-ktx:$activityKtx")
+    implementation ("androidx.activity:activity-ktx:$activityKtx")
 
 
 }

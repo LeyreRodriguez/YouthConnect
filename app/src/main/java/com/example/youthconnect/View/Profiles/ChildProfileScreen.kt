@@ -135,7 +135,7 @@ fun ChildProfileScreen(
 
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+            userViewModel.uploadProfileImage(uri, onSuccess = { _ ->
                 userViewModel.getProfileImage(
                     onSuccess = { fetchedUrl ->
                         imageUrlState.value = fetchedUrl
@@ -145,7 +145,7 @@ fun ChildProfileScreen(
                             Toast.LENGTH_LONG
                         ).show()
                     },
-                    onFailure = { exception ->
+                    onFailure = { _ ->
                         Toast.makeText(
                             context,
                             "Error al bajar la imagen",
@@ -153,7 +153,7 @@ fun ChildProfileScreen(
                         ).show()
                     }
                 )
-            }, onFailure = { exception ->
+            }, onFailure = { _ ->
                 Toast.makeText(
                     context,
                     "Error al subir la imagen",
@@ -168,7 +168,7 @@ fun ChildProfileScreen(
         if (success) {
             // Aquí manejas la imagen capturada usando imageUri
             imageUri?.let { uri ->
-                userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+                userViewModel.uploadProfileImage(uri, onSuccess = { _ ->
                     userViewModel.getProfileImage(
                         onSuccess = { fetchedUrl ->
                             imageUrlState.value = fetchedUrl
@@ -178,7 +178,7 @@ fun ChildProfileScreen(
                                 Toast.LENGTH_LONG
                             ).show()
                         },
-                        onFailure = { exception ->
+                        onFailure = { _ ->
                             Toast.makeText(
                                 context,
                                 "Error al bajar la imagen",
@@ -186,7 +186,7 @@ fun ChildProfileScreen(
                             ).show()
                         }
                     )
-                }, onFailure = { exception ->
+                }, onFailure = { _ ->
                     Toast.makeText(
                         context,
                         "Error al subir la imagen",
@@ -202,7 +202,7 @@ fun ChildProfileScreen(
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
@@ -449,7 +449,6 @@ fun ChildProfileScreen(
                         )
 
 
-                        //val parentState = listOf<String>("Florencio Rodriguez Rodriguez", "Juani Quintana Monroy")
                         LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
                             items(items = parents) { item ->
                                 item?.fullName?.let { Text(text = it) }
@@ -472,7 +471,6 @@ fun ChildProfileScreen(
                                 letterSpacing = 0.9.sp,
                             )
                         )
-                        // val numbers = listOf<String>("680806622", "635556961")
 
                         LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
                             items(items = parents) { item ->
@@ -485,7 +483,6 @@ fun ChildProfileScreen(
                 }
 
                 Spacer(modifier = Modifier.size(40.dp))
-               // Log.i("AWA", child.ID)
                 DisplayQRCode(childId)
 
                 if (documentExists.value == "0") {

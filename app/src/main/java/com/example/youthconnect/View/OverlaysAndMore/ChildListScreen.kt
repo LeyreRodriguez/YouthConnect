@@ -36,6 +36,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +63,8 @@ import com.example.youthconnect.R
 import com.example.youthconnect.View.Components.CustomDropdownMenu
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ViewModel.SignUpViewModel
+import com.example.youthconnect.ui.theme.Blue
+import com.example.youthconnect.ui.theme.Blue50
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import java.time.LocalDate
@@ -156,52 +159,8 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
             modifier = Modifier.fillMaxSize(),
         ) {
 
-            /*
-            Canvas(
-                modifier = Modifier.fillMaxSize(),
-                onDraw = {
-                    // Dibuja un rectángulo blanco como fondo
-                    drawRect(Color.White)
-
-                    // Define el pincel para el borde con el gradiente del Brush
-                    val borderBrush = Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFFE15554),
-                            Color(0xFF3BB273),
-                            Color(0xFFE1BC29),
-                            Color(0xFF4D9DE0)
-                        )
-                    )
-
-                    // Dibuja el borde con el pincel definido
-                    drawRect(
-                        brush = borderBrush,
-                        topLeft = Offset(0f, 0f),
-                        size = Size(size.width, size.height),
-                        style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                    )
-                }
-            )
-
-
-             */
-
             Column(modifier = Modifier.fillMaxHeight()) {
-/*
-                Row (modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(30.dp),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically){
 
-                    if (user.toString().isNotEmpty()) {
-                        userImage(user = user.toString(), navController = navController , documentExists.value)
-                    }
-
-
-                }
-
- */
                 Column(horizontalAlignment = Alignment.CenterHorizontally){
                     Text(
                         text = "Lista de niños",
@@ -292,7 +251,7 @@ fun MyChildren(navController: NavController, child: Child) {
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
@@ -416,14 +375,13 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
     }
 
     Surface(
-        //color = MaterialTheme.colorScheme.primary,
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp),
         onClick = {navController.navigate("child_profile_screen/${child.id}")}
     ) {
@@ -449,23 +407,29 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
                     .weight(1f)
                     .padding(bottom = extraPadding, start = 10.dp)
             ) {
-                Text(text = child.fullName,  fontWeight = FontWeight.Bold)
+                val faithGroupsState = rememberUpdatedState(child.faithGroups)
+
+                val nameColor = if (faithGroupsState.value && child.instructorId.isNullOrEmpty()) Blue else Color.Black
+
+                Text(text = child.fullName, fontWeight = FontWeight.Bold, color = nameColor)
+
+
                 if (expanded.value) {
 
 
                         Text(text = "Animador: ", fontWeight = FontWeight.Bold )
 
                         if(child.instructorId.isNullOrEmpty()){
-                            //Text("There is not instructor assigned to this child")
-
-                                CustomDropdownMenu(instructorsList, "", Color.DarkGray, onSelected = { selectedOption ->
+                                CustomDropdownMenu(instructorsList, "", Color.DarkGray, onSelected = { _ ->
                                     userViewModel.changeInstructor(child, instructorID)
+                                    navController.navigate(NavScreen.ChildList.name + "/${instructorID}")
                                 })
 
                         }else{
                             instructor?.let {
-                                CustomDropdownMenu(instructorsList, it.fullName, Color.DarkGray, onSelected = { selectedOption ->
+                                CustomDropdownMenu(instructorsList, it.fullName, Color.DarkGray, onSelected = { _ ->
                                     userViewModel.changeInstructor(child, instructorID)
+                                    navController.navigate(NavScreen.ChildList.name + "/${instructorID}")
                                 })
                             }
                         }

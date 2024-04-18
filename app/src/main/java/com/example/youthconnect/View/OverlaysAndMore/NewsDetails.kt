@@ -64,7 +64,7 @@ fun NewsDetails(
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )

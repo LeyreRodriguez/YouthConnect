@@ -108,7 +108,7 @@ fun ParentsProfileScreen(parentId : String,
 
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
+            userViewModel.uploadProfileImage(uri, onSuccess = { _ ->
                 userViewModel.getProfileImage(
                     onSuccess = { fetchedUrl ->
                         imageUrlState.value = fetchedUrl
@@ -118,7 +118,7 @@ fun ParentsProfileScreen(parentId : String,
                             Toast.LENGTH_LONG
                         ).show()
                     },
-                    onFailure = { exception ->
+                    onFailure = { _ ->
                         Toast.makeText(
                             context,
                             "Error al bajar la imagen",
@@ -126,7 +126,7 @@ fun ParentsProfileScreen(parentId : String,
                         ).show()
                     }
                 )
-            }, onFailure = { exception ->
+            }, onFailure = { _ ->
                 Toast.makeText(
                     context,
                     "Error al subir la imagen",
@@ -151,7 +151,7 @@ fun ParentsProfileScreen(parentId : String,
                                 Toast.LENGTH_LONG
                             ).show()
                         },
-                        onFailure = { exception ->
+                        onFailure = { _ ->
                             Toast.makeText(
                                 context,
                                 "Error al bajar la imagen",
@@ -159,7 +159,7 @@ fun ParentsProfileScreen(parentId : String,
                             ).show()
                         }
                     )
-                }, onFailure = { exception ->
+                }, onFailure = { _ ->
                     Toast.makeText(
                         context,
                         "Error al subir la imagen",
@@ -175,7 +175,7 @@ fun ParentsProfileScreen(parentId : String,
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )

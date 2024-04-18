@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.youthconnect.Model.Enum.Course
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
@@ -54,22 +55,28 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
     var telephone by remember { mutableStateOf("")}
     val listState = rememberLazyListState()
 
-    if (item is Instructor){
-         fullName = item.fullName
+    when (item) {
+        is Instructor -> {
+            fullName = item.fullName
 
-    } else if (item is Child){
-         childFullName = item.fullName
+        }
 
-         course = item.course
-         belongsToSchool = item.belongsToSchool
-         faithGroups  = item.faithGroups
-         goOutAlone = item.goOutAlone
-         observations  = item.observations.toString()
-    } else if (item is Parent){
-         parentFullName =item.fullName
+        is Child -> {
+            childFullName = item.fullName
 
-         telephone = item.phoneNumber
+            course = item.course
+            belongsToSchool = item.belongsToSchool
+            faithGroups  = item.faithGroups
+            goOutAlone = item.goOutAlone
+            observations  = item.observations.toString()
+        }
 
+        is Parent -> {
+            parentFullName =item.fullName
+
+            telephone = item.phoneNumber
+
+        }
     }
 
 
@@ -153,8 +160,11 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
 
                             )
 
+                            println(course)
+                            println(Course.fromString(course))
 
-                            CoursesSelectionScreen(course, { course = it.name})
+                            Course.fromString(course)
+                                ?.let { CoursesSelectionScreen(it) { course = it.name } }
 
                             CustomRadioButton(editedBelongsToSchool, onBelongsToSchool = { editedBelongsToSchool = it }, "¿Pertenece al colegio?")
 

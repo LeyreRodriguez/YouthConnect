@@ -279,7 +279,7 @@ fun SignUpView( navController: NavController) {
                                 )
                             }
                             item {
-                                CoursesSelectionScreen(childCourse, { childCourse = it.name})
+                                CoursesSelectionScreen(Course.TerceroEP){  childCourse = it.name }
 
 
                             }
@@ -570,7 +570,7 @@ fun CustomRadioButton(belongsToSchool: Boolean,
                         no.value = false
                         onBelongsToSchool(yes.value)
                     })
-                Text(text = "Yes", fontSize = 18.sp)
+                Text(text = "Si", fontSize = 18.sp)
             }
             Column(
                 modifier = Modifier.wrapContentSize(),
@@ -592,12 +592,12 @@ fun CustomRadioButton(belongsToSchool: Boolean,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoursesSelectionScreen(childCourse: String, onChildCourseChange : (Course) -> Unit) {
+fun CoursesSelectionScreen(selectedCourse: Course, onChildCourseChange : (Course) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf(Course.values()[0]) }
+    var selectedText by remember(selectedCourse) { mutableStateOf(selectedCourse) }
     // Dropdown menu
     OutlinedTextField(
-        value = selectedText.name,
+        value = selectedText.displayName,
         onValueChange = {},
         modifier = Modifier
             .fillMaxWidth()
@@ -620,7 +620,7 @@ fun CoursesSelectionScreen(childCourse: String, onChildCourseChange : (Course) -
             DropdownMenuItem(
                 modifier = Modifier
                     .fillMaxWidth(), // Hace que el DropdownMenuItem ocupe el ancho máximo disponible
-                text = { Text(text = course.name) },
+                text = { Text(text = course.displayName) },
                 onClick = {
                     selectedText = course
                     expanded = false

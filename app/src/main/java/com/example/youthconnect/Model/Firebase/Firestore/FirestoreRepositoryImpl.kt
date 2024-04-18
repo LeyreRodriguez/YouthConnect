@@ -61,8 +61,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 faithGroups = document.getBoolean("faithGroups") ?: false,
                 goOutAlone = document.getBoolean("goOutAlone") ?: false,
                 observations = document.getString("observations") ?: "",
-                parentId = document.get("parentID") as? List<String> ?: emptyList(),
-                instructorId = document.getString("instructorID") ?: "",
+                parentId = document.get("parentId") as? List<String> ?: emptyList(),
+                instructorId = document.getString("instructorId") ?: "",
                 state = document.getBoolean("state") ?: false,
                 score = document.getLong("score")?.toInt() ?: null,
                 rollCall = document.get("rollCall") as? List<String> ?: emptyList()
@@ -89,8 +89,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                         faithGroups = document.getBoolean("faithGroups") ?: false,
                         goOutAlone = document.getBoolean("goOutAlone") ?: false,
                         observations = document.getString("observations") ?: "",
-                        parentId = document.get("parentID") as? List<String> ?: emptyList(),
-                        instructorId = document.getString("instructorID") ?: "",
+                        parentId = document.get("parentId") as? List<String> ?: emptyList(),
+                        instructorId = document.getString("instructorId") ?: "",
                         state = document.getBoolean("state") ?: false,
                         score = document.getLong("score")?.toInt() ?: null,
                         rollCall = document.get("rollCall") as? List<String> ?: emptyList()
@@ -105,7 +105,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun getChildByInstructorId(instructorId: String): List<Child?> {
         return try {
             firebaseFirestore.collection("Child")
-                .whereEqualTo("instructorID", instructorId)
+                .whereEqualTo("instructorId", instructorId)
                 .get()
                 .await()
                 .documents
@@ -119,8 +119,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                         faithGroups = document.getBoolean("faithGroups") ?: false,
                         goOutAlone = document.getBoolean("goOutAlone") ?: false,
                         observations = document.getString("observations") ?: "",
-                        parentId = document.get("parentID") as? List<String> ?: emptyList(),
-                        instructorId = document.getString("instructorID") ?: "",
+                        parentId = document.get("parentId") as? List<String> ?: emptyList(),
+                        instructorId = document.getString("instructorId") ?: "",
                         state = document.getBoolean("state") ?: false,
                         score = document.getLong("score")?.toInt() ?: null,
                         rollCall = document.get("rollCall") as? List<String> ?: emptyList()
@@ -135,7 +135,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun getChildByInstructorIdThatIsInSchool(instructorId: String): List<Child?> {
         return try {
             firebaseFirestore.collection("Child")
-                .whereEqualTo("instructorID", instructorId)
+                .whereEqualTo("instructorId", instructorId)
                 .whereEqualTo("state", true)
                 .get()
                 .await()
@@ -150,8 +150,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                         faithGroups = document.getBoolean("faithGroups") ?: false,
                         goOutAlone = document.getBoolean("goOutAlone") ?: false,
                         observations = document.getString("observations") ?: "",
-                        parentId = document.get("parentID") as? List<String> ?: emptyList(),
-                        instructorId = document.getString("instructorID") ?: "",
+                        parentId = document.get("parentId") as? List<String> ?: emptyList(),
+                        instructorId = document.getString("instructorId") ?: "",
                         state = document.getBoolean("state") ?: false,
                         score = document.getLong("score")?.toInt() ?: null,
                         rollCall = document.get("rollCall") as? List<String> ?: emptyList()
@@ -166,7 +166,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun getChildByParentsId(parentID : String) : List<Child?>{
         return try {
             firebaseFirestore.collection("Child")
-                .whereArrayContains("parentID", parentID)
+                .whereArrayContains("parentId", parentID)
                 .get()
                 .await()
                 .documents
@@ -180,8 +180,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                         faithGroups = document.getBoolean("faithGroups") ?: false,
                         goOutAlone = document.getBoolean("goOutAlone") ?: false,
                         observations = document.getString("observations") ?: "",
-                        parentId = document.get("parentID") as? List<String> ?: emptyList(),
-                        instructorId = document.getString("instructorID") ?: "",
+                        parentId = document.get("parentId") as? List<String> ?: emptyList(),
+                        instructorId = document.getString("instructorId") ?: "",
                         state = document.getBoolean("state") ?: false,
                         score = document.getLong("score")?.toInt() ?: null,
                         rollCall = document.get("rollCall") as? List<String> ?: emptyList()
@@ -204,8 +204,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 faithGroups = document.getBoolean("faithGroups") ?: false,
                 goOutAlone = document.getBoolean("goOutAlone") ?: false,
                 observations = document.getString("observations") ?: "",
-                parentId = document.get("parentID") as? List<String> ?: emptyList(),
-                instructorId = document.getString("instructorID") ?: "",
+                parentId = document.get("parentId") as? List<String> ?: emptyList(),
+                instructorId = document.getString("instructorId") ?: "",
                 state = document.getBoolean("state") ?: false,
                 score = document.getLong("score")?.toInt() ?: null,
                 rollCall = document.get("rollCall") as? List<String> ?: emptyList()
@@ -364,7 +364,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 password = document.getString("password") ?: "",
                 score = document.getLong("score")?.toInt() ?: null
             )
-          //  document.toObject(Instructor::class.java)
         } catch (e: Exception) {
             Log.e("FirestoreRepository", "getChild failed with $e")
             null
@@ -375,7 +374,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun getInstructorByChildId(childId: String): Instructor? {
         return try {
             val document = firebaseFirestore.collection("Child").document(childId).get().await()
-            val instructorId = document.getString("instructorID")
+            val instructorId = document.getString("instructorId")
             if (instructorId != null && instructorId.isNotEmpty()) {
                 val instructorDocument = firebaseFirestore.collection("Instructor").document(instructorId).get().await()
                 Instructor(
@@ -400,11 +399,11 @@ class FirestoreRepositoryImpl @Inject constructor(
         documentRef.get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
-                    val currentParentIds = document.get("parentID") as? List<String> ?: emptyList()
+                    val currentParentIds = document.get("parentId") as? List<String> ?: emptyList()
                     val newParentsId = currentParentIds + child.parentId
 
                     val updates = hashMapOf<String, Any>(
-                        "parentID" to newParentsId
+                        "parentId" to newParentsId
                         // Puedes agregar más campos según sea necesario
                     )
 
@@ -414,7 +413,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                             // La actualización fue exitosa
                             Log.i("Actualizacion", "completada")
                         }
-                        .addOnFailureListener { exception ->
+                        .addOnFailureListener { _ ->
                             Log.i("Actualizacion", "no completada")
                         }
 
@@ -441,11 +440,7 @@ class FirestoreRepositoryImpl @Inject constructor(
         // Realiza la consulta para obtener el documento
         documentRef.get()
             .addOnSuccessListener { document ->
-                if (document.exists()) {
-
-                } else {
-                    // El documento no existe
-
+                if (!document.exists()) {
                     firebaseFirestore.collection("Parents")
                         .document(parent.id)
                         .set(parent)
@@ -481,7 +476,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun addInstructorToChild(child: Child, instructorID: String) {
         val childDocument = firebaseFirestore.collection("Child").document(child.id)
         // Actualizar el valor de instructorId en el documento
-        childDocument.update("instructorID", instructorID)
+        childDocument.update("instructorId", instructorID)
 
     }
 
@@ -511,13 +506,11 @@ class FirestoreRepositoryImpl @Inject constructor(
                             // La actualización fue exitosa
                             Log.i("Actualizacion", "completada")
                         }
-                        .addOnFailureListener { exception ->
+                        .addOnFailureListener { _ ->
                             Log.i("Actualizacion", "no completada")
                         }
 
                     val data = document.data
-                } else {
-
                 }
             }
 
@@ -580,7 +573,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun removeInstructorFromChild(child: Child, instructorID: String) {
         val childDocument = firebaseFirestore.collection("Child").document(child.id)
         // Actualizar el valor de instructorId en el documento
-        childDocument.update("instructorID", "")
+        childDocument.update("instructorId", "")
     }
 
     override suspend fun getUser(): UserData? {

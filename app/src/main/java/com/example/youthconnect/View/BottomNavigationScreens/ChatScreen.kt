@@ -157,7 +157,7 @@ fun UserEachRow(
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 print("Child not found")
             }
         )
@@ -449,7 +449,7 @@ fun Recipient(userData: UserData, navController : NavController){
             onSuccess = { url ->
                 imageUrlState.value = url
             },
-            onFailure = { exception ->
+            onFailure = { _ ->
                 // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
