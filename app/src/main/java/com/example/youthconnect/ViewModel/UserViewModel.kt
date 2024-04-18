@@ -3,7 +3,6 @@ package com.example.youthconnect.ViewModel
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -63,7 +62,6 @@ class UserViewModel @Inject constructor(
             document = firestoreRepository.getCurrentUser()
             return document
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getCurrentUser", e)
             return null
         }
     }
@@ -73,7 +71,6 @@ class UserViewModel @Inject constructor(
             user = firestoreRepository.getUserById(id)
             user
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getUserById", e)
             null
         }
     }
@@ -87,7 +84,6 @@ class UserViewModel @Inject constructor(
             document = firestoreRepository.findDocument(userId)
             return document
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en findDocument", e)
             return null
         }
     }
@@ -102,7 +98,6 @@ class UserViewModel @Inject constructor(
             return searchedChild
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getAllChildren", e)
             return emptyList()
         }
     }
@@ -117,7 +112,6 @@ class UserViewModel @Inject constructor(
             return allInstructor
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getAllChildren", e)
             return emptyList()
         }
     }
@@ -131,7 +125,6 @@ class UserViewModel @Inject constructor(
             return allChild
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getChildByInstructorId", e)
             return emptyList()
         }
     }
@@ -144,7 +137,6 @@ class UserViewModel @Inject constructor(
             return allChild
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getChildByInstructorId", e)
             return emptyList()
         }
     }
@@ -159,7 +151,6 @@ class UserViewModel @Inject constructor(
             return instructor
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getChildByInstructorId", e)
             return null
         }
     }
@@ -175,7 +166,6 @@ class UserViewModel @Inject constructor(
             return allChild
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getChildByParentsId", e)
             return emptyList()
         }
     }
@@ -186,7 +176,6 @@ class UserViewModel @Inject constructor(
             child = firestoreRepository.getCurrentChildById(childId)
             return child
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getCurrentChildById", e)
             return null
         }
     }
@@ -196,7 +185,6 @@ class UserViewModel @Inject constructor(
             parent = firestoreRepository.getCurrentUserById(parentID)
             return parent
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getCurrentUserById", e)
             return null
         }
     }
@@ -208,11 +196,9 @@ class UserViewModel @Inject constructor(
             if (allParents.isEmpty()){
                 allParents = firestoreRepository.getParentsByParentsID(parentsID)
             }
-           // searchedChild = allChild
             return allParents
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getParentsByParentsID", e)
             return emptyList()
         }
     }
@@ -222,7 +208,6 @@ class UserViewModel @Inject constructor(
             instructor = firestoreRepository.getCurrentInstructorById(instructorID)
             return  instructor
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getCurrentInstructorById", e)
             null
         }
     }
@@ -233,8 +218,6 @@ class UserViewModel @Inject constructor(
             firestoreRepository.changeState(childId)
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en changeState", e)
-
         }
     }
 
@@ -267,7 +250,6 @@ class UserViewModel @Inject constructor(
     fun getProfileEspecificImage(email: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         viewModelScope.launch {
 
-            Log.i("USERx", email)
             val userId = email
             if (userId != null) {
                 try {
@@ -303,7 +285,6 @@ class UserViewModel @Inject constructor(
         try {
             return firestoreRepository.getAllUser()
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getCurrentUser", e)
             return null
         }
     }
@@ -334,7 +315,6 @@ class UserViewModel @Inject constructor(
             firestoreRepository.updateUser(user)
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en changeState", e)
 
         }
     }

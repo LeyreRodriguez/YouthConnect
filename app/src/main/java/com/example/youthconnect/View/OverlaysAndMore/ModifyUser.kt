@@ -135,14 +135,14 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
             LazyColumn(state = listState) {
                 item{
 
-
+                    val name = "Nombre Completo"
                     when(item){
                         is Instructor ->{
                             CustomOutlinedTextField(
                                 value = editedFullName ?: "",
                                 onValueChange = { editedFullName = it },
 
-                                label = "Nombre completo",
+                                label = name,
                                 leadingIconImageVector = Icons.Default.PermIdentity
 
                             )
@@ -155,13 +155,11 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
                                 value = editedChildFullName ?: "",
                                 onValueChange = { editedChildFullName = it },
 
-                                label = "Nombre completo",
+                                label = name,
                                 leadingIconImageVector = Icons.Default.PermIdentity
 
                             )
 
-                            println(course)
-                            println(Course.fromString(course))
 
                             Course.fromString(course)
                                 ?.let { CoursesSelectionScreen(it) { course = it.name } }
@@ -185,7 +183,7 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
                             value = editedParentsFullName ?: "",
                             onValueChange = { editedParentsFullName = it },
 
-                            label = "Nombre completo",
+                            label = name,
                             leadingIconImageVector = Icons.Default.PermIdentity
 
                         )

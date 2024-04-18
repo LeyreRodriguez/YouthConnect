@@ -1,6 +1,5 @@
 package com.example.youthconnect.Model.Firebase.Firestore
 
-import android.util.Log
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
@@ -68,7 +67,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 rollCall = document.get("rollCall") as? List<String> ?: emptyList()
             )
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChild failed with $e")
             null
         }
     }
@@ -97,7 +95,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     )
                 }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getAllChilds failed with $e")
             emptyList()
         }
     }
@@ -127,7 +124,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     )
                 }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChildByInstructorId failed with $e")
             emptyList()
         }
     }
@@ -158,7 +154,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     )
                 }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChildByInstructorId failed with $e")
             emptyList()
         }
     }
@@ -188,7 +183,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     )
                 }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChildByInstructorId failed with $e")
             emptyList()
         }
     }
@@ -211,7 +205,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 rollCall = document.get("rollCall") as? List<String> ?: emptyList()
             )
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChild failed with $e")
             null
         }
     }
@@ -234,7 +227,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 )
             }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getNews failed with $e")
             emptyList()
         }
     }
@@ -258,7 +250,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     )
                 }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getNews failed with $e")
             emptyList()
         }
     }
@@ -268,7 +259,6 @@ class FirestoreRepositoryImpl @Inject constructor(
             val document = firebaseFirestore.collection("News").document(newsId).get().await()
             document.toObject(News::class.java)
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChild failed with $e")
             null
         }
     }
@@ -287,7 +277,6 @@ class FirestoreRepositoryImpl @Inject constructor(
     }
 
     override suspend fun findDocument(userId: String): String? {
-        Log.e("OWO", userId)
         return withContext(Dispatchers.IO) {
             try {
                 val childDocRef = firebaseFirestore.collection("Child").document(userId).get().await()
@@ -326,7 +315,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 score = document.getLong("score")?.toInt() ?: null
             )
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChild failed with $e")
             null
         }
     }
@@ -350,7 +338,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     }
             }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getParentsByParentsID failed with $e")
             emptyList()
         }
     }
@@ -365,7 +352,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 score = document.getLong("score")?.toInt() ?: null
             )
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChild failed with $e")
             null
         }
     }
@@ -387,7 +373,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 null
             }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChild failed with $e")
             null
         }
     }
@@ -404,24 +389,15 @@ class FirestoreRepositoryImpl @Inject constructor(
 
                     val updates = hashMapOf<String, Any>(
                         "parentId" to newParentsId
-                        // Puedes agregar más campos según sea necesario
                     )
 
-                    // Realiza la actualización del documento
                     documentRef.update(updates)
                         .addOnSuccessListener {
-                            // La actualización fue exitosa
-                            Log.i("Actualizacion", "completada")
                         }
                         .addOnFailureListener { _ ->
-                            Log.i("Actualizacion", "no completada")
                         }
 
-                    val data = document.data
-                    // Haz algo con los datos obtenidos
                 } else {
-                    // El documento no existe
-
                     firebaseFirestore.collection("Child")
                         .document(child.id)
                         .set(child)
@@ -465,11 +441,9 @@ class FirestoreRepositoryImpl @Inject constructor(
 
             val currentState = childDocument.getBoolean("state") ?: false
 
-            // Cambiar el valor de State al opuesto del estado actual
             childDocumentRef.update("state", !currentState).await()
 
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "toggleChildState failed with $e")
         }
     }
 
@@ -504,10 +478,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                     documentRef.update(updates)
                         .addOnSuccessListener {
                             // La actualización fue exitosa
-                            Log.i("Actualizacion", "completada")
                         }
                         .addOnFailureListener { _ ->
-                            Log.i("Actualizacion", "no completada")
                         }
 
                     val data = document.data
@@ -534,10 +506,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                     documentRef.update(updates)
                         .addOnSuccessListener {
                             // La actualización fue exitosa
-                            Log.i("Actualizacion", "completada")
                         }
                         .addOnFailureListener { exception ->
-                            Log.i("Actualizacion", "no completada")
                         }
 
                     val data = document.data
@@ -682,7 +652,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 }
             })
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getAllUsers failed with $e")
         }
         return allUsers
     }
@@ -713,11 +682,9 @@ class FirestoreRepositoryImpl @Inject constructor(
                     })
                 } catch (e: FirebaseFirestoreException) {
                     // Manejar excepciones si es necesario
-                    Log.e("FirestoreRepository", "getAllUsers failed with $e")
                 }
             }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getAllUsers failed with $e")
         }
 
         return allUsers
@@ -737,7 +704,6 @@ class FirestoreRepositoryImpl @Inject constructor(
             // Si no se encuentra el campo chatID en ningún documento
             return null
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getChatId failed with $e")
             null
         }
     }
@@ -759,7 +725,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     )
                 }
         } catch (e: Exception) {
-            Log.e("FirestoreRepository", "getNews failed with $e")
             throw e
         }
 

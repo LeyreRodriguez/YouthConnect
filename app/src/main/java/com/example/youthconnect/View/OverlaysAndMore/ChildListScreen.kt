@@ -1,7 +1,6 @@
 package com.example.youthconnect.View.OverlaysAndMore
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -152,7 +151,6 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
             }
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
         }
     }
         Box(
@@ -240,7 +238,6 @@ fun MyChildren(navController: NavController, child: Child) {
 
             userType = user?.let { userViewModel.getUserType(it).toString() }.toString()
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
         }
     }
 
@@ -342,7 +339,6 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
 
     val documentExists = remember { mutableStateOf("-1") }
     var result by remember { mutableStateOf<String?>("") }
-    var showDialog by remember { mutableStateOf(false)  }
     var user by remember { mutableStateOf<String?>("") }
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var instructorsList by remember { mutableStateOf<List<Instructor?>>(emptyList()) }
@@ -365,7 +361,6 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
             instructor = userViewModel.getInstructorByChildId(child.id)
             instructorsList = userViewModel.getAllInstructors()
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
         }
     }
 

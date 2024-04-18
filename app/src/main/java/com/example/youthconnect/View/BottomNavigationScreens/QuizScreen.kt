@@ -84,7 +84,6 @@ fun QuizScreen( navController: NavHostController,
             }
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getAllQuestions", e)
         }
     }
 
@@ -103,7 +102,6 @@ fun QuizScreen( navController: NavHostController,
             }
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
         }
     }
 
@@ -435,7 +433,6 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
             }
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en getAllQuestions", e)
         }
     }
 
@@ -445,7 +442,6 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
             allUsers = userViewModel.getAllUsers()!!
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
         }
     }
 
@@ -454,7 +450,6 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
             score = quizViewModel.getScore(user.toString()).toString()
 
         } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
         }
     }
 

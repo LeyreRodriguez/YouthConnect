@@ -19,6 +19,12 @@ import org.junit.Test
 
 
 class FirestoreRepositoryTest {
+
+    val date1 = "2024-04-14"
+    val date2 = "2024-04-15"
+    val ana = "Ana Martínez"
+
+    val notImplemented = "Not yet implemented"
     val child1 = Child(
         fullName = "Juan Pérez",
         id = "00000000A",
@@ -32,7 +38,7 @@ class FirestoreRepositoryTest {
         instructorId = "instructor1ID",
         state = true,
         score = 85,
-        rollCall = listOf("2024-04-14", "2024-04-15")
+        rollCall = listOf(date1 , date2)
     )
 
     val child2 = Child(
@@ -64,11 +70,11 @@ class FirestoreRepositoryTest {
         instructorId = "instructor3ID",
         state = true,
         score = 90,
-        rollCall = listOf("2024-04-14", "2024-04-15")
+        rollCall = listOf(date1, date2 )
     )
 
     val instructor1 = Instructor(
-        fullName = "Ana Martínez",
+        fullName = ana,
         id = "00000001A",
         password = "instructorpassword123",
         score = 85
@@ -104,7 +110,7 @@ class FirestoreRepositoryTest {
     )
 
     val parent3 = Parent(
-        fullName = "Ana Martínez",
+        fullName = ana,
         id = "00000002C",
         phoneNumber = "555-123-4567",
         password = "mompassword789"
@@ -219,87 +225,87 @@ class FirestoreRepositoryTest {
             }
 
             override suspend fun addChild(child: Child) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun addParent(parent: Parent) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun addInstructor(instructor: Instructor) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun changeState(childId: String) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun addInstructorToChild(child: Child, instructorID: String) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun rollCall(child: Child) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun notRollCall(child: Child) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getRollCall(childId: String): List<String>? {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun removeInstructorFromChild(child: Child, instructorID: String) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getUser(): UserData? {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getUserById(id: String): UserData? {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getAllUser(): List<UserData?> {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getAllUser(userType: String): List<UserData> {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getChatId(chatId: String): String? {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getQuestions(): List<Question?> {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override fun addNewQuestion(question: Question) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override fun updateScore(collection: String, documentId: String) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override fun resetScore(collection: String, documentId: String) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun findUserType(id: String): String {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override fun getScore(coleccion: String, idDocumento: String): String {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override fun updateUser(user: Any) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
         }
 
@@ -323,7 +329,7 @@ class FirestoreRepositoryTest {
             assertEquals("instructor1ID", child?.instructorId)
             assertTrue(child?.state!!)
             assertEquals(85, child?.score)
-            assertEquals(listOf("2024-04-14", "2024-04-15"), child?.rollCall)
+            assertEquals(listOf(date1, date2), child?.rollCall)
 
             child = repository.getChild("00000000B")
             assertNotNull(child)
@@ -357,7 +363,7 @@ class FirestoreRepositoryTest {
         runBlocking {
             var instructor = repository.getCurrentInstructorById("00000001A")
             assertNotNull(instructor)
-            assertEquals("Ana Martínez", instructor?.fullName)
+            assertEquals(ana, instructor?.fullName)
             assertEquals("00000001A", instructor?.id)
             assertEquals("instructorpassword123", instructor?.password)
             assertEquals(85, instructor?.score)
