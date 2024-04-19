@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,9 +50,7 @@ import com.example.youthconnect.Model.Object.UserData
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
@@ -151,8 +148,13 @@ fun UserEachRow(
 
     val userViewModel : UserViewModel = hiltViewModel()
     val imageUrlState = remember { mutableStateOf("") }
+    var userType by remember { mutableStateOf("") }
+    var currentUserType by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
+        userType = userViewModel.getUserType(person.userId).toString()
+        currentUserType = userViewModel.getCurrentUser()
+            ?.let { userViewModel.getUserType(it).toString() }.toString()
         userViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
@@ -161,15 +163,6 @@ fun UserEachRow(
                 print("Child not found")
             }
         )
-    }
-
-    var userType by remember { mutableStateOf("") }
-    var currentUserType by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        userType = userViewModel.getUserType(person.userId).toString()
-        currentUserType = userViewModel.getCurrentUser()
-            ?.let { userViewModel.getUserType(it).toString() }.toString()
     }
 
     Card(
@@ -186,16 +179,7 @@ fun UserEachRow(
                     .padding(16.dp),
             ) {
 
-                AsyncImage(
-                    model = imageUrlState.value,
-                    contentDescription = "Foto de perfil",
-                    modifier = Modifier
-                        .size(50.dp)
-
-                        .padding(4.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                ProfileImage(imageUrlState.value)
 
                 if (person.userId in unseenMessages) {
                     Icon(
@@ -224,96 +208,22 @@ fun UserEachRow(
                     }
                 }
 
-                if (currentLine.isNotEmpty()) {
-                    lines.add(currentLine.trim())
-                }
-
-                val cleanedLines = lines.filter { it.isNotBlank() }
-
-
-                if (lines.size >= 2){
-                    Column(
-                        verticalArrangement = Arrangement.Center
-                    ) {
-
-                        cleanedLines.forEach { line ->
-                            Text(
-                                text = line,
-                                style = TextStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
-                                    color = Color.Black
-                                ),
-                                modifier = Modifier
-                                    .padding(start = 10.dp)
-
-                            )
-
-                        }
-                    }
-                } else {
-                    person.userName?.let {
-                        Text(
-                            text = it,
-                            style = TextStyle(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp,
-                                color = Color.Black
-                            ),
-                            modifier = Modifier
-                                .padding(start = 10.dp)
-                                .align(CenterVertically),
-
-                        )
-                    }
-                }
-
-
+                DisplayName(userName)
 
             }
 
-            Row( horizontalArrangement =  Arrangement.End,
+
+            Row(
+                horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxSize(),
-            ){
-                if (currentUserType == "Instructor"){
-                    when (userType) {
-                        "Child" -> {
-                            Icon(
-                                imageVector = Icons.Outlined.ChildCare ,
-                                contentDescription = "Child",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    .size(35.dp)
-                                    .align(CenterVertically)
-                                    .padding(4.dp)
-                            )
-                        }
-                        "Parents" -> {
-                            Icon(
-                                imageVector = Icons.Outlined.FamilyRestroom ,
-                                contentDescription = "Parents",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    .size(35.dp)
-                                    .align(CenterVertically)
-                                    .padding(4.dp)
-                            )
-                        }
-                        "Instructor" -> {
-                            Icon(
-                                imageVector = Icons.Outlined.School ,
-                                contentDescription = "Instructor",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    .size(35.dp)
-                                    .align(CenterVertically)
-                                    .padding(4.dp)
-                            )
-                        }
-                    }
-                }
+                modifier = Modifier.fillMaxSize()
+            ) {
+                UserTypeIcon(userType, currentUserType)
             }
+
+
+
+
         }
 
 
@@ -322,10 +232,62 @@ fun UserEachRow(
 
     }
 }
+@Composable
+private fun UserTypeIcon(userType: String, currentUserType: String) {
+    if (currentUserType == "Instructor") {
+        val iconResource = when (userType) {
+            "Child" -> Icons.Outlined.ChildCare
+            "Parents" -> Icons.Outlined.FamilyRestroom
+            "Instructor" -> Icons.Outlined.School
+            else -> null
+        }
+        iconResource?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = userType,
+                tint = Color.Black,
+                modifier = Modifier
+                    .size(35.dp)
+                //    .align(CenterVertically)
+                    .padding(4.dp)
+            )
+        }
+    }
+}
+@Composable
+private fun ProfileImage(url: String) {
+    AsyncImage(
+        model = url,
+        contentDescription = "Foto de perfil",
+        modifier = Modifier
+            .size(50.dp)
+            .padding(4.dp)
+            .clip(CircleShape),
+        contentScale = ContentScale.Crop
+    )
+}
 
+@Composable
+private fun DisplayName(userName: String) {
+    val maxWordsPerLine = 3 // Máximo de palabras por línea
+    val lines = userName.split(" ").chunked(maxWordsPerLine) { it.joinToString(" ") }
 
-
-
+    Column(
+        verticalArrangement = Arrangement.Center
+    ) {
+        lines.forEach { line ->
+            Text(
+                text = line,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Color.Black
+                ),
+                modifier = Modifier.padding(start = 10.dp)
+            )
+        }
+    }
+}
 
 
 

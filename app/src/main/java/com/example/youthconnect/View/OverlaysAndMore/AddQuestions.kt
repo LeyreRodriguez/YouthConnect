@@ -13,6 +13,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,154 +22,106 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.View.Authentication.CustomOutlinedTextField
 import com.example.youthconnect.ViewModel.QuizViewModel
-
-@SuppressLint("SuspiciousIndentation")
 @Composable
-fun AddQuestions (onDismiss: () -> Unit){
+fun AddQuestions(onDismiss: () -> Unit) {
+    val quizViewModel = hiltViewModel<QuizViewModel>()
+    val questionData = remember { mutableStateOf(QuestionData()) }
 
-    val quizViewModel : QuizViewModel = hiltViewModel()
-    var question  by remember { mutableStateOf("") }
-    var optionA  by remember { mutableStateOf("") }
-    var optionB  by remember { mutableStateOf("") }
-    var optionC  by remember { mutableStateOf("") }
-    var optionD  by remember { mutableStateOf("") }
-    var selectedAnswer by remember { mutableStateOf("") }
-    val listState = rememberLazyListState()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icons.Outlined.Quiz },
+        title = { Text("Inserte una nueva pregunta") },
+        text = { QuestionForm(questionData) },
+        confirmButton = {
 
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            icon = {
-                Icons.Outlined.Quiz
-            },
-            title = {
-                Text(text = "Inserte una nueva pregunta")
-            },
-            text = {
+            TextButton(onClick = {
 
-
-                LazyColumn(state = listState) {
-                    item{
-                        Text(text = "Escriba primero la pregunta y seguidamente las posibles respuestas, no olvide marcar cual es la respuesta correcta")
-
-                        CustomOutlinedTextField(
-                            value = question,
-                            onValueChange = { question = it },
-                            label = "Pregunta",
-                            leadingIconImageVector = Icons.Default.QuestionMark
+                if (questionData.value.selectedAnswer.isNotEmpty()) {
+                    quizViewModel.addNewQuestion(
+                        Question(
+                            answer = questionData.value.selectedAnswer,
+                            optionA = questionData.value.optionA,
+                            optionB = questionData.value.optionB,
+                            optionC = questionData.value.optionC,
+                            optionD = questionData.value.optionD,
+                            question = questionData.value.question
                         )
-
-                        Row{
-                            Checkbox(checked = selectedAnswer == "OptionA",
-                                onCheckedChange = { isChecked ->
-                                    if (isChecked) {
-                                        selectedAnswer = "OptionA"
-                                    } else {
-                                        selectedAnswer = ""
-                                    }
-                                }
-                            )
-                            CustomOutlinedTextField(
-                                value = optionA,
-                                onValueChange = { optionA = it },
-                                label = "Primera opcion",
-                                leadingIconImageVector = Icons.Default.QuestionAnswer
-                            )
-                        }
-                        Row {
-                            Checkbox(checked = selectedAnswer == "OptionB",
-                                onCheckedChange = { isChecked ->
-                                    if (isChecked) {
-                                        selectedAnswer = "OptionB"
-                                    } else {
-                                        selectedAnswer = ""
-                                    }
-                                }
-                            )
-
-                            CustomOutlinedTextField(
-                                value = optionB,
-                                onValueChange = { optionB = it },
-                                label = "Segunda opcion",
-                                leadingIconImageVector = Icons.Default.QuestionAnswer
-                            )
-                        }
-                        Row {
-                            Checkbox(checked = selectedAnswer == "OptionC",
-                                onCheckedChange = { isChecked ->
-                                    if (isChecked) {
-                                        selectedAnswer = "OptionC"
-                                    } else {
-                                        selectedAnswer = ""
-                                    }
-                                }
-                            )
-                            CustomOutlinedTextField(
-                                value = optionC,
-                                onValueChange = { optionC = it },
-                                label = "Tercera opcion",
-                                leadingIconImageVector = Icons.Default.QuestionAnswer
-                            )
-                        }
-                        Row {
-                            Checkbox(checked = selectedAnswer == "OptionD",
-                                onCheckedChange = { isChecked ->
-                                    if (isChecked) {
-                                        selectedAnswer = "OptionD"
-                                    } else {
-                                        selectedAnswer = ""
-                                    }
-                                }
-                            )
-                            CustomOutlinedTextField(
-                                value = optionD,
-                                onValueChange = { optionD = it },
-                                label = "Cuarta opcion",
-                                leadingIconImageVector = Icons.Default.QuestionAnswer
-                            )
-                        }
-                    }
-
-
+                    )
 
                 }
-            },
 
-            confirmButton = {
-                if (selectedAnswer.isNotEmpty()) {
-
-                    quizViewModel.addNewQuestion(Question(
-                        answer = selectedAnswer,
-                        optionA = optionA,
-                        optionB = optionB,
-                        optionC = optionC,
-                        optionD = optionD,
-                        question = question
-                    ))
-
-                }
-                TextButton(
-                    onClick = {
-                        question = ""
-                        optionA = ""
-                        optionB = ""
-                        optionC = ""
-                        optionD = ""
-                        selectedAnswer = ""
-                    }
-                ) {
-                    Text("Confirmar")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        onDismiss()
-                    }
-                ) {
-                    Text("Cancelar")
-                }
+                questionData.value = QuestionData()
+            }) {
+                Text("Confirmar")
             }
-        )
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        }
+    )
+}
+
+@Composable
+fun QuestionForm(questionData: MutableState<QuestionData>) {
+    LazyColumn {
+        item {
+            Text("Escriba primero la pregunta y seguidamente las posibles respuestas, no olvide marcar cual es la respuesta correcta")
+            CustomOutlinedTextField(
+                value = questionData.value.question,
+                onValueChange = { questionData.value = questionData.value.copy(question = it) },
+                label = "Pregunta",
+                leadingIconImageVector = Icons.Default.QuestionMark
+            )
+            OptionsForm(questionData)
+        }
     }
+}
 
+@Composable
+fun OptionsForm(questionData: MutableState<QuestionData>) {
+    val options = listOf("A", "B", "C", "D")
+    options.forEachIndexed { _, option ->
+        Row {
+            Checkbox(
+                checked = questionData.value.selectedAnswer == option,
+                onCheckedChange = { isChecked ->
+                    if (isChecked) {
+                        questionData.value = questionData.value.copy(selectedAnswer = option)
+                    } else {
+                        questionData.value = questionData.value.copy(selectedAnswer = "")
+                    }
+                }
+            )
+            CustomOutlinedTextField(
+                value = when (option) {
+                    "A" -> questionData.value.optionA
+                    "B" -> questionData.value.optionB
+                    "C" -> questionData.value.optionC
+                    "D" -> questionData.value.optionD
+                    else -> ""
+                },
+                onValueChange = {
+                    when (option) {
+                        "A" -> questionData.value = questionData.value.copy(optionA = it)
+                        "B" -> questionData.value = questionData.value.copy(optionB = it)
+                        "C" -> questionData.value = questionData.value.copy(optionC = it)
+                        "D" -> questionData.value = questionData.value.copy(optionD = it)
+                    }
+                },
+                label = "Opción ${option} ",
+                leadingIconImageVector = Icons.Default.QuestionAnswer
+            )
+        }
+    }
+}
 
+data class QuestionData(
+    var question: String = "",
+    var optionA: String = "",
+    var optionB: String = "",
+    var optionC: String = "",
+    var optionD: String = "",
+    var selectedAnswer: String = ""
+)

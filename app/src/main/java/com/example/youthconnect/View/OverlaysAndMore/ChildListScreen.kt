@@ -1,6 +1,7 @@
 package com.example.youthconnect.View.OverlaysAndMore
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -55,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
@@ -63,7 +65,6 @@ import com.example.youthconnect.View.Components.CustomDropdownMenu
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ViewModel.SignUpViewModel
 import com.example.youthconnect.ui.theme.Blue
-import com.example.youthconnect.ui.theme.Blue50
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import java.time.LocalDate
@@ -151,6 +152,7 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
             }
 
         } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
         }
     }
         Box(
@@ -184,7 +186,7 @@ fun ChildListScreen(navController : NavHostController, instructorID: String){
                             it?.fullName?.contains(searchedText, ignoreCase = true) ?: false
                         }, key = { it?.id ?: "" }) { item ->
                             if (item != null) {
-                                Greeting(navController = navController, item)
+                                EachChild(navController = navController, item)
                             }
                         }
                     }
@@ -238,6 +240,7 @@ fun MyChildren(navController: NavController, child: Child) {
 
             userType = user?.let { userViewModel.getUserType(it).toString() }.toString()
         } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
         }
     }
 
@@ -323,35 +326,27 @@ fun MyChildren(navController: NavController, child: Child) {
 
 
 
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Greeting(navController : NavController, child : Child, modifier: Modifier = Modifier) {
-    val expanded = remember { mutableStateOf(false) }
-    val extraPadding = if (expanded.value) 10.dp else 0.dp
-
+fun EachChild(navController : NavController, child : Child, modifier: Modifier = Modifier) {
 
     val userViewModel: UserViewModel = hiltViewModel()
-
-
-
     var myKids by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var instructorID by remember { mutableStateOf("") }
-
     val documentExists = remember { mutableStateOf("-1") }
     var result by remember { mutableStateOf<String?>("") }
     var user by remember { mutableStateOf<String?>("") }
     var instructor by remember { mutableStateOf<Instructor?>(null) }
     var instructorsList by remember { mutableStateOf<List<Instructor?>>(emptyList()) }
+    val imageUrlState = remember { mutableStateOf("") }
 
-
-
-    LaunchedEffect(userViewModel) {
+    LaunchedEffect(Unit) {
         try {
             instructorID = userViewModel.getCurrentUser().toString()
-
             myKids = instructorID?.let { userViewModel.getChildByInstructorId(it) }!!
-            // myKids = UserViewModel.getAllChildren()
-
             user = userViewModel.getCurrentUser()
             result = user?.let { userViewModel.findDocument(it) }
 
@@ -360,111 +355,145 @@ fun Greeting(navController : NavController, child : Child, modifier: Modifier = 
             }
             instructor = userViewModel.getInstructorByChildId(child.id)
             instructorsList = userViewModel.getAllInstructors()
+
+            userViewModel.getProfileEspecificImage(child.id.lowercase() + "@youthconnect.com",
+                onSuccess = { url ->
+                    imageUrlState.value = url
+                },
+                onFailure = { _ ->
+                    // Manejar el error, por ejemplo, mostrar un mensaje
+                }
+            )
         } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
         }
     }
 
-    val imageUrlState = remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
-        userViewModel.getProfileEspecificImage(child.id.lowercase() + "@youthconnect.com",
-            onSuccess = { url ->
-                imageUrlState.value = url
-            },
-            onFailure = { _ ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
-            }
-        )
-    }
 
     Surface(
         modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp),
         onClick = {navController.navigate("child_profile_screen/${child.id}")}
     ) {
 
-        Row(modifier = Modifier.padding(24.dp)) {
-
-            AsyncImage(
-                model = imageUrlState.value,
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(50.dp)
-                    .border(
-                        BorderStroke(4.dp, SolidColor(if (child.goOutAlone) Green else Red)),
-                        CircleShape
-                    )
-                    .padding(4.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(bottom = extraPadding, start = 10.dp)
-            ) {
-                val faithGroupsState = rememberUpdatedState(child.faithGroups)
-
-                val nameColor = if (faithGroupsState.value && child.instructorId.isNullOrEmpty()) Blue else Color.Black
-
-                Text(text = child.fullName, fontWeight = FontWeight.Bold, color = nameColor)
-
-
-                if (expanded.value) {
-
-
-                        Text(text = "Animador: ", fontWeight = FontWeight.Bold )
-
-                        if(child.instructorId.isNullOrEmpty()){
-                                CustomDropdownMenu(instructorsList, "", Color.DarkGray, onSelected = { _ ->
-                                    userViewModel.changeInstructor(child, instructorID)
-                                    navController.navigate(NavScreen.ChildList.name + "/${instructorID}")
-                                })
-
-                        }else{
-                            instructor?.let {
-                                CustomDropdownMenu(instructorsList, it.fullName, Color.DarkGray, onSelected = { _ ->
-                                    userViewModel.changeInstructor(child, instructorID)
-                                    navController.navigate(NavScreen.ChildList.name + "/${instructorID}")
-                                })
-                            }
-                        }
-
-
-
-
-                    if(child.faithGroups){
-                        Text(text = "Pertenece a grupos de fe")
-                    }else{
-                        Text(text = "No pertenece a grupos de fe")
-                    }
-
-                    if(child.belongsToSchool){
-                        Text(text = "Pertenece al colegio")
-                    }else{
-                        Text(text = "No pertenece al colegio")
-                    }
-
-                    Text(text = "Obervaciones: ", fontWeight = FontWeight.Bold )
-
-                    if(child.observations.isNullOrEmpty()){
-                        Text("No hay observaciones")
-                    }else{
-                        child.observations?.let { Text(text = it) }
-                    }
-
-
-                }
-            }
-            IconButton(
-                onClick = { expanded.value = !expanded.value }
-            ) {
-                Icon(
-                    if (expanded.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                    contentDescription = if (expanded.value) "Mostrar menos" else "Mostrar mas"
-                )
-            }
-        }
+        ChildRow(imageUrlState.value, child, navController, instructorsList, instructor)
     }
 }
 
 
+@Composable
+fun ChildRow(imageUrlState : String, child: Child, navController: NavController, instructorsList : List<Instructor?>, instructor: Instructor?){
+    val userViewModel: UserViewModel = hiltViewModel()
+    val expanded = remember { mutableStateOf(false) }
+    val extraPadding = if (expanded.value) 10.dp else 0.dp
+
+    Row(modifier = Modifier.padding(24.dp)) {
+
+        ChildImage(imageUrlState,child, modifier = Modifier.size(50.dp))
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(bottom = extraPadding, start = 10.dp)
+        ) {
+            val faithGroupsState = rememberUpdatedState(child.faithGroups)
+
+            val nameColor = if (faithGroupsState.value && child.instructorId.isNullOrEmpty()) Blue else Color.Black
+
+            Text(text = child.fullName, fontWeight = FontWeight.Bold, color = nameColor)
+
+
+            if (expanded.value) {
+
+                SelectInstructor(
+                    child = child,
+                    instructorsList = instructorsList ,
+                    instructor = instructor,
+                    userViewModel = userViewModel,
+                    navController = navController
+                )
+                ChildData(child = child)
+
+
+
+            }
+        }
+        IconButton(
+            onClick = { expanded.value = !expanded.value }
+        ) {
+            Icon(
+                if (expanded.value) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                contentDescription = if (expanded.value) "Mostrar menos" else "Mostrar mas"
+            )
+        }
+    }
+}
+@Composable
+fun ChildData(child: Child){
+    if(child.faithGroups){
+        Text(text = "Pertenece a grupos de fe")
+    }else{
+        Text(text = "No pertenece a grupos de fe")
+    }
+
+    if(child.belongsToSchool){
+        Text(text = "Pertenece al colegio")
+    }else{
+        Text(text = "No pertenece al colegio")
+    }
+
+    Text(text = "Obervaciones: ", fontWeight = FontWeight.Bold )
+
+    if(child.observations.isNullOrEmpty()){
+        Text("No hay observaciones")
+    }else{
+        child.observations?.let { Text(text = it) }
+    }
+}
+
+@Composable
+fun SelectInstructor(child: Child, instructorsList : List<Instructor?>, instructor: Instructor?, userViewModel : UserViewModel, navController: NavController){
+    Text(text = "Animador: ", fontWeight = FontWeight.Bold )
+
+    if(child.instructorId.isNullOrEmpty()){
+        CustomDropdownMenu(
+            list = instructorsList,
+            defaultSelected = null,
+            color = Color.DarkGray,
+            onSelected = { selectedInstructor ->
+                selectedInstructor?.let { instructor ->
+                    userViewModel.changeInstructor(child, selectedInstructor.id)
+                    navController.navigate(NavScreen.ChildList.name + "/${instructor.id}")
+                }
+            }
+        )
+
+    }else{
+        instructor?.let {
+            CustomDropdownMenu(
+                list = instructorsList,
+                defaultSelected = it,
+                color = Color.DarkGray,
+                onSelected = { selectedInstructor ->
+                    selectedInstructor?.let { instructor ->
+                        userViewModel.changeInstructor(child, selectedInstructor.id)
+                        navController.navigate(NavScreen.ChildList.name + "/${instructor.id}")
+                    }
+                }
+            )
+        }
+    }
+}
+@Composable
+fun ChildImage(image: String, child:Child, modifier: Modifier) {
+    AsyncImage(
+        model = image,
+        contentDescription = "Profile Picture",
+        modifier = modifier
+            .border(
+                BorderStroke(4.dp, SolidColor(if (child.goOutAlone) Green else Red)),
+                CircleShape
+            )
+            .padding(4.dp)
+            .clip(CircleShape),
+        contentScale = ContentScale.Crop
+    )
+}

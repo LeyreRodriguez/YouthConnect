@@ -23,21 +23,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.PopupProperties
 import com.example.youthconnect.Model.Object.Instructor
 
-
-
 @Composable
 fun CustomDropdownMenu(
-    list: List<Instructor?>, // Menu Options
-    defaultSelected: String, // Default Selected Option on load
-    color: Color, // Color
-    modifier: Modifier = Modifier, // Modifier
-    onSelected: (String) -> Unit, // Pass the Selected Option
+    list: List<Instructor?>,
+    defaultSelected: Instructor?,
+    color: Color,
+    modifier: Modifier = Modifier,
+    onSelected: (Instructor?) -> Unit,
 ) {
-    var selectedIndex by remember { mutableStateOf(0) }
     var expand by remember { mutableStateOf(false) }
     var stroke by remember { mutableStateOf(1) }
     var selectedOption by remember(defaultSelected) { mutableStateOf(defaultSelected) }
-
 
     Box(
         modifier = modifier
@@ -50,12 +46,12 @@ fun CustomDropdownMenu(
 
         Row(modifier = Modifier.fillMaxWidth()){
             Text(
-                text = if (selectedOption.isNullOrEmpty()) "No hay animador asignado \na este niño" else selectedOption,
+                text = selectedOption?.fullName ?: "No hay animador asignado a este niño",
                 color = color,
             )
 
             Icon(
-                imageVector = Icons.Default.ArrowDropDown ,
+                imageVector = Icons.Default.ArrowDropDown,
                 contentDescription = "Expand",
                 tint = Color.DarkGray,
                 modifier = Modifier
@@ -63,11 +59,8 @@ fun CustomDropdownMenu(
                         expand = !expand
                         stroke = if (expand) 2 else 1
                     }
-                //.padding(12.dp)
             )
         }
-
-
 
         DropdownMenu(
             expanded = expand,
@@ -84,29 +77,25 @@ fun CustomDropdownMenu(
                 .background(Color.White)
         ) {
 
-
-            list.forEachIndexed { index, item ->
-                DropdownMenuItem(
-                    text = {
-                        if (item != null) {
+            list.forEachIndexed { _, item ->
+                if (item != null) {
+                    DropdownMenuItem(
+                        text = {
                             Text(
                                 text = item.fullName,
                                 color = color,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
+                        },
+                        onClick = {
+                            selectedOption = item
+                            onSelected(selectedOption)
+                            expand = false
+                            stroke = 1
                         }
-                    },
-                    onClick = {
-                        selectedIndex = index
-                        if (item != null) {
-                            selectedOption = item.fullName
-                        }
-                        onSelected(selectedOption)
-                        expand = false
-                        stroke = 1
-                    })
-
+                    )
+                }
             }
         }
     }

@@ -81,25 +81,21 @@ fun NewsScreen(
     var showDialog by remember { mutableStateOf(false)  }
 
 
-    LaunchedEffect(newsViewModel) {
+    LaunchedEffect(Unit) {
         try {
             news = newsViewModel.getAllNews()
-        } catch (e: Exception) {
-            Log.e("Firestore", "Error en ChildList", e)
-        }
-    }
-
-    LaunchedEffect(userViewModel) {
-        try {
             user = userViewModel.getCurrentUser()
-            result = user?.let { userViewModel.findDocument(it) }
+            result = user?.let { userViewModel.findDocument(it)
 
+            }
             if (result != null) {
                 documentExists.value = result.toString()
             }
+
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
+
     }
 
 
@@ -108,47 +104,16 @@ fun NewsScreen(
     ) {
 
 
-        Column( horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(15.dp)) {
-
-            Row (modifier = Modifier
-                .fillMaxWidth(),
-             //   .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically){
-                Text(
-                    text = "Horario",
-                    style = TextStyle(
-                        fontSize = 40.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF000000),
-                        letterSpacing = 0.9.sp,
-                    ), modifier = Modifier
-                        .padding(start = 15.dp, top = 10.dp )
-                )
-
-
-            }
-
-            Text(
-                text = "Viernes\n16:00 - 20:00",
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                    fontWeight = FontWeight(400),
-                    color = Color(0xFF000000),
-
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.6.sp,
-                )
-            )
-
+        Column(
+            modifier = Modifier.fillMaxSize().padding(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            NewsHeader()
+            NewsSchedule()
             Column(
                 modifier
                     .fillMaxWidth()
                     .padding(15.dp)) {
-
 
                 Text(
                     text = "Últimas noticias",
@@ -173,11 +138,9 @@ fun NewsScreen(
                         FloatingButton {
                             // Aquí puedes agregar la lógica que se activará al hacer clic en el botón
                             // Por ejemplo, puedes navegar a una nueva pantalla
-                           // navController.navigate("addNews")
+                            // navController.navigate("addNews")
                             showDialog = true
                         }
-
-
                     }
 
                     if (showDialog) {
@@ -186,29 +149,88 @@ fun NewsScreen(
 
 
                 }
-
-
-
-
-
-
             }
-
-
-
 
         }
 
 
-
-
     }
-
-
 
 }
 
 
+@Composable
+fun NewsHeader() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Horario",
+            style = TextStyle(
+                fontSize = 40.sp,
+                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                fontWeight = FontWeight(400),
+                color = Color(0xFF000000),
+                letterSpacing = 0.9.sp
+            ),
+            modifier = Modifier.padding(start = 15.dp, top = 10.dp)
+        )
+    }
+}
+
+@Composable
+fun NewsSchedule() {
+    Text(
+        text = "Viernes\n16:00 - 20:00",
+        style = TextStyle(
+            fontSize = 20.sp,
+            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+            fontWeight = FontWeight(400),
+            color = Color(0xFF000000),
+            textAlign = TextAlign.Center,
+            letterSpacing = 0.6.sp
+        )
+    )
+}
+
+@Composable
+fun LatestNewsSection(
+    news: List<News?>,
+    navController: NavHostController,
+    documentExists: Boolean,
+    showDialog: Boolean,
+    onShowDialogChange: (Boolean) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(15.dp)
+    ) {
+        Text(
+            text = "Últimas noticias",
+            style = TextStyle(
+                fontSize = 40.sp,
+                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                fontWeight = FontWeight(400),
+                color = Color(0xFF000000),
+                letterSpacing = 0.9.sp
+            ),
+            modifier = Modifier.padding(start = 15.dp, top = 10.dp)
+        )
+
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+            RecyclerView(news = news, navController = navController)
+
+            if (documentExists) {
+                FloatingButton(onClick = { onShowDialogChange(true) })
+            }
+
+            if (showDialog) {
+                AddNews(onDismiss = { onShowDialogChange(false) }, navController = navController)
+            }
+        }
+    }
+}
 @Composable
 fun userImage(user: String,
               navController: NavHostController,

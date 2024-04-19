@@ -64,9 +64,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Object.Child
+import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
+import com.example.youthconnect.View.Components.EditIcon
+import com.example.youthconnect.View.Components.ProfilePicture
 import com.example.youthconnect.View.OverlaysAndMore.ModifyUsers
 import com.example.youthconnect.View.QR.DisplayQRCode
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -77,9 +80,7 @@ import com.example.youthconnect.ui.theme.Red
 fun ChildProfileScreen(
     childId: String,
     modifier: Modifier = Modifier.background(color = Color.White),
-    loginViewModel: LoginViewModel = viewModel(),
     navController: NavController,
-    onDismiss: (() -> Unit)? = null
 ){
 
     var child by remember { mutableStateOf<Child?>(null) }
@@ -91,16 +92,12 @@ fun ChildProfileScreen(
 
     val documentExists = remember { mutableStateOf("-1") }
     var result by remember { mutableStateOf<String?>("") }
-    var showDialog by remember { mutableStateOf(false)  }
+
     var user by remember { mutableStateOf<String?>("") }
 
-    var editUser by remember { mutableStateOf(false)  }
+
 
     var currentUserType by remember { mutableStateOf("") }
-
-
-
-
 
     LaunchedEffect(userViewModel) {
         val user = userViewModel.getUserById(childId)
@@ -126,384 +123,198 @@ fun ChildProfileScreen(
 
 
 
-    val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var showImagePickerDialog by remember { mutableStateOf(false) }
-
-
-    val imageUrlState = remember { mutableStateOf("") }
-
-    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            userViewModel.uploadProfileImage(uri, onSuccess = { _ ->
-                userViewModel.getProfileImage(
-                    onSuccess = { fetchedUrl ->
-                        imageUrlState.value = fetchedUrl
-                        Toast.makeText(
-                            context,
-                            "Imagen Actualizada",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    },
-                    onFailure = { _ ->
-                        Toast.makeText(
-                            context,
-                            "Error al bajar la imagen",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                )
-            }, onFailure = { _ ->
-                Toast.makeText(
-                    context,
-                    "Error al subir la imagen",
-                    Toast.LENGTH_LONG
-                ).show()
-            })
-        }
-    }
-
-    // Lanzador para tomar foto con la cámara
-    val takePictureLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) {
-            // Aquí manejas la imagen capturada usando imageUri
-            imageUri?.let { uri ->
-                userViewModel.uploadProfileImage(uri, onSuccess = { _ ->
-                    userViewModel.getProfileImage(
-                        onSuccess = { fetchedUrl ->
-                            imageUrlState.value = fetchedUrl
-                            Toast.makeText(
-                                context,
-                                "Imagen Actualizada",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        },
-                        onFailure = { _ ->
-                            Toast.makeText(
-                                context,
-                                "Error al bajar la imagen",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    )
-                }, onFailure = { _ ->
-                    Toast.makeText(
-                        context,
-                        "Error al subir la imagen",
-                        Toast.LENGTH_LONG
-                    ).show()
-                })
-            }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        userViewModel.getProfileEspecificImage(childId.lowercase() + "@youthconnect.com",
-            onSuccess = { url ->
-                imageUrlState.value = url
-            },
-            onFailure = { _ ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
-            }
-        )
-    }
-
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted: Boolean ->
-            if (isGranted) {
-                // Permiso concedido, proceder con la acción
-                imageUri = userViewModel.createImageUri(context)
-                imageUri?.let { uri ->
-                    takePictureLauncher.launch(uri)
-                }
-            } else {
-                // Permiso denegado, mostrar un mensaje
-                Toast.makeText(
-                    context,
-                    "No se puede abrir la cámara",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-    )
-
-
-    if (showImagePickerDialog) {
-        AlertDialog(
-            onDismissRequest = { showImagePickerDialog = false },
-            title = { Text("Seleccionar Imagen") },
-            text = { Text("Elige de dónde quieres seleccionar la imagen.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    imagePickerLauncher.launch("image/*")
-                    showImagePickerDialog = false
-                }) {
-                    Text("Galería")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    when (PackageManager.PERMISSION_GRANTED) {
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
-                            // Permiso ya concedido, proceder con la acción
-                            imageUri = userViewModel.createImageUri(context)
-                            imageUri?.let { uri ->
-                                takePictureLauncher.launch(uri)
-                            }
-                        }
-                        else -> {
-                            // Solicitar permiso
-                            permissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
-                    }
-                    showImagePickerDialog = false
-                }) {
-                    Text("Cámara")
-                }
-            }
-        )
-    }
-
-
     Box(
             modifier = modifier.fillMaxSize(),
         ) {
 
+        ChildInfo(
+            childId = childId,
+            child = child ,
+            currentUser = currentUser ,
+            currentUserType = currentUserType,
+            parents = parents,
+            documentExists = documentExists.value,
+            navController = navController
+        )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(15.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center
-            ) {
-
-
-                val configuration = LocalConfiguration.current
-
-                AsyncImage(
-                    model = imageUrlState.value,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .border(
-                            BorderStroke(
-                                4.dp,
-                                SolidColor(if (child?.goOutAlone == true) Green else Red)
-                            ),
-                            CircleShape
-                        )
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            if (currentUser == child?.id) {
-                                showImagePickerDialog = true
-                            }
-
-                        },
-                    contentScale = ContentScale.Crop
-                )
-
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center){
-                    child?.fullName?.let {
-                        Text(
-                            text = it,
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
-                                letterSpacing = 0.9.sp,
-                            ), modifier = Modifier
-                                .padding(start = 15.dp, top = 10.dp, end = 5.dp)
-                        )
-                    }
-
-
-
-                        if(currentUserType == "Instructor"){
-                            Icon(
-                                imageVector = Icons.Outlined.Edit ,
-                                contentDescription = "Edit",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .clickable {
-                                        editUser = true
-                                    }
-                            )
-                        }
-
-                        if (editUser) {
-                            child?.let {
-                                ModifyUsers(onDismiss = { editUser = false },
-                                    it, navController
-                                )
-                            }
-                        }
-
-
-
-
-
-                    if (child?.state ?: "" == false){
-                        Icon(
-                            imageVector = Icons.Outlined.Park ,
-                            contentDescription = "Recieved",
-                            tint = Color.Black,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }else{
-                        Icon(
-                            imageVector = Icons.Outlined.Home ,
-                            contentDescription = "Recieved",
-                            tint =  Color.Black,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
-                }
-
-
-
-
-
-                    child?.course?.let {
-                        Text(
-                            text = it,
-                            style = TextStyle(
-                                fontSize = 15.sp,
-                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
-                                letterSpacing = 0.9.sp,
-                            ), modifier = Modifier
-                                .padding(start = 15.dp, top = 10.dp)
-                        )
-                    }
-
-                child?.observations?.let {
-                    Text(
-                        text = it,
-                        style = TextStyle(
-                            fontSize = 15.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                        ), modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                    )
-                }
-
-
-
-
-
-
-
-
-
-
-                if(currentUser == child?.id){
-                    Text(
-                        text = "Salir",
-                        style = TextStyle(
-                            fontSize = 30.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                            textAlign = TextAlign.Center
-                        ), modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                            .fillMaxWidth()
-                            .clickable {
-                                loginViewModel.signOut()
-                                navController.navigate("login")
-                            }
-                    )
-                }
-
-
-
-
-                Row() {
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                        Text(
-                            text = "Padres",
-                            style = TextStyle(
-                                fontSize = 15.sp,
-                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
-                                letterSpacing = 0.9.sp,
-                            )
-                        )
-
-
-                        LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-                            items(items = parents) { item ->
-                                item?.fullName?.let { Text(text = it) }
-                            }
-                        }
-
-
-                    }
-                    Spacer(modifier = Modifier.size(20.dp))
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-                        Text(
-                            text = "Teléfono",
-                            style = TextStyle(
-                                fontSize = 15.sp,
-                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
-                                letterSpacing = 0.9.sp,
-                            )
-                        )
-
-                        LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
-                            items(items = parents) { item ->
-                                item?.phoneNumber?.let { Text(text = it) }
-                            }
-                        }
-                    }
-
-
-                }
-
-                Spacer(modifier = Modifier.size(40.dp))
-                DisplayQRCode(childId)
-
-                if (documentExists.value == "0") {
-
-                    OutlinedButton(onClick = { showDialog = true }) {
-                        Text("Ver lista de asistencia")
-                    }
-
-                }
-                if (showDialog) {
-                    SeeRollCall(onDismiss = { showDialog = false }, childId)
-                }
-
-
-            }
         }
 
 
     }
 
 
+@Composable
+
+fun ChildInfo(childId: String, child: Child?, currentUser: String?, currentUserType :String?, parents : List<Parent?>, documentExists : String, navController: NavController){
+    val userViewModel : UserViewModel = hiltViewModel()
+    val loginViewModel : LoginViewModel = hiltViewModel()
+    var showDialog by remember { mutableStateOf(false)  }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(15.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        ProfilePicture(userViewModel = userViewModel, userId = childId, user = child, currentUser = currentUser)
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center)
+        {
+            child?.fullName?.let {
+                Text(
+                    text = it,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF000000),
+                        letterSpacing = 0.9.sp,
+                    ), modifier = Modifier
+                        .padding(start = 15.dp, top = 10.dp, end = 5.dp)
+                )
+            }
+
+            EditIcon(currentUserType = currentUserType, user = child, navController = navController)
+
+
+
+
+
+            if (child?.state ?: "" == false){
+                Icon(
+                    imageVector = Icons.Outlined.Park ,
+                    contentDescription = "Recieved",
+                    tint = Color.Black,
+                    modifier = Modifier.size(30.dp)
+                )
+            }else{
+                Icon(
+                    imageVector = Icons.Outlined.Home ,
+                    contentDescription = "Recieved",
+                    tint =  Color.Black,
+                    modifier = Modifier.size(30.dp)
+                )
+            }
+        }
+
+        child?.course?.let {
+            Text(
+                text = it,
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFF000000),
+                    letterSpacing = 0.9.sp,
+                ), modifier = Modifier
+                    .padding(start = 15.dp, top = 10.dp)
+            )
+        }
+
+        child?.observations?.let {
+            Text(
+                text = it,
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFF000000),
+                    letterSpacing = 0.9.sp,
+                ), modifier = Modifier
+                    .padding(start = 15.dp, top = 10.dp)
+            )
+        }
+
+        if(currentUser == child?.id){
+            Text(
+                text = "Salir",
+                style = TextStyle(
+                    fontSize = 30.sp,
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFF000000),
+                    letterSpacing = 0.9.sp,
+                    textAlign = TextAlign.Center
+                ), modifier = Modifier
+                    .padding(start = 15.dp, top = 10.dp)
+                    .fillMaxWidth()
+                    .clickable {
+                        loginViewModel.signOut()
+                        navController.navigate("login")
+                    }
+            )
+        }
+        Row() {
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Text(
+                    text = "Padres",
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF000000),
+                        letterSpacing = 0.9.sp,
+                    )
+                )
+
+
+                LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
+                    items(items = parents) { item ->
+                        item?.fullName?.let { Text(text = it) }
+                    }
+                }
+
+
+            }
+            Spacer(modifier = Modifier.size(20.dp))
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Text(
+                    text = "Teléfono",
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF000000),
+                        letterSpacing = 0.9.sp,
+                    )
+                )
+
+                LazyColumn(modifier = Modifier.padding(vertical = 4.dp)) {
+                    items(items = parents) { item ->
+                        item?.phoneNumber?.let { Text(text = it) }
+                    }
+                }
+            }
+
+
+        }
+
+        Spacer(modifier = Modifier.size(40.dp))
+        DisplayQRCode(childId)
+
+        if (documentExists == "0") {
+
+            OutlinedButton(onClick = { showDialog = true }) {
+                Text("Ver lista de asistencia")
+            }
+
+        }
+        if (showDialog) {
+            SeeRollCall(onDismiss = { showDialog = false }, childId)
+        }
+
+
+    }
+}
 
 
 

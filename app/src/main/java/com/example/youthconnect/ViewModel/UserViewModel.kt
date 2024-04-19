@@ -3,6 +3,7 @@ package com.example.youthconnect.ViewModel
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,6 +41,7 @@ class UserViewModel @Inject constructor(
     private var allInstructor: List<Instructor?> = emptyList()
     private var instructor: Instructor? = null
     private var user: UserData? = null
+
 
 
     private var _userData = MutableStateFlow<UserData?>(null)
@@ -218,6 +220,7 @@ class UserViewModel @Inject constructor(
             firestoreRepository.changeState(childId)
 
         } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
         }
     }
 
@@ -315,6 +318,7 @@ class UserViewModel @Inject constructor(
             firestoreRepository.updateUser(user)
 
         } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
 
         }
     }

@@ -40,8 +40,6 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
 
     var fullName by remember { mutableStateOf("") }
 
-
-
     var parentFullName by remember { mutableStateOf("") }
 
 
@@ -63,7 +61,6 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
 
         is Child -> {
             childFullName = item.fullName
-
             course = item.course
             belongsToSchool = item.belongsToSchool
             faithGroups  = item.faithGroups
@@ -80,13 +77,8 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
     }
 
 
-
-
     var editedFullName by remember {
         mutableStateOf((item as? Instructor)?.fullName ?: "")
-    }
-    var editedPassword by remember {
-        mutableStateOf((item as? Instructor)?.password ?: "")
     }
 
     //PARENTS
@@ -94,9 +86,7 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
     var editedParentsFullName by remember {
         mutableStateOf((item as? Parent)?.fullName ?: "")
     }
-    var editedParentsPassword by remember {
-        mutableStateOf((item as? Parent)?.password ?: "")
-    }
+
     var editedParentsPhoneNumber by remember {
         mutableStateOf((item as? Parent)?.phoneNumber ?: "")
     }
@@ -106,9 +96,7 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
     var editedChildFullName by remember {
         mutableStateOf((item as? Child)?.fullName ?: "")
     }
-    var editedChildPassword by remember {
-        mutableStateOf((item as? Child)?.password ?: "")
-    }
+
     var editedFaithGroups by remember {
         mutableStateOf((item as? Child)?.faithGroups ?: false)
     }
@@ -154,29 +142,24 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
                             CustomOutlinedTextField(
                                 value = editedChildFullName ?: "",
                                 onValueChange = { editedChildFullName = it },
-
                                 label = name,
                                 leadingIconImageVector = Icons.Default.PermIdentity
 
                             )
-
-
-                            Course.fromString(course)
-                                ?.let { CoursesSelectionScreen(it) { course = it.name } }
 
                             CustomRadioButton(editedBelongsToSchool, onBelongsToSchool = { editedBelongsToSchool = it }, "¿Pertenece al colegio?")
 
                             CustomRadioButton(editedFaithGroups,  { editedFaithGroups = it }, "¿Quieres apuntar a \n tu hijo/hija en grupos de fe?")
 
                             CustomRadioButton(editedGoOutAlone, { editedGoOutAlone = it }, "¿Puede tu hijo/hija salir solo del centro?")
-                            OutlinedTextField(
+                            CustomOutlinedTextField(
                                 value = editedObservations ?: "",
                                 onValueChange = {editedObservations = it },
-                                label = { Text("Observaciones") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 10.dp)
+                                label = "Observaciones",
+                                leadingIconImageVector = Icons.Default.PermIdentity
                             )
+
+
 
                         } is Parent ->{
                         CustomOutlinedTextField(
@@ -246,7 +229,7 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
                                 )
                             )
 
-                            navController.navigate(" child_profile_screen/${item.id}")
+                            navController.navigate("child_profile_screen/${item.id}")
 
                         }
                     }

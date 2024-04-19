@@ -59,9 +59,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -70,7 +68,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -506,14 +503,14 @@ fun CustomOutlinedTextField(
             },
             isError = showError,
             trailingIcon = {
-                if (showError && !isPasswordField ) Icon(imageVector = Icons.Filled.Error, contentDescription = "Show error icon")
-                if (isPasswordField){
-                    IconButton(onClick = { onVisibilityChange(!isPasswordVisible) }) {
-                        Icon(
-                            imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = "Toggle password visibility"
-                        )
-                    }
+                if (showError && !isPasswordField) {
+                    Icon(imageVector = Icons.Filled.Error, contentDescription = "Show error icon")
+                }
+                if (isPasswordField) {
+                    PasswordVisibilityIconButton(
+                        isPasswordVisible = isPasswordVisible,
+                        onVisibilityChange = { onVisibilityChange(!isPasswordVisible) }
+                    )
                 }
             },
             visualTransformation = when {
@@ -526,66 +523,70 @@ fun CustomOutlinedTextField(
             singleLine = true
         )
         if (showError) {
-            Text(
-                text = errorMessage,
-                color = MaterialTheme.colorScheme.error ,
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .offset(y = (-8).dp)
-                    .fillMaxWidth(0.9f)
-            )
+            ErrorMessage(errorMessage = errorMessage)
         }
     }
 }
 
 @Composable
+fun PasswordVisibilityIconButton(
+    isPasswordVisible: Boolean,
+    onVisibilityChange: () -> Unit
+) {
+    IconButton(onClick = { onVisibilityChange() }) {
+        Icon(
+            imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+            contentDescription = "Toggle password visibility"
+        )
+    }
+}
+@Composable
+fun ErrorMessage(errorMessage : String){
+    Text(
+        text = errorMessage,
+        color = MaterialTheme.colorScheme.error ,
+        style = MaterialTheme.typography.labelSmall,
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .offset(y = (-8).dp)
+            .fillMaxWidth(0.9f)
+    )
+}
+@Composable
 fun CustomRadioButton(belongsToSchool: Boolean,
-                      onBelongsToSchool : (Boolean) -> Unit, question : String){
-    val yes = remember { mutableStateOf(belongsToSchool) }
-    val no = remember { mutableStateOf(!belongsToSchool) }
+                      onBelongsToSchool: (Boolean) -> Unit,
+                      question: String) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val text = question
         Text(
-            text = buildAnnotatedString {
-                withStyle(style = ParagraphStyle(lineHeight = 20.sp)) {
-                    append(text)
-                }
-            },
+            text = question,
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
         Row(verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center){
-            Column(
-                modifier = Modifier.wrapContentSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                RadioButton(selected = yes.value,
-                    onClick = {
-                        yes.value = true
-                        no.value = false
-                        onBelongsToSchool(yes.value)
-                    })
-                Text(text = "Si", fontSize = 18.sp)
-            }
-            Column(
-                modifier = Modifier.wrapContentSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                RadioButton(
-                    selected = no.value ,
-                    onClick = {
-                        yes.value = false
-                        no.value = true
-                        onBelongsToSchool(no.value) })
-                Text(text = "No", fontSize = 18.sp)
-            }
+            horizontalArrangement = Arrangement.Center) {
+            RadioButton(
+                selected = belongsToSchool,
+                onClick = { onBelongsToSchool(true) }
+            )
+            Text(
+                text = "Si",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+            RadioButton(
+                selected = !belongsToSchool,
+                onClick = { onBelongsToSchool(false) }
+            )
+            Text(
+                text = "No",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
-
     }
 }
 

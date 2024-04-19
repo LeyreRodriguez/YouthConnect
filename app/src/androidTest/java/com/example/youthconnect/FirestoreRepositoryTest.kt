@@ -153,7 +153,7 @@ class FirestoreRepositoryTest {
             }
 
             override suspend fun getChildByInstructorIdThatIsInSchool(instructorId: String): List<Child?> {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getCurrentChildById(childId: String): Child? {
@@ -175,19 +175,19 @@ class FirestoreRepositoryTest {
             }
 
             override suspend fun getAllNews(): List<News?> {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getNewsById(newsId: String): News? {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun addNews(news: News) {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun findDocument(userId: String): String? {
-                TODO("Not yet implemented")
+                TODO(notImplemented)
             }
 
             override suspend fun getCurrentUserById(parentID: String): Parent? {

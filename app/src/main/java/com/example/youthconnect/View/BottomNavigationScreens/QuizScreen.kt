@@ -60,7 +60,7 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun QuizScreen( navController: NavHostController,
-    modifier : Modifier = Modifier.background(color = Color.White)
+                modifier : Modifier = Modifier.background(color = Color.White)
 ) {
     var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
     val quizViewModel: QuizViewModel = hiltViewModel()
@@ -69,9 +69,7 @@ fun QuizScreen( navController: NavHostController,
     var currentQuestionIndex by remember { mutableStateOf(0) }
 
 
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp
-    val buttonWidth = screenWidthDp / 2 - 10.dp
+
 
     val documentExists = remember { mutableStateOf("-1") }
     var result by remember { mutableStateOf<String?>("") }
@@ -82,18 +80,6 @@ fun QuizScreen( navController: NavHostController,
             withContext(Dispatchers.IO) {
                 questions = quizViewModel.getAllQuestions()
             }
-
-        } catch (e: Exception) {
-        }
-    }
-
-
-
-
-
-
-    LaunchedEffect(userViewModel) {
-        try {
             user = userViewModel.getCurrentUser()
             result = user?.let { userViewModel.findDocument(it) }
 
@@ -102,318 +88,202 @@ fun QuizScreen( navController: NavHostController,
             }
 
         } catch (e: Exception) {
+            e.message?.let { Log.e("Error: ", it) }
+
         }
     }
 
 
-    val currentQuestion = if (questions.isNotEmpty() && currentQuestionIndex < questions.size) {
-        questions[currentQuestionIndex]
-    } else {
-        null
-    }
+    val currentQuestion = questions.getOrNull(currentQuestionIndex)
 
 
-
-
-
-    Box(
-        modifier = modifier.fillMaxSize(),
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
 
         var showDialog by remember { mutableStateOf(false) }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(10.dp),
-            contentAlignment = Alignment.BottomEnd
+        DialogForQuestions(documentExists.value, showDialog) { showDialog = it }
+
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
         ) {
+            Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
+            Text(
+                text = "AJ MAJO QUIZ",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFFFFFFFF),
+                    letterSpacing = 0.3.sp,
+                ),
+                color = Color.Black,
+                textAlign = TextAlign.Center
 
-
-            if (documentExists.value == "0") {
-
-                FloatingButton {
-                    showDialog = true
-                }
-
-
-            }
-
-            if (showDialog) {
-                AddQuestions(onDismiss = { showDialog = false })
-            }
-
-
+            )
 
             Column(
-                verticalArrangement = Arrangement.Top,
+                verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
+
             ) {
+                currentQuestion?.question?.let {
+                    Text(
+                        text = it,
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFFFFFFFF),
+                            letterSpacing = 0.3.sp,
+                        ),
+                        color = Color.Black,
+                        textAlign = TextAlign.Center
+                    )
+                }
 
+                val colors = listOf(Red, Green, Yellow, Blue).shuffled()
+                Box() {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
 
-                Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
-
-                Text(
-                    text = "AJ MAJO QUIZ",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFFFFFFFF),
-                        letterSpacing = 0.3.sp,
-                    ),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-
-                )
-
-
-                Column(
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize()
-
-                ) {
-
-                    currentQuestion?.question?.let {
-                        Text(
-                            text = it,
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFFFFFFFF),
-                                letterSpacing = 0.3.sp,
-                            ),
-                            color = Color.Black,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-
-                    Box() {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 10.dp, end = 10.dp)
                         ) {
-                            val colors = listOf(Red, Green, Yellow, Blue).shuffled()
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 10.dp, end = 10.dp)
+
+                            OptionButton(
+                                text = currentQuestion?.optionA ?: "",
+                                backgroundColor = colors[0]
                             ) {
-
-                                Button(
-                                    onClick = {
-
-                                        if (currentQuestionIndex == 0) {
-                                            quizViewModel.resetScore(user.toString())
-                                        }
-
-                                        if (currentQuestion != null && currentQuestion.answer.equals("OptionA")) {
-
-                                                user?.let { quizViewModel.updateScore(it) }
-
-                                        }
-
-                                        if (currentQuestionIndex == questions.size - 1) {
-                                            navController.navigate("Scores")
-                                        }
-                                        currentQuestionIndex++
-
-                                    },
-                                    modifier = Modifier
-                                        .width(buttonWidth)
-                                        .height(100.dp)
-                                        .background(
-                                            color = colors[0],
-                                            shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
-                                        ),
-                                    colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = colors[0], // Set the background color as per your requirement
-
-                                    )
-
-                                ) {
-                                    currentQuestion?.optionA?.let {
-                                        Text(
-                                            text = it,
-                                            style = TextStyle(
-                                                fontSize = 15.sp,
-                                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                                fontWeight = FontWeight(400),
-                                                color = Color(0xFFFFFFFF),
-                                                letterSpacing = 0.3.sp,
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
-
-                                Button(
-                                    onClick = {
-
-                                        if (currentQuestionIndex == 0) {
-                                            quizViewModel.resetScore(user.toString())
-                                        }
-
-                                        if (currentQuestion != null && currentQuestion.answer.equals("OptionB")) {
-
-                                                user?.let { quizViewModel.updateScore(it) }
-
-                                        }
-                                        if (currentQuestionIndex == questions.size - 1) {
-                                            navController.navigate("Scores")
-                                        }
-                                        currentQuestionIndex++
-                                    },
-                                    modifier = Modifier
-                                        .width(buttonWidth)
-                                        .height(100.dp)
-                                        .background(
-                                            color = colors[1],
-                                            shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
-                                        ),
-                                    colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = colors[1], // Set the background color as per your requirement
-
-                                    )
-
-
-                                ) {
-                                    currentQuestion?.optionB?.let {
-                                        Text(
-                                            text = it,
-                                            style = TextStyle(
-                                                fontSize = 15.sp,
-                                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                                fontWeight = FontWeight(400),
-                                                color = Color(0xFFFFFFFF),
-                                                letterSpacing = 0.3.sp,
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
+                                onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"A")
+                                currentQuestionIndex++
                             }
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 10.dp, end = 10.dp)
+                            OptionButton(
+                                text = currentQuestion?.optionB ?: "",
+                                backgroundColor = colors[1]
+                            ) {
+                                onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController, "B")
+                                currentQuestionIndex++
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 10.dp, end = 10.dp)
+                        ) {
+
+
+                            OptionButton(
+                                text = currentQuestion?.optionC ?: "",
+                                backgroundColor = colors[2]
                             ) {
 
-                                Button(
-                                    onClick = {
+                                onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"C")
+                                currentQuestionIndex++
+                            }
 
-                                        if (currentQuestionIndex == 0) {
-                                            quizViewModel.resetScore(user.toString())
-                                        }
+                            OptionButton(
+                                text = currentQuestion?.optionD ?: "",
+                                backgroundColor = colors[3]
+                            ) {
 
-                                        if (currentQuestion != null && currentQuestion.answer.equals("OptionC")) {
-
-                                                user?.let { quizViewModel.updateScore(it) }
-
-                                        }
-                                        if (currentQuestionIndex == questions.size - 1) {
-                                            navController.navigate("Scores")
-                                        }
-                                        currentQuestionIndex++
-                                    },
-                                    modifier = Modifier
-                                        .width(buttonWidth)
-                                        .height(100.dp)
-                                        .background(
-                                            color = colors[2],
-                                            shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
-                                        ),
-                                    colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = colors[2], // Set the background color as per your requirement
-
-                                    )
-
-
-                                ) {
-                                    currentQuestion?.optionC?.let {
-                                        Text(
-                                            text = it,
-                                            style = TextStyle(
-                                                fontSize = 15.sp,
-                                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                                fontWeight = FontWeight(400),
-                                                color = Color(0xFFFFFFFF),
-                                                letterSpacing = 0.3.sp,
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
-
-                                Button(
-                                    onClick = {
-
-                                        if (currentQuestionIndex == 0) {
-                                            quizViewModel.resetScore(user.toString())
-                                        }
-
-                                        if (currentQuestion != null && currentQuestion.answer.equals("OptionD") ) {
-
-                                                user?.let { quizViewModel.updateScore(it) }
-
-                                        }
-
-                                        if (currentQuestionIndex == questions.size - 1) {
-                                            navController.navigate("Scores")
-                                        }
-                                        currentQuestionIndex++
-                                    },
-                                    modifier = Modifier
-                                        .width(buttonWidth)
-                                        .height(100.dp)
-                                        .background(
-                                            color = colors[3],
-                                            shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
-                                        ),
-                                    colors = ButtonDefaults.buttonColors(
-                                        backgroundColor = colors[3], // Set the background color as per your requirement
-
-                                    )
-
-
-                                ) {
-                                    currentQuestion?.optionD?.let {
-                                        Text(
-                                            text = it,
-                                            style = TextStyle(
-                                                fontSize = 15.sp,
-                                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                                fontWeight = FontWeight(400),
-                                                color = Color(0xFFFFFFFF),
-                                                letterSpacing = 0.3.sp,
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
-                                }
+                                onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"D")
+                                currentQuestionIndex++
                             }
                         }
                     }
-
-
                 }
+
             }
+
+        }
+
+    }
+
+}
+
+
+fun onClick(currentQuestionIndex: Int, quizViewModel: QuizViewModel, user:String, currentQuestion: Question, questions: List<Question?>, navController: NavHostController, option :String){
+    if (currentQuestionIndex == 0) {
+        quizViewModel.resetScore(user.toString())
+    }
+
+    if (currentQuestion != null && currentQuestion.answer.equals(option)) {
+        user?.let { quizViewModel.updateScore(it) }
+    }
+
+    if (currentQuestionIndex == questions.size - 1) {
+        navController.navigate("Scores")
+    }
+
+}
+@Composable
+fun OptionButton(text: String, backgroundColor: Color, onClick: () -> Unit) {
+
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+    val buttonWidth = screenWidthDp / 2 - 10.dp
+
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .width(buttonWidth)
+            .height(100.dp)
+            .background(
+                color = backgroundColor,
+                shape = RoundedCornerShape(10.dp)
+            ),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = backgroundColor
+        )
+    ) {
+        Text(
+            text = text,
+            style = TextStyle(
+                fontSize = 15.sp,
+                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                fontWeight = FontWeight(400),
+                color = Color(0xFFFFFFFF),
+                letterSpacing = 0.3.sp,
+            ),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+@Composable
+fun DialogForQuestions(documentExists:String, showDialog  : Boolean, onShowDialog :(Boolean) -> Unit){
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        if (documentExists == "0") {
+
+            FloatingButton {
+                onShowDialog(true)
+            }
+
+        }
+
+        if (showDialog) {
+            AddQuestions(onDismiss = { onShowDialog(false) })
         }
     }
 }
 
-
-
 @Composable
 fun Scores( navController: NavHostController,modifier : Modifier = Modifier.background(color = Color.White)){
-
 
     var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
     val quizViewModel : QuizViewModel = hiltViewModel()
@@ -423,37 +293,19 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
 
     var allUsers by remember { mutableStateOf<List<UserData?>>(emptyList()) }
 
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp
-
     LaunchedEffect(Unit) {
         try {
             withContext(Dispatchers.IO) {
                 questions = quizViewModel.getAllQuestions()
             }
-
-        } catch (e: Exception) {
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        try {
             user = userViewModel.getCurrentUser()
             allUsers = userViewModel.getAllUsers()!!
-
-        } catch (e: Exception) {
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        try {
             score = quizViewModel.getScore(user.toString()).toString()
-
         } catch (e: Exception) {
+            e.message?.let { Log.e("Error: ", it) }
+
         }
     }
-
-
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -552,25 +404,25 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
         }
 
 
-            Text(
-                text =    text,
-                style = TextStyle(
-                    fontSize = 30.sp,
-                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                    fontWeight = FontWeight(400),
-                    color = Color(0xFFFFFFFF),
-                    letterSpacing = 0.3.sp,
-                ),
-                color = Color.Black,
-                textAlign = TextAlign.Center
+        Text(
+            text =    text,
+            style = TextStyle(
+                fontSize = 30.sp,
+                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                fontWeight = FontWeight(400),
+                color = Color(0xFFFFFFFF),
+                letterSpacing = 0.3.sp,
+            ),
+            color = Color.Black,
+            textAlign = TextAlign.Center
 
-            )
+        )
 
-            Image(
-                painter = painterResource(id = imagen),
-                contentDescription = null,
-                modifier = Modifier.padding(16.dp)
-            )
+        Image(
+            painter = painterResource(id = imagen),
+            contentDescription = null,
+            modifier = Modifier.padding(16.dp)
+        )
 
 
 
@@ -599,22 +451,21 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
 
         ) {
 
-                Text(
-                    text = "REINICIAR",
-                    style = TextStyle(
-                        fontSize = 30.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFFFFFFFF),
-                        letterSpacing = 0.3.sp,
-                    ),
-                    textAlign = TextAlign.Center
-                )
+            Text(
+                text = "REINICIAR",
+                style = TextStyle(
+                    fontSize = 30.sp,
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFFFFFFFF),
+                    letterSpacing = 0.3.sp,
+                ),
+                textAlign = TextAlign.Center
+            )
 
         }
     }
 }
-
 
 
 

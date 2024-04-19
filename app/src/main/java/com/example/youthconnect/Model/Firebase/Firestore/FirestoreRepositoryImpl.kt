@@ -1,5 +1,6 @@
 package com.example.youthconnect.Model.Firebase.Firestore
 
+import android.util.Log
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
@@ -444,12 +445,12 @@ class FirestoreRepositoryImpl @Inject constructor(
             childDocumentRef.update("state", !currentState).await()
 
         } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
         }
     }
 
     override suspend fun addInstructorToChild(child: Child, instructorID: String) {
         val childDocument = firebaseFirestore.collection("Child").document(child.id)
-        // Actualizar el valor de instructorId en el documento
         childDocument.update("instructorId", instructorID)
 
     }
@@ -479,7 +480,9 @@ class FirestoreRepositoryImpl @Inject constructor(
                         .addOnSuccessListener {
                             // La actualización fue exitosa
                         }
-                        .addOnFailureListener { _ ->
+                        .addOnFailureListener { e ->
+                            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+
                         }
 
                     val data = document.data
@@ -507,7 +510,9 @@ class FirestoreRepositoryImpl @Inject constructor(
                         .addOnSuccessListener {
                             // La actualización fue exitosa
                         }
-                        .addOnFailureListener { exception ->
+                        .addOnFailureListener { e ->
+                            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+
                         }
 
                     val data = document.data
@@ -652,6 +657,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 }
             })
         } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+
         }
         return allUsers
     }
@@ -685,6 +692,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 }
             }
         } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+
         }
 
         return allUsers

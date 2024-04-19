@@ -7,9 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,15 +38,17 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.libraryapp.model.firebaseAuth.SignInState
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Firebase.Authentication.GoogleAuthUiClient
@@ -70,7 +70,6 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -126,17 +125,43 @@ class MainActivity : ComponentActivity() {
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
+    @Composable
+    private fun CheckIfUserIsSignedInAndNavigate(
+        navController: NavController,
+    ) {
+        LaunchedEffect(key1 = Unit) {
+            if (googleAuthUiClient.getSignedInUser() != null) {
+                navController.navigate("secondScreens")
+            }
+        }
+    }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun HandleSuccessfulSignIn(
+        navController: NavController,
+        viewModel: LoginViewModel,
+        state: SignInState
+    ) {
+        LaunchedEffect(key1 = state.isSignInSuccessful) {
+            if (state.isSignInSuccessful) {
+                Toast.makeText(
+                    applicationContext,
+                    "Sesión Iniciada",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                navController.navigate("secondScreens")
+                viewModel.resetState()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
 
-            NavHost(navController = navController,
-                startDestination = "firstScreens"
-            ){
+            NavHost(navController = navController, startDestination = "firstScreens" ){
                 navigation(
                     startDestination = "login",
                     route = "firstScreens"
@@ -145,39 +170,9 @@ class MainActivity : ComponentActivity() {
                         val viewModel = viewModel<LoginViewModel>()
                         val state by viewModel.state.collectAsStateWithLifecycle()
 
-                        LaunchedEffect(key1 = Unit){
-                            if(googleAuthUiClient.getSignedInUser() != null){
-                                navController.navigate("secondScreens")
-                            }
-                        }
+                        CheckIfUserIsSignedInAndNavigate(navController)
 
-                        val launcher = rememberLauncherForActivityResult(
-                            contract = ActivityResultContracts.StartIntentSenderForResult(),
-                            onResult = {result ->
-                                if(result.resultCode == RESULT_OK) {
-                                    lifecycleScope.launch {
-                                        val signInResult = googleAuthUiClient.signInWithIntent(
-                                            intent = result.data ?: return@launch
-                                        )
-                                        viewModel.onSignInResult(signInResult)
-                                    }
-                                }
-                            }
-                        )
-
-                        LaunchedEffect(key1 = state.isSignInSuccessful) {
-                            if(state.isSignInSuccessful) {
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Sesión Iniciada",
-                                    Toast.LENGTH_LONG
-                                ).show()
-
-                                navController.navigate("secondScreens")
-                                viewModel.resetState()
-                            }
-                        }
-
+                        HandleSuccessfulSignIn(navController, viewModel, state)
                         LoginView(
                             navController = navController,
                             state = state
@@ -189,334 +184,173 @@ class MainActivity : ComponentActivity() {
 
 
                     composable("qr") {
-                        var showDialog by remember { mutableStateOf(false)  }
 
-                        BackHandler {
-                            navController.popBackStack()
-                        }
-
-
+                        HandleBackNavigation(navController = navController)
                         checkCameraPermission(this@MainActivity )
                         if ( textResult.value.isNotEmpty()) {
                             QrScannerScreen(textResult.value, navController)
                         }
 
-
-
                         LaunchedEffect(textResult.value) {
                             if (textResult.value.isEmpty()) {
-                                // Navegar de vuelta a la pantalla anterior si no hay texto de resultado
                                 navController.popBackStack()
                             }
                         }
                     }
                 }
-                navigation(
-                    startDestination = NavScreen.NewsScreen.name,
-                    route = "secondScreens"
-                ){
+                secondScreensNavigation(navController)
+            }
 
-                    composable(NavScreen.NewsScreen.name){
+        }
+    }
 
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                NewsScreen(navController = navController)
-                            }
+}
 
 
-                        }
-                    }
+@Composable
+private fun HandleBackNavigation(navController: NavHostController){
+    BackHandler {
+        navController.popBackStack()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+private fun NavGraphBuilder.secondScreensNavigation(navController: NavHostController){
+    navigation(startDestination = NavScreen.NewsScreen.name, route = "secondScreens"){
+        composable(NavScreen.NewsScreen.name){
+            ComposableScreen({ NewsScreen(navController) }, navController)
+        }
+
+        composable(NavScreen.QuizScreen.name){
+            ComposableScreen({ QuizScreen(navController) }, navController)
+        }
+
+        composable(NavScreen.ChatScreen.name){
+            ComposableScreen({ HomeScreen(navController) }, navController)
+        }
 
 
 
-                    composable(NavScreen.QuizScreen.name){
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                QuizScreen(navController)
-                            }
+        composable(NavScreen.Profile.name){
 
+            val userViewModel : UserViewModel = hiltViewModel()
+            var user by remember { mutableStateOf<String?>("") }
+            var userType by remember { mutableStateOf<String?>("") }
 
-                        }
+            LaunchedEffect(key1 = Unit){
+                user = userViewModel.getCurrentUser()
+                userType = user?.let { it1 -> userViewModel.getUserType(it1) }
+            }
 
-                    }
-
-                    composable(NavScreen.ChatScreen.name){
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                               // ChatScreen()
-                                HomeScreen(navController)
-                            }
-
-
+            userType?.let { type ->
+                when (type) {
+                    "Child" -> {
+                        user?.let { childId ->
+                            HandleBackNavigation(navController = navController)
+                            ComposableScreen({ ChildProfileScreen(childId, navController = navController) }, navController)
                         }
 
                     }
-
-
-
-                    composable(NavScreen.Profile.name){
-
-                        val userViewModel : UserViewModel = hiltViewModel()
-                        var user by remember { mutableStateOf<String?>("") }
-                        var userType by remember { mutableStateOf<String?>("") }
-
-                        LaunchedEffect(key1 = Unit){
-                            user = userViewModel.getCurrentUser()
-                            userType = user?.let { it1 -> userViewModel.getUserType(it1) }
-                        }
-
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                userType?.let { type ->
-                                    when (type) {
-                                        "Child" -> {
-                                            user?.let { childId ->
-                                                ChildProfileScreen(
-                                                    childId = childId,
-                                                    navController = navController
-                                                )
-                                            }
-                                        }
-
-                                        "Parents" -> {
-                                            user?.let { parentId ->
-                                                ParentsProfileScreen(
-                                                    parentId = parentId,
-                                                    navController = navController
-                                                )
-                                            }
-                                        }
-
-                                        "Instructor" -> {
-                                            user?.let { instructorId ->
-                                                InstructorProfileScreen(
-                                                    instructorId = instructorId,
-                                                    navController = navController
-                                                )
-                                            }
-                                        }
-
-                                        else -> {
-                                            // Manejar caso por defecto o error
-                                        }
-                                    }
-                                }
-                            }
-
-
-                        }
-
-                    }
-
-                    composable(
-                        route = "chatscreen/{recipientUserId}",
-                        arguments = listOf(navArgument("recipientUserId") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val recipientUserId = backStackEntry.arguments?.getString("recipientUserId") ?: ""
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) { padding ->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                ChatScreen(recipientUserId = recipientUserId, navController)
-                            }
+                    "Parents" -> {
+                        user?.let { parentId ->
+                            HandleBackNavigation(navController = navController)
+                            ComposableScreen({ ParentsProfileScreen(parentId, navController = navController) }, navController)
                         }
                     }
-
-
-
-
-                    composable(
-                        route = NavScreen.ChildList.name +"/{instructorID}",
-                        arguments = listOf(navArgument("instructorID") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val instructorID = backStackEntry.arguments?.getString("instructorID") ?: ""
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                ChildListScreen(navController = navController, instructorID = instructorID)
-                            }
-
+                    "Instructor" -> {
+                        user?.let { instructorId ->
+                            HandleBackNavigation(navController = navController)
+                            ComposableScreen({ InstructorProfileScreen(instructorId, navController = navController) }, navController)
 
                         }
-
-
-                    }
-
-
-
-                    composable("Scores"){
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-
-                                Scores(navController)
-                            }
-
-
-                        }
-
-                    }
-
-                    composable(
-                        route = "news_details_screen/{newsId}",
-                        arguments = listOf(navArgument("newsId") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val newsId = backStackEntry.arguments?.getString("newsId") ?: ""
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                NewsDetails(newsId = newsId)
-                            }
-
-
-                        }
-
-
-                    }
-
-
-                    composable(
-                        route = "child_profile_screen/{childId}",
-                        arguments = listOf(navArgument("childId") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val childId = backStackEntry.arguments?.getString("childId") ?: ""
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                ChildProfileScreen(childId = childId, navController = navController)
-                            }
-
-
-                        }
-
-                    }
-
-
-
-
-                    composable(
-                        route = "parent_profile_screen/{parentId}",
-                        arguments = listOf(navArgument("parentId") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val parentId = backStackEntry.arguments?.getString("parentId") ?: ""
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                ParentsProfileScreen(parentId = parentId, navController = navController)
-                            }
-
-
-                        }
-
-
-                    }
-
-
-                    composable(
-                        route = "instructor_profile_screen/{instructorId}",
-                        arguments = listOf(navArgument("instructorId") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        val instructorId = backStackEntry.arguments?.getString("instructorId") ?: ""
-                        Scaffold(
-                            bottomBar = {
-                                BottomNavigation(navController)
-                            }
-                        ) {padding->
-                            Box(
-                                modifier = Modifier
-                                    .padding(padding)
-                                    .fillMaxSize()
-                            ) {
-                                InstructorProfileScreen(instructorId = instructorId, navController = navController)
-                            }
-
-
-                        }
-
 
                     }
                 }
             }
 
 
+        }
+
+        composable(
+            route = "chatscreen/{recipientUserId}",
+            arguments = listOf(navArgument("recipientUserId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val recipientUserId = backStackEntry.arguments?.getString("recipientUserId") ?: ""
+            ComposableScreen({ ChatScreen(recipientUserId = recipientUserId, navController) }, navController)
+
+        }
+
+
+        composable(
+            route = NavScreen.ChildList.name +"/{instructorID}",
+            arguments = listOf(navArgument("instructorID") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val instructorID = backStackEntry.arguments?.getString("instructorID") ?: ""
+            ComposableScreen({ ChildListScreen(navController = navController, instructorID = instructorID) }, navController)
+        }
+
+
+        composable("Scores"){
+            ComposableScreen({ Scores(navController) }, navController)
+        }
+
+        composable(
+            route = "news_details_screen/{newsId}",
+            arguments = listOf(navArgument("newsId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val newsId = backStackEntry.arguments?.getString("newsId") ?: ""
+            ComposableScreen({ NewsDetails(newsId = newsId) }, navController)
+
+        }
+
+        composable(
+            route = "child_profile_screen/{childId}",
+            arguments = listOf(navArgument("childId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val childId = backStackEntry.arguments?.getString("childId") ?: ""
+            ComposableScreen({ ChildProfileScreen(childId = childId, navController = navController) }, navController)
+
+        }
+
+
+        composable(
+            route = "parent_profile_screen/{parentId}",
+            arguments = listOf(navArgument("parentId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val parentId = backStackEntry.arguments?.getString("parentId") ?: ""
+            ComposableScreen({ ParentsProfileScreen(parentId = parentId, navController = navController) }, navController)
+
+        }
+
+
+        composable(
+            route = "instructor_profile_screen/{instructorId}",
+            arguments = listOf(navArgument("instructorId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val instructorId = backStackEntry.arguments?.getString("instructorId") ?: ""
+            ComposableScreen({InstructorProfileScreen(instructorId = instructorId, navController = navController) }, navController)
 
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ComposableScreen(screenFunction: @Composable NavController.() -> Unit, navController: NavHostController) {
+    Scaffold(
+        bottomBar = {
+            BottomNavigation(navController)
+        }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            navController.screenFunction()
+        }
+    }
+}
 
 
 @Composable

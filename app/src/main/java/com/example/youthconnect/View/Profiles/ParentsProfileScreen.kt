@@ -60,6 +60,8 @@ import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.R
+import com.example.youthconnect.View.Components.EditIcon
+import com.example.youthconnect.View.Components.ProfilePicture
 import com.example.youthconnect.View.OverlaysAndMore.ModifyUsers
 import com.example.youthconnect.View.OverlaysAndMore.MyChildren
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -80,8 +82,6 @@ fun ParentsProfileScreen(parentId : String,
 
     val userViewModel : UserViewModel = hiltViewModel()
 
-    var editUser by remember { mutableStateOf(false)  }
-
     var currentUserType by remember { mutableStateOf("") }
 
 
@@ -99,145 +99,7 @@ fun ParentsProfileScreen(parentId : String,
     }
 
 
-    val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var showImagePickerDialog by remember { mutableStateOf(false) }
 
-
-    val imageUrlState = remember { mutableStateOf("") }
-
-    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            userViewModel.uploadProfileImage(uri, onSuccess = { _ ->
-                userViewModel.getProfileImage(
-                    onSuccess = { fetchedUrl ->
-                        imageUrlState.value = fetchedUrl
-                        Toast.makeText(
-                            context,
-                            "Imagen Actualizada",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    },
-                    onFailure = { _ ->
-                        Toast.makeText(
-                            context,
-                            "Error al bajar la imagen",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                )
-            }, onFailure = { _ ->
-                Toast.makeText(
-                    context,
-                    "Error al subir la imagen",
-                    Toast.LENGTH_LONG
-                ).show()
-            })
-        }
-    }
-
-    // Lanzador para tomar foto con la cámara
-    val takePictureLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success) {
-            // Aquí manejas la imagen capturada usando imageUri
-            imageUri?.let { uri ->
-                userViewModel.uploadProfileImage(uri, onSuccess = { newImageUrl ->
-                    userViewModel.getProfileImage(
-                        onSuccess = { fetchedUrl ->
-                            imageUrlState.value = fetchedUrl
-                            Toast.makeText(
-                                context,
-                                "Imagen Actualizada",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        },
-                        onFailure = { _ ->
-                            Toast.makeText(
-                                context,
-                                "Error al bajar la imagen",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    )
-                }, onFailure = { _ ->
-                    Toast.makeText(
-                        context,
-                        "Error al subir la imagen",
-                        Toast.LENGTH_LONG
-                    ).show()
-                })
-            }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        userViewModel.getProfileEspecificImage(parentId.lowercase() + "@youthconnect.com",
-            onSuccess = { url ->
-                imageUrlState.value = url
-            },
-            onFailure = { _ ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
-            }
-        )
-    }
-
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted: Boolean ->
-            if (isGranted) {
-                // Permiso concedido, proceder con la acción
-                imageUri = userViewModel.createImageUri(context)
-                imageUri?.let { uri ->
-                    takePictureLauncher.launch(uri)
-                }
-            } else {
-                // Permiso denegado, mostrar un mensaje
-                Toast.makeText(
-                    context,
-                    "No se puede abrir la cámara",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-    )
-
-
-    if (showImagePickerDialog) {
-        AlertDialog(
-            onDismissRequest = { showImagePickerDialog = false },
-            title = { Text("Seleccionar Imagen") },
-            text = { Text("Elige de dónde quieres seleccionar la imagen.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    imagePickerLauncher.launch("image/*")
-                    showImagePickerDialog = false
-                }) {
-                    Text("Galería")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    when (PackageManager.PERMISSION_GRANTED) {
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
-                            // Permiso ya concedido, proceder con la acción
-                            imageUri = userViewModel.createImageUri(context)
-                            imageUri?.let { uri ->
-                                takePictureLauncher.launch(uri)
-                            }
-                        }
-                        else -> {
-                            // Solicitar permiso
-                            permissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
-                    }
-                    showImagePickerDialog = false
-                }) {
-                    Text("Cámara")
-                }
-            }
-        )
-    }
 
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -254,32 +116,13 @@ fun ParentsProfileScreen(parentId : String,
                     val configuration = LocalConfiguration.current
                     val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
 
-                    // Profile Image
-                    AsyncImage(
-                        model = imageUrlState.value,
-                        contentDescription = "Profile Picture",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .border(
-                                BorderStroke(4.dp, remember {
-                                    Brush.sweepGradient(
-                                        listOf(
-                                            Green, Red
-                                        )
-                                    )
-                                }),
-                                CircleShape
-                            )
-                            .padding(4.dp)
-                            .clip(CircleShape)
-                            .clickable {
-                                if(currentUser == parent?.id){
-                                    showImagePickerDialog = true
-                                }
-
-                            },
-                        contentScale = ContentScale.Crop
+                    ProfilePicture(
+                        userViewModel = userViewModel,
+                        userId = parentId,
+                        user = parent,
+                        currentUser = currentUser
                     )
+
                     Row(verticalAlignment = Alignment.CenterVertically){
                         parent?.fullName?.let {
                             Text(
@@ -295,39 +138,17 @@ fun ParentsProfileScreen(parentId : String,
                             )
                         }
 
-                        if(currentUserType == "Instructor"){
-                            Icon(
-                                imageVector = Icons.Outlined.Edit ,
-                                contentDescription = "Edit",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .clickable {
-                                        editUser = true
-                                    }
-                            )
-                        }
-
-                        if (editUser) {
-                            parent?.let {
-                                ModifyUsers(onDismiss = { editUser = false },
-                                    it, navController
-                                )
-                            }
-                        }
+                        EditIcon(
+                            currentUserType = currentUserType,
+                            user = parent,
+                            navController = navController
+                        )
 
 
                     }
 
-
-
-
-
-
                     Spacer(modifier = Modifier.size(40.dp))
                 }
-
-
 
                 Column ( modifier = Modifier.fillMaxWidth()
                 ){
@@ -345,8 +166,10 @@ fun ParentsProfileScreen(parentId : String,
                                 .padding(start = 15.dp, top = 10.dp)
                                 .fillMaxWidth()
 
-                                .clickable { loginViewModel.signOut()
-                                    navController.navigate("firstScreens")}
+                                .clickable {
+                                    loginViewModel.signOut()
+                                    navController.navigate("firstScreens")
+                                }
                         )
                     }
 

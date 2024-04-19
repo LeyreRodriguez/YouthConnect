@@ -12,7 +12,6 @@ enum class Course(val displayName: String) {
 
     companion object {
         fun fromString(s: String): Course? {
-            println(s)
             return values().find { it.displayName == s }
         }
     }

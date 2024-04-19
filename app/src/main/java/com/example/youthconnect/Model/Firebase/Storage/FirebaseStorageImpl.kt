@@ -2,6 +2,7 @@ package com.example.youthconnect.Model.Firebase.Storage
 
 
 import android.net.Uri
+import android.util.Log
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Sealed.Response
@@ -54,13 +55,21 @@ class FirebaseStorageImpl @Inject constructor(
             uri.toString()
         } catch (exception: StorageException) {
 
-            if (exception.errorCode == StorageException.ERROR_OBJECT_NOT_FOUND) {
-
-                throw exception
-            } else {
-
-                throw exception
+            when (exception.errorCode) {
+                StorageException.ERROR_OBJECT_NOT_FOUND -> {
+                    // Handle object not found error
+                    // For example, return a default profile picture URL
+                    Constants.IMAGE
+                }
+                else -> {
+                    // Handle other types of errors
+                    // For example, log the error and return a generic error message
+                    Log.e("StorageError", "Error fetching profile picture: ${exception.message}")
+                    "generic_error_url"
+                }
             }
+
+
         }
     }
 

@@ -130,7 +130,7 @@ dependencies {
     implementation("androidx.wear.compose:compose-material:$composeMaterial")
     implementation("androidx.compose.material:material-icons-extended:$icons")   //Icons
     implementation ("androidx.compose.material:material:$composeMaterial2")  //Navigation
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
     implementation("androidx.hilt:hilt-navigation-compose:$hilt")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$viewmodelCompose")
     implementation ("androidx.navigation:navigation-compose:$navigationCompose") // Usa la última versión disponible
@@ -166,15 +166,6 @@ dependencies {
     implementation ("com.vanniktech:android-image-cropper:$imageCropper")
 
 
-    // Testing
-    testImplementation("junit:junit:$jUnit")
-    testImplementation("org.mockito:mockito-core:$mockito")
-    testImplementation("org.mockito:mockito-inline:$mockito")
-    androidTestImplementation("androidx.test.ext:junit:$jUnit2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:$espresso")
-    androidTestImplementation(platform("androidx.compose:compose-bom:$bom"))
-    androidTestImplementation("org.testng:testng:$testng")
-
 
     // QR & Barcode Scanning
     implementation("com.google.zxing:core:$zxing")
@@ -197,7 +188,7 @@ dependencies {
 
     //Dagger Hilt
     implementation ("com.google.dagger:hilt-android:$daggerHilt")
-    kapt ("com.google.dagger:hilt-compiler:$daggerHilt")
+
 
     // Activity Compose
 
@@ -206,7 +197,22 @@ dependencies {
     implementation ("androidx.activity:activity-ktx:$activityKtx")
 
 
+    // Testing
+    testImplementation("junit:junit:$jUnit")
+    testImplementation("org.mockito:mockito-core:$mockito")
+    testImplementation("org.mockito:mockito-inline:$mockito")
+    androidTestImplementation("androidx.test.ext:junit:$jUnit2")
+    androidTestImplementation("androidx.test.espresso:espresso-core:$espresso")
+    androidTestImplementation(platform("androidx.compose:compose-bom:$bom"))
+    androidTestImplementation("org.testng:testng:$testng")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+
+
+    kapt ("com.google.dagger:hilt-compiler:$daggerHilt")
+
 }
+
 
 kapt {
     correctErrorTypes = true
