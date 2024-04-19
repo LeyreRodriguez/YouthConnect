@@ -1,9 +1,7 @@
 package com.example.youthconnect.View.OverlaysAndMore
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.QuestionMark
@@ -14,10 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.View.Authentication.CustomOutlinedTextField
