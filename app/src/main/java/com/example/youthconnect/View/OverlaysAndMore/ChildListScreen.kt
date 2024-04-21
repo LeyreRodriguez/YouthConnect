@@ -303,7 +303,7 @@ fun MyChildren(navController: NavController, child: Child) {
             val currentRoute = navController.currentBackStackEntry?.destination?.route
 
 
-            if (currentRoute != NavScreen.ChildList.name +"/{instructorID}" && userType == "Instructor") {
+            if (currentRoute == NavScreen.Profile.name  && userType == "Instructor") {
 
                     Checkbox(
                         checked = isChecked,

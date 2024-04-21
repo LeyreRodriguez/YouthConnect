@@ -16,9 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val firestoreRepository: FirestoreRepository,
-    private val repo: FirebaseStorageRepository,
-): ViewModel() {
+    private val firestoreRepository: FirestoreRepository): ViewModel() {
 
     private var _recipientUserId = MutableLiveData<String>()
     val recipientUserId: LiveData<String> = _recipientUserId

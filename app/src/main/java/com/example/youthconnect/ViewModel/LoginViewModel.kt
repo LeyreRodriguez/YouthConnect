@@ -15,9 +15,6 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel: ViewModel() {
 
-    var userEmail: String = ""
-    var userPassword: String = ""
-
     private val _state = MutableStateFlow(SignInState())
     val state = _state.asStateFlow()
 

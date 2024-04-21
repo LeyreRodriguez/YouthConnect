@@ -4,7 +4,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
 
@@ -200,7 +199,9 @@ dependencies {
     // Testing
     testImplementation("junit:junit:$jUnit")
     testImplementation("org.mockito:mockito-core:$mockito")
+    testImplementation("io.mockk:mockk:1.12.2")
     testImplementation("org.mockito:mockito-inline:$mockito")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     androidTestImplementation("androidx.test.ext:junit:$jUnit2")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espresso")
     androidTestImplementation(platform("androidx.compose:compose-bom:$bom"))
