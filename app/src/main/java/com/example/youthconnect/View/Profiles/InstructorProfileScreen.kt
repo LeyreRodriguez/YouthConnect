@@ -82,8 +82,19 @@ fun InstructorProfileScreen(instructorId : String,
         try {
             instructor = userViewModel.getCurrentInstructorById(instructorId)
             children = userViewModel.getChildByInstructorIdThatIsInSchool(instructorId)
-            currentUser = userViewModel.getCurrentUser()
+   //         currentUser = userViewModel.getCurrentUser()
+    //        currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
 
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error fetching data", e)
+        }
+    }
+
+    LaunchedEffect(userViewModel) {
+        try {
+      //      instructor = userViewModel.getCurrentInstructorById(instructorId)
+      //      children = userViewModel.getChildByInstructorIdThatIsInSchool(instructorId)
+            currentUser = userViewModel.getCurrentUser()
             currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
 
         } catch (e: Exception) {

@@ -2,6 +2,7 @@ package com.example.youthconnect
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -70,6 +72,16 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.prefs.Preferences
+import android.Manifest
+import androidx.activity.viewModels
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import com.example.youthconnect.Model.Constants.TAG
+import com.example.youthconnect.ViewModel.NotificationViewModel
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -83,6 +95,60 @@ class MainActivity : ComponentActivity() {
             textResult.value = result.contents
         }
     }
+
+    private fun requestNotificationPermission() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if(!hasPermission) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+            }
+        }
+    }
+
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // FCM SDK (and your app) can post notifications.
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                // TODO: display an educational UI explaining to the user the features that will be enabled
+                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
+                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
+                //       If the user selects "No thanks," allow the user to continue without notifications.
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    private fun registrarDispositivo(){
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+
+            // Log and toast
+          //  val msg = getString(R.string.msg_token_fmt, token)
+         //   Log.d(TAG, msg)
+            //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+        })
+    }
+
 
 
     private fun showCamera(){
@@ -155,10 +221,42 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        val viewModel: NotificationViewModel by viewModels()
+
         super.onCreate(savedInstanceState)
+        askNotificationPermission()
+        registrarDispositivo()
+        //requestNotificationPermission()
+
         setContent {
+/*
+            Surface(
+                color = MaterialTheme.colorScheme.background,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val state = viewModel.state
+                if(state.isEnteringToken) {
+                    EnterTokenDialog(
+                        token = state.remoteToken,
+                        onTokenChange = viewModel::onRemoteTokenChange,
+                        onSubmit = viewModel::onSubmitRemoteToken
+                    )
+                } else {
+                    NotificationScreen(
+                        messageText = state.messageText,
+                        onMessageSend = {
+                            viewModel.sendMessage(isBroadcast = false)
+                        },
+                        onMessageBroadcast = {
+                            viewModel.sendMessage(isBroadcast = true)
+                        },
+                        onMessageChange = viewModel::onMessageChange
+                    )
+                }
+            }*/
+
+
             val navController = rememberNavController()
 
             NavHost(navController = navController, startDestination = "firstScreens" ){
@@ -200,6 +298,8 @@ class MainActivity : ComponentActivity() {
                 }
                 secondScreensNavigation(navController)
             }
+
+
 
         }
     }

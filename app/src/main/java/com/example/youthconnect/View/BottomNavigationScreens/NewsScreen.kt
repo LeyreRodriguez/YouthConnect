@@ -2,6 +2,7 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
@@ -59,6 +62,7 @@ import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
 import com.example.youthconnect.View.OverlaysAndMore.AddNews
 import com.example.youthconnect.ViewModel.NewsViewModel
+import com.example.youthconnect.ViewModel.NotificationViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
 
 
@@ -81,9 +85,12 @@ fun NewsScreen(
     var showDialog by remember { mutableStateOf(false)  }
 
 
+    LaunchedEffect(newsViewModel ) {
+        news = newsViewModel.getAllNews()
+    }
     LaunchedEffect(Unit) {
         try {
-            news = newsViewModel.getAllNews()
+
             user = userViewModel.getCurrentUser()
             result = user?.let { userViewModel.findDocument(it)
 
@@ -99,13 +106,16 @@ fun NewsScreen(
     }
 
 
+
     Box(
         modifier = modifier.fillMaxSize(),
     ) {
 
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(15.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             NewsHeader()
@@ -134,13 +144,16 @@ fun NewsScreen(
                     RecyclerView(news = news, navController = navController)
 
                     if (documentExists.value == "0") {
+                        Column {
+                            FloatingButton {
+                                // Aquí puedes agregar la lógica que se activará al hacer clic en el botón
+                                // Por ejemplo, puedes navegar a una nueva pantalla
+                                // navController.navigate("addNews")
+                                showDialog = true
+                            }
 
-                        FloatingButton {
-                            // Aquí puedes agregar la lógica que se activará al hacer clic en el botón
-                            // Por ejemplo, puedes navegar a una nueva pantalla
-                            // navController.navigate("addNews")
-                            showDialog = true
                         }
+
                     }
 
                     if (showDialog) {
@@ -204,7 +217,9 @@ fun LatestNewsSection(
     onShowDialogChange: (Boolean) -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(15.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp)
     ) {
         Text(
             text = "Últimas noticias",
@@ -261,12 +276,15 @@ fun userImage(user: String,
                     "0" -> {
                         navController.navigate("instructor_profile_screen/${user}")
                     }
+
                     "1" -> {
                         navController.navigate("parent_profile_screen/${user}")
                     }
+
                     "2" -> {
                         navController.navigate("child_profile_screen/${user}")
                     }
+
                     else -> {
                         navController.navigate("parent_profile_screen/${user}")
                     }

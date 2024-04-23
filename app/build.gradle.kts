@@ -118,6 +118,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-code-scanner:$scanner")
     implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:$barcode")
     implementation("com.google.android.gms:play-services-auth:$playServicesAuth")
+    implementation("com.google.firebase:firebase-messaging-ktx:23.0.6")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 
     //Jetpack Compose
@@ -211,6 +213,12 @@ dependencies {
 
 
     kapt ("com.google.dagger:hilt-compiler:$daggerHilt")
+
+    //Notification
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+
 
 }
 

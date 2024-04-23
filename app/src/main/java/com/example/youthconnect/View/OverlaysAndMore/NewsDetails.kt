@@ -86,7 +86,7 @@ fun NewsDetails(
                         text = it,
                         style = TextStyle(
                             fontSize = 30.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                          //  fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
                             fontWeight = FontWeight(400),
                             color = Color(0xFF000000),
                             letterSpacing = 0.9.sp,
@@ -116,7 +116,7 @@ fun NewsDetails(
                     text = it,
                     style = TextStyle(
                         fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                  //      fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
                         fontWeight = FontWeight(400),
                         color = Color(0xFF000000),
                         letterSpacing = 0.9.sp,

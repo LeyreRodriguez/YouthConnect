@@ -90,6 +90,8 @@ fun HomeScreen(
             Log.e("Firestore", "Error en ChildList", e)
         }
     }
+
+
     val unseenMessagesState = chatViewModel.getUnseenMessages().observeAsState(initial = emptyList())
 
     val unseenMessages by remember {
@@ -155,6 +157,18 @@ fun UserEachRow(
         userType = userViewModel.getUserType(person.userId).toString()
         currentUserType = userViewModel.getCurrentUser()
             ?.let { userViewModel.getUserType(it).toString() }.toString()
+        userViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
+            onSuccess = { url ->
+                imageUrlState.value = url
+            },
+            onFailure = { _ ->
+                print("Child not found")
+            }
+        )
+    }
+
+
+    LaunchedEffect(Unit) {
         userViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
             onSuccess = { url ->
                 imageUrlState.value = url
