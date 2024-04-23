@@ -36,24 +36,6 @@ class NotificationViewModel : ViewModel() {
         }
     }
 
-    fun onRemoteTokenChange(newToken: String) {
-        state = state.copy(
-            remoteToken = newToken
-        )
-    }
-
-    fun onSubmitRemoteToken() {
-        state = state.copy(
-            isEnteringToken = false
-        )
-    }
-
-    fun onMessageChange(message: String) {
-        state = state.copy(
-            messageText = message
-        )
-    }
-
     fun sendMessage(isBroadcast: Boolean, news : News) {
         viewModelScope.launch {
             val messageDto = SendNotificationDto(

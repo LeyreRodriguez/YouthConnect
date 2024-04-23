@@ -96,23 +96,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun requestNotificationPermission() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val hasPermission = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-
-            if(!hasPermission) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    0
-                )
-            }
-        }
-    }
-
     private fun askNotificationPermission() {
         // This is only necessary for API level >= 33 (TIRAMISU)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -121,10 +104,6 @@ class MainActivity : ComponentActivity() {
             ) {
                 // FCM SDK (and your app) can post notifications.
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                // TODO: display an educational UI explaining to the user the features that will be enabled
-                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
-                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
-                //       If the user selects "No thanks," allow the user to continue without notifications.
             } else {
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -138,14 +117,6 @@ class MainActivity : ComponentActivity() {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
-
-            // Get new FCM registration token
-            val token = task.result
-
-            // Log and toast
-          //  val msg = getString(R.string.msg_token_fmt, token)
-         //   Log.d(TAG, msg)
-            //Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
         })
     }
 
@@ -230,33 +201,6 @@ class MainActivity : ComponentActivity() {
         //requestNotificationPermission()
 
         setContent {
-/*
-            Surface(
-                color = MaterialTheme.colorScheme.background,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val state = viewModel.state
-                if(state.isEnteringToken) {
-                    EnterTokenDialog(
-                        token = state.remoteToken,
-                        onTokenChange = viewModel::onRemoteTokenChange,
-                        onSubmit = viewModel::onSubmitRemoteToken
-                    )
-                } else {
-                    NotificationScreen(
-                        messageText = state.messageText,
-                        onMessageSend = {
-                            viewModel.sendMessage(isBroadcast = false)
-                        },
-                        onMessageBroadcast = {
-                            viewModel.sendMessage(isBroadcast = true)
-                        },
-                        onMessageChange = viewModel::onMessageChange
-                    )
-                }
-            }*/
-
-
             val navController = rememberNavController()
 
             NavHost(navController = navController, startDestination = "firstScreens" ){
