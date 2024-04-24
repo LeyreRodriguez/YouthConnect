@@ -25,7 +25,7 @@ class NotificationViewModel : ViewModel() {
         private set
 
     private val api: FcmApi = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8080/")
+        .baseUrl("http://88.25.188.222:5001/")
         .addConverterFactory(MoshiConverterFactory.create())
         .build()
         .create()
@@ -34,6 +34,24 @@ class NotificationViewModel : ViewModel() {
         viewModelScope.launch {
             Firebase.messaging.subscribeToTopic("notification").await()
         }
+    }
+
+    fun onRemoteTokenChange(newToken: String) {
+        state = state.copy(
+            remoteToken = newToken
+        )
+    }
+
+    fun onSubmitRemoteToken() {
+        state = state.copy(
+            isEnteringToken = false
+        )
+    }
+
+    fun onMessageChange(message: String) {
+        state = state.copy(
+            messageText = message
+        )
     }
 
     fun sendMessage(isBroadcast: Boolean, news : News) {
