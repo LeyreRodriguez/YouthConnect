@@ -223,7 +223,7 @@ fun AddInstructorFragment(currentUser : String?, instructor: Instructor?){
                     showDialog = true
                 }
                 .border(
-                    BorderStroke(4.dp, remember {
+                    BorderStroke(2.dp, remember {
                         Brush.sweepGradient(
                             listOf(
                                 Green, Red
@@ -237,7 +237,9 @@ fun AddInstructorFragment(currentUser : String?, instructor: Instructor?){
 
         )
         if (showDialog) {
-            AddInstructor(onDismiss = { showDialog = false })
+            if (instructor != null) {
+                AddInstructor(onDismiss = { showDialog = false })
+            }
         }
     }
 }

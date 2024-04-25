@@ -2,7 +2,9 @@ package com.example.youthconnect.View.BottomNavigationScreens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,12 +35,14 @@ import com.example.youthconnect.ViewModel.ChatViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.ChildCare
 import androidx.compose.material.icons.outlined.FamilyRestroom
 import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,14 +58,17 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.View.Components.SingleMessage
 import com.example.youthconnect.View.OverlaysAndMore.SearchView
+import com.example.youthconnect.ViewModel.NotificationViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
@@ -183,7 +190,11 @@ fun UserEachRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(4.dp)
+            .padding(4.dp),
+
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent
+        )
 
     ) {
 
@@ -195,14 +206,20 @@ fun UserEachRow(
 
                 ProfileImage(imageUrlState.value)
 
-                if (person.userId in unseenMessages) {
-                    Icon(
-                        imageVector = Icons.Outlined.MarkEmailUnread,
-                        contentDescription = "Recibido",
-                        tint = Red,
-                        modifier = Modifier.size(20.dp)
-                    )
+                Column(){
+                    UserTypeIcon(userType, currentUserType)
+                    if (person.userId in unseenMessages) {
+                        Icon(
+                            imageVector = Icons.Outlined.MarkEmailUnread,
+                            contentDescription = "Recibido",
+                            tint = Red,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
                 }
+
+
 
                 val userName = person.userName ?: ""
                 val maxWordsPerLine = 3 // Máximo de palabras por línea
@@ -226,23 +243,14 @@ fun UserEachRow(
 
             }
 
-
-            Row(
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                UserTypeIcon(userType, currentUserType)
-            }
-
-
-
-
         }
-
-
-
-
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            color = Color.Gray,
+            thickness = 1.dp
+        )
 
     }
 }
@@ -261,9 +269,9 @@ private fun UserTypeIcon(userType: String, currentUserType: String) {
                 contentDescription = userType,
                 tint = Color.Black,
                 modifier = Modifier
-                    .size(35.dp)
+                    .size(20.dp)
                 //    .align(CenterVertically)
-                    .padding(4.dp)
+                  //  .padding(4.dp)
             )
         }
     }
@@ -286,12 +294,29 @@ private fun DisplayName(userName: String) {
     val maxWordsPerLine = 3 // Máximo de palabras por línea
     val lines = userName.split(" ").chunked(maxWordsPerLine) { it.joinToString(" ") }
 
-    Column(
-        verticalArrangement = Arrangement.Center
-    ) {
-        lines.forEach { line ->
+    if(lines.size < 1){
+        Column(
+            verticalArrangement = Arrangement.Center
+        ) {
+            lines.forEach { line ->
+                Text(
+                    text = line,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        color = Color.Black
+                    ),
+                    modifier = Modifier.padding(start = 10.dp)
+                )
+            }
+        }
+    }else{
+
+        Column(
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(
-                text = line,
+                text = userName,
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
@@ -300,7 +325,11 @@ private fun DisplayName(userName: String) {
                 modifier = Modifier.padding(start = 10.dp)
             )
         }
+
+
     }
+
+
 }
 
 
@@ -391,6 +420,7 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
                         IconButton(
                             onClick = {
                                 chatViewModel.addMessage(recipientUserId)
+
                             }
                         ) {
                             Icon(

@@ -21,6 +21,7 @@ class ChatViewModel @Inject constructor(
     private var _recipientUserId = MutableLiveData<String>()
     val recipientUserId: LiveData<String> = _recipientUserId
 
+
     init {
         recipientUserId.observeForever { userId ->
             Log.e("recipientUserId", userId)
@@ -82,6 +83,8 @@ class ChatViewModel @Inject constructor(
                 .addOnSuccessListener {
                     _message.value = ""
                 }
+
+
         }
     }
 

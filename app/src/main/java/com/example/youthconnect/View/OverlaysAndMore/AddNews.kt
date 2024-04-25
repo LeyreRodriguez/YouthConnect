@@ -2,10 +2,13 @@ package com.example.youthconnect.View.OverlaysAndMore
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -64,9 +68,8 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
     }
 
     val viewModel: NotificationViewModel = viewModel()
-
     var isBroadcast by remember { mutableStateOf(false) }
-
+    val mcontext = LocalContext.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -75,49 +78,56 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
         text = {
             LazyColumn(state = listState) {
                 item {
-                    CustomOutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        label = "Titulo",
-                        leadingIconImageVector = Icons.Default.Title
-                    )
-
-                    CustomOutlinedTextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = "Descripcion",
-                        leadingIconImageVector = Icons.Default.Description
-                    )
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Checkbox(
-                            checked = isBroadcast,
-                            onCheckedChange = { isChecked -> isBroadcast = isChecked },
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                        Text(text = "Notificar a los usuarios")
-                    }
-
-
-
-                    Button(
-                        onClick = { galleryLauncher.launch(ALL_IMAGES) }
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Seleccionar imagen")
-                    }
-
-                    // Mostrar la imagen seleccionada
-                    imageUri?.let { uri ->
-                        Image(
-                            painter = rememberImagePainter(uri),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(200.dp)
-                                .padding(vertical = 8.dp)
-                                .clip(shape = RoundedCornerShape(8.dp))
-
+                        CustomOutlinedTextField(
+                            value = title,
+                            onValueChange = { title = it },
+                            label = "Titulo",
+                            leadingIconImageVector = Icons.Default.Title
                         )
+
+                        CustomOutlinedTextField(
+                            value = description,
+                            onValueChange = { description = it },
+                            label = "Descripcion",
+                            leadingIconImageVector = Icons.Default.Description
+                        )
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = isBroadcast,
+                                onCheckedChange = { isChecked -> isBroadcast = isChecked },
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                            Text(text = "Notificar a los usuarios")
+                        }
+
+
+
+                        Button(
+                            onClick = { galleryLauncher.launch(ALL_IMAGES) }
+                        ) {
+                            Text("Seleccionar imagen")
+                        }
+
+                        // Mostrar la imagen seleccionada
+                        imageUri?.let { uri ->
+                            Image(
+                                painter = rememberImagePainter(uri),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .padding(vertical = 8.dp)
+                                    .clip(shape = RoundedCornerShape(8.dp))
+
+
+                            )
+                        }
                     }
+
                 }
             }
         },
@@ -125,6 +135,7 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
             TextButton(
                 onClick = {
                     val news = News(id, title, description)
+
 
                     newsViewModel.getNewsImageFromDatabase()
 
@@ -134,11 +145,13 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
 
                         // Invoke addNewsToDatabase with imageUrl as String
                         newsViewModel.addNewsToDatabase(Uri.parse(imageUrl), news)
+                        Toast.makeText(mcontext, "Noticia agregada correctamente", Toast.LENGTH_SHORT).show()
                     }
 
                     val state = viewModel.state
                     if (state.isEnteringToken && isBroadcast) {
                         viewModel.sendMessage(isBroadcast = true, news)
+                        Toast.makeText(mcontext, "Notificación enviada correctamente", Toast.LENGTH_SHORT).show()
 
                     }
 

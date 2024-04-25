@@ -307,36 +307,6 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
         }
     }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-            onDraw = {
-                // Dibuja un rectángulo blanco como fondo
-                drawRect(Color.White)
-
-                // Define el pincel para el borde con el gradiente del Brush
-                val borderBrush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFFE15554),
-                        Color(0xFF3BB273),
-                        Color(0xFFE1BC29),
-                        Color(0xFF4D9DE0)
-                    )
-                )
-
-                // Dibuja el borde con el pincel definido
-                drawRect(
-                    brush = borderBrush,
-                    topLeft = Offset(0f, 0f),
-                    size = Size(size.width, size.height),
-                    style = Stroke(width = 15.dp.toPx()) // Ancho del borde
-                )
-            }
-        )
-    }
-
 
     Column(
         verticalArrangement = Arrangement.Top,

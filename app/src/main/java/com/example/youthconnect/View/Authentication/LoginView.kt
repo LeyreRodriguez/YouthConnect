@@ -193,7 +193,8 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                                 ),
                                 keyboardActions = KeyboardActions(
                                     onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                                )
+                                ),
+
                             )
                         }
                         item {

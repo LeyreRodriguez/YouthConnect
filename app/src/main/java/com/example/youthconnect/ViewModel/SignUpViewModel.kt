@@ -79,6 +79,23 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
+
+    fun signInWithEmail(email: String, passworld: String, home: () -> Unit) = viewModelScope.launch{
+        val realEmail = email+"@youthconnect.com"
+        try {
+            auth.signInWithEmailAndPassword(realEmail, passworld)
+                .addOnCompleteListener {task ->
+                    if( task.isSuccessful){
+                        home()
+                    }
+                }
+        }
+        catch (e: Exception){
+            Log.d("Login Email", "${e.message}")
+
+        }
+    }
+
      fun addChild(child: Child){
 
          viewModelScope.launch {

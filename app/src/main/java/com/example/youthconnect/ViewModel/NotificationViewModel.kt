@@ -54,13 +54,16 @@ class NotificationViewModel : ViewModel() {
         )
     }
 
-    fun sendMessage(isBroadcast: Boolean, news : News) {
+    fun sendMessage(isBroadcast: Boolean, item : News) {
+
+
         viewModelScope.launch {
             val messageDto = SendNotificationDto(
                 to = if(isBroadcast) "/topics/notification" else state.remoteToken,
+
                 notification = NotificationBody(
-                    title = news.title,
-                    body = news.description
+                    title = item.title,
+                    body = item.description
                 )
             )
 

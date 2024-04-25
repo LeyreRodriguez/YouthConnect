@@ -493,7 +493,8 @@ fun CustomOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 10.dp),
-            label = { Text(label)},
+            label = { Text(label,
+                style = TextStyle(color = Color.Black))},
             leadingIcon = {
                 Icon(
                     imageVector = leadingIconImageVector,

@@ -74,6 +74,9 @@ import com.journeyapps.barcodescanner.ScanOptions
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.prefs.Preferences
 import android.Manifest
+import android.view.View
+import android.widget.Button
+import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -86,6 +89,9 @@ import com.google.firebase.messaging.FirebaseMessaging
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+
+    private var isButtonVisible by mutableStateOf(false)
+
     private var textResult = mutableStateOf("")
 
     private val barCodeLauncher = registerForActivityResult(ScanContract()) { result ->
@@ -93,8 +99,14 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this@MainActivity, "Cancelled", Toast.LENGTH_SHORT).show()
         } else{
             textResult.value = result.contents
+            showButtonAfterScan()
         }
     }
+    private fun showButtonAfterScan() {
+        // Actualiza el estado para mostrar el botón
+        isButtonVisible = true
+    }
+
 
     private fun askNotificationPermission() {
         // This is only necessary for API level >= 33 (TIRAMISU)
@@ -193,12 +205,10 @@ class MainActivity : ComponentActivity() {
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
-        val viewModel: NotificationViewModel by viewModels()
 
         super.onCreate(savedInstanceState)
         askNotificationPermission()
         registrarDispositivo()
-        //requestNotificationPermission()
 
         setContent {
             val navController = rememberNavController()
@@ -227,17 +237,37 @@ class MainActivity : ComponentActivity() {
 
                     composable("qr") {
 
+                        val userViewModel : UserViewModel = hiltViewModel()
+
                         HandleBackNavigation(navController = navController)
                         checkCameraPermission(this@MainActivity )
+
+
+
                         if ( textResult.value.isNotEmpty()) {
-                            QrScannerScreen(textResult.value, navController)
+                            LaunchedEffect(userViewModel) {
+                                try {
+                                    userViewModel.changeState(textResult.value)
+
+                                } catch (e: Exception) {
+                                    Log.e("Firestore", "Error en QR", e)
+                                }
+                            }
+
+                            navController.navigate("child_profile_screen/${textResult.value}")
                         }
 
+
+/*
                         LaunchedEffect(textResult.value) {
                             if (textResult.value.isEmpty()) {
-                                navController.popBackStack()
+                                navController.navigate("child_profile_screen/${textResult.value}
                             }
                         }
+
+ */
+
+
                     }
                 }
                 secondScreensNavigation(navController)

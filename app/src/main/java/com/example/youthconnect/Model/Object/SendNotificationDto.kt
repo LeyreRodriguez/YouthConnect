@@ -11,5 +11,5 @@ data class SendNotificationDto(
 
 data class NotificationBody(
     val title: String,
-    val body: String
+    val body: String? = ""
 )

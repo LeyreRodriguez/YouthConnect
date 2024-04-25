@@ -22,10 +22,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -321,13 +324,18 @@ fun userImage(user: String,
 @Composable
 fun ListItem(news: News, navController: NavHostController) {
 
+
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .clickable {
                 navController.navigate("news_details_screen/${news.id}")
             }
             .padding(bottom = 4.dp)
+            ,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent
+        )
 
     ) {
         Row(
@@ -372,6 +380,15 @@ fun ListItem(news: News, navController: NavHostController) {
         }
 
     }
+
+    Divider(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        color = Color.Gray,
+        thickness = 1.dp
+    )
+
 }
 
 @Composable
