@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -148,7 +150,7 @@ fun NewsScreen(
 
                     if (documentExists.value == "0") {
                         Column {
-                            FloatingButton {
+                            FloatingButton(Icons.Outlined.Add) {
                                 // Aquí puedes agregar la lógica que se activará al hacer clic en el botón
                                 // Por ejemplo, puedes navegar a una nueva pantalla
                                 // navController.navigate("addNews")
@@ -240,7 +242,7 @@ fun LatestNewsSection(
             RecyclerView(news = news, navController = navController)
 
             if (documentExists) {
-                FloatingButton(onClick = { onShowDialogChange(true) })
+                FloatingButton(Icons.Outlined.Add, onClick = { onShowDialogChange(true) })
             }
 
             if (showDialog) {
@@ -438,13 +440,13 @@ fun RecyclerView(
 
 
 @Composable
-fun FloatingButton(onClick: () -> Unit) {
+fun FloatingButton( icon : ImageVector,onClick: () -> Unit) {
     SmallFloatingActionButton(
         onClick = { onClick() },
         containerColor = MaterialTheme.colorScheme.secondaryContainer,
         contentColor = MaterialTheme.colorScheme.secondary
     ) {
-        Icon(Icons.Filled.Add, "Small floating action button.")
+        Icon(icon, "Small floating action button.")
     }
 }
 

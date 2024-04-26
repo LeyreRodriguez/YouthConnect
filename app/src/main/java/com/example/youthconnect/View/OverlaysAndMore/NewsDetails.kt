@@ -2,13 +2,20 @@ package com.example.youthconnect.View.OverlaysAndMore
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,28 +37,39 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
 import com.example.youthconnect.View.BottomNavigationScreens.CoilImage
+import com.example.youthconnect.View.BottomNavigationScreens.FloatingButton
+import com.example.youthconnect.View.BottomNavigationScreens.RecyclerView
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
 
 @Composable
 fun NewsDetails(
     newsId: String,
+    navController: NavController,
     modifier: Modifier = Modifier.background(color = Color.White)
 ) {
-
+    var editNews by remember { mutableStateOf(false)  }
 
 
     val newsViewModel: NewsViewModel = hiltViewModel()
     val userViewModel: UserViewModel = hiltViewModel()
     var news by remember { mutableStateOf<News?>(null) }
     val imageUrlState = remember { mutableStateOf("") }
+    var currentUser by remember { mutableStateOf<String?>(null) }
+    var currentUserType by remember { mutableStateOf("") }
 
     LaunchedEffect(newsViewModel) {
         try {
             news = newsViewModel.getNewsById(newsId)
+            currentUser = userViewModel.getCurrentUser()
+            currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
         } catch (e: Exception) {
             Log.e("Firestore", "Error en ChildList", e)
         }
@@ -70,8 +88,16 @@ fun NewsDetails(
         )
     }
 
+    if (editNews) {
+        news?.let {
+            ModifyNews(it, navController,onDismiss = { editNews = false })
+        }
+    }
+
     LazyColumn(
-        modifier = modifier.fillMaxSize().padding(15.dp)
+        modifier = modifier
+            .fillMaxSize()
+            .padding(15.dp)
     ) {
         item {
             Row(
@@ -81,19 +107,22 @@ fun NewsDetails(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                news?.title?.let {
-                    Text(
-                        text = it,
-                        style = TextStyle(
-                            fontSize = 30.sp,
-                          //  fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF000000),
-                            letterSpacing = 0.9.sp,
-                        ), modifier = Modifier
-                            .padding(start = 15.dp, top = 10.dp)
-                    )
+                Box(modifier = Modifier.weight(1f)) {
+                    news?.title?.let {
+                        Text(
+                            text = it,
+                            style = TextStyle(
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFF000000),
+                                letterSpacing = 0.9.sp,
+                            ),
+                            modifier = Modifier.padding(start = 15.dp, top = 10.dp)
+                        )
+                    }
                 }
+
+
             }
 
             val configuration = LocalConfiguration.current
@@ -125,5 +154,21 @@ fun NewsDetails(
                 )
             }
         }
+    }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(10.dp), contentAlignment = Alignment.BottomEnd) {
+
+        if (currentUserType == "Instructor") {
+            Row(){
+                FloatingButton(Icons.Outlined.Edit, onClick = { editNews = true })
+                FloatingButton(Icons.Outlined.DeleteOutline, onClick = { newsViewModel.deleteNews(newsId); navController.navigate(
+                    NavScreen.NewsScreen.name)    })
+            }
+
+        }
+
+
     }
 }

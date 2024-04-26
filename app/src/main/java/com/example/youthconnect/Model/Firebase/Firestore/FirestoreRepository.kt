@@ -73,6 +73,8 @@ interface FirestoreRepository {
     fun getScore(coleccion: String, idDocumento: String): String
 
     fun updateUser(user : Any)
+    fun updateNews(news : News)
+    fun deleteNews(newsId: String)
 
 
 }

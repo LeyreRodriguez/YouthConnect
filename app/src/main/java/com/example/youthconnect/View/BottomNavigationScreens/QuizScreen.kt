@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -270,9 +272,8 @@ fun DialogForQuestions(documentExists:String, showDialog  : Boolean, onShowDialo
     ) {
         if (documentExists == "0") {
 
-            FloatingButton {
-                onShowDialog(true)
-            }
+            FloatingButton(Icons.Outlined.Add, onClick = { onShowDialog(true) })
+
 
         }
 

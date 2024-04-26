@@ -887,6 +887,22 @@ class FirestoreRepositoryImpl @Inject constructor(
     }
 
 
+    override fun updateNews(news : News){
+
+        val instructorRef = firebaseFirestore.collection("News").document(news.id)
+        instructorRef.update("title", news.title)
+        instructorRef.update("description", news.description)
+        instructorRef.update("image", news.image)
+
+
+    }
+
+
+    override fun deleteNews(newsId: String) {
+        val newsRef = firebaseFirestore.collection("News").document(newsId)
+        newsRef.delete()
+    }
+
 
 
 

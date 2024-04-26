@@ -373,7 +373,7 @@ private fun NavGraphBuilder.secondScreensNavigation(navController: NavHostContro
             arguments = listOf(navArgument("newsId") { type = NavType.StringType })
         ) { backStackEntry ->
             val newsId = backStackEntry.arguments?.getString("newsId") ?: ""
-            ComposableScreen({ NewsDetails(newsId = newsId) }, navController)
+            ComposableScreen({ NewsDetails(newsId = newsId, navController) }, navController)
 
         }
 

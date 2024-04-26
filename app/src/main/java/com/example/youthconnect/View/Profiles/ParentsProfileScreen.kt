@@ -57,11 +57,12 @@ fun ParentsProfileScreen(parentId : String,
 
     var parent by remember { mutableStateOf<Parent?>(null) }
     var currentUser by remember { mutableStateOf<String?>(null) }
+    var currentUserType by remember { mutableStateOf("") }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
 
     val userViewModel : UserViewModel = hiltViewModel()
 
-    var currentUserType by remember { mutableStateOf("") }
+
 
 
 

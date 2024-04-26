@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
 import com.example.youthconnect.Model.Object.News
@@ -76,6 +77,26 @@ class NewsViewModel @Inject constructor(
     fun getNewsImageFromDatabase() = viewModelScope.launch {
         getImageFromDatabaseResponse = Response.Loading
         getImageFromDatabaseResponse = repo.getNewsImageUrlFromFirestore()
+    }
+
+    fun updateNews( news : News){
+        try {
+            firestoreRepository.updateNews(news)
+
+        } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+
+        }
+    }
+
+    fun deleteNews( newsId : String){
+        try {
+            firestoreRepository.deleteNews(newsId)
+
+        } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+
+        }
     }
 
 
