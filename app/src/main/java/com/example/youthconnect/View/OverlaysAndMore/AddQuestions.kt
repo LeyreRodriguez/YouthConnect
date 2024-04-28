@@ -2,6 +2,8 @@ package com.example.youthconnect.View.OverlaysAndMore
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QuestionAnswer
 import androidx.compose.material.icons.filled.QuestionMark
@@ -15,11 +17,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.View.Authentication.CustomOutlinedTextField
 import com.example.youthconnect.ViewModel.QuizViewModel
+import java.util.UUID
+
 @Composable
-fun AddQuestions(onDismiss: () -> Unit) {
+fun AddQuestions(navController : NavHostController, onDismiss: () -> Unit) {
     val quizViewModel = hiltViewModel<QuizViewModel>()
     val questionData = remember { mutableStateOf(QuestionData()) }
 
@@ -31,10 +36,13 @@ fun AddQuestions(onDismiss: () -> Unit) {
         confirmButton = {
 
             TextButton(onClick = {
+                val id = UUID.randomUUID().toString()
+
 
                 if (questionData.value.selectedAnswer.isNotEmpty()) {
                     quizViewModel.addNewQuestion(
                         Question(
+                            id = id,
                             answer = questionData.value.selectedAnswer,
                             optionA = questionData.value.optionA,
                             optionB = questionData.value.optionB,
@@ -47,6 +55,8 @@ fun AddQuestions(onDismiss: () -> Unit) {
                 }
 
                 questionData.value = QuestionData()
+
+                navController.navigate("DecideScreen")
             }) {
                 Text("Confirmar")
             }
@@ -61,7 +71,9 @@ fun AddQuestions(onDismiss: () -> Unit) {
 
 @Composable
 fun QuestionForm(questionData: MutableState<QuestionData>) {
-    LazyColumn {
+
+    val listState = rememberLazyListState()
+    LazyColumn(state = listState) {
         item {
             Text("Escriba primero la pregunta y seguidamente las posibles respuestas, no olvide marcar cual es la respuesta correcta")
             CustomOutlinedTextField(

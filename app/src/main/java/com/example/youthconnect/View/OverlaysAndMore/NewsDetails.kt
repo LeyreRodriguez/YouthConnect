@@ -44,8 +44,8 @@ import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
 import com.example.youthconnect.View.BottomNavigationScreens.CoilImage
-import com.example.youthconnect.View.BottomNavigationScreens.FloatingButton
 import com.example.youthconnect.View.BottomNavigationScreens.RecyclerView
+import com.example.youthconnect.View.Components.FloatingButton
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
 

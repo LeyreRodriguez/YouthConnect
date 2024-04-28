@@ -19,9 +19,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Park
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,15 +45,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.libraryapp.viewModel.LoginViewModel
+import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.Model.Object.Child
+import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
 import com.example.youthconnect.View.Components.EditIcon
+import com.example.youthconnect.View.Components.ExtendedFloatingButton
+import com.example.youthconnect.View.Components.FloatingButton
 import com.example.youthconnect.View.Components.ProfilePicture
 import com.example.youthconnect.View.QR.DisplayQRCode
+import com.example.youthconnect.ViewModel.SignUpViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
 
 @Composable
@@ -61,6 +70,7 @@ fun ChildProfileScreen(
 ){
 
     var child by remember { mutableStateOf<Child?>(null) }
+    var instructor by remember { mutableStateOf<Instructor?>(null) }
     var parents by remember { mutableStateOf<List<Parent?>>(emptyList()) }
     var currentUser by remember { mutableStateOf<String?>(null) }
     val userViewModel : UserViewModel = hiltViewModel()
@@ -72,15 +82,18 @@ fun ChildProfileScreen(
 
     var user by remember { mutableStateOf<String?>("") }
 
-
+    val signUpViewModel : SignUpViewModel = hiltViewModel()
 
     var currentUserType by remember { mutableStateOf("") }
+
+    val loginViewModel: LoginViewModel = viewModel()
 
     LaunchedEffect(userViewModel) {
         val user = userViewModel.getUserById(childId)
         currentUser = userViewModel.getCurrentUser()
         currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
         userState.value = user
+        instructor = currentUser?.let { userViewModel.getCurrentInstructorById(it) }
     }
 
     LaunchedEffect(userViewModel) {
@@ -98,26 +111,33 @@ fun ChildProfileScreen(
         }
     }
 
+    Column(modifier = modifier.fillMaxSize()) {
 
 
-    Box(
-            modifier = modifier.fillMaxSize(),
-        ) {
+        Box(
+           // modifier = modifier.fillMaxSize(),
+            ) {
 
-        ChildInfo(
-            childId = childId,
-            child = child ,
-            currentUser = currentUser ,
-            currentUserType = currentUserType,
-            parents = parents,
-            documentExists = documentExists.value,
-            navController = navController
-        )
+            ChildInfo(
+                childId = childId,
+                child = child ,
+                currentUser = currentUser ,
+                currentUserType = currentUserType,
+                parents = parents,
+                documentExists = documentExists.value,
+                navController = navController
+            )
+
+
+            }
+
+
 
         }
 
 
-    }
+
+}
 
 
 @Composable

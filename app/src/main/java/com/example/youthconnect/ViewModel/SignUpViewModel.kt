@@ -8,12 +8,14 @@ import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.Model.Object.Parent
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,6 +70,81 @@ class SignUpViewModel @Inject constructor(
             _loading.value = false
         }
     }
+
+
+    fun deleteChild(email: String, password: String) {
+
+
+
+        viewModelScope.launch {
+            _loading.value = true
+            val result = emailService.unregisterUser(email.lowercase(), password)
+            _message.value = result.fold(
+                onSuccess = {
+                    _navigateToNextScreen.value = true // Indica que la eliminación fue exitosa y se debe navegar
+                    it
+                },
+                onFailure = {
+                    "Error al eliminar usuario: ${it.message}"
+                }
+            )
+            _loading.value = false
+        }
+
+        firestoreRepository.deleteChild(email)
+
+    }
+
+    fun deleteParent(email: String, password: String) {
+
+
+
+        viewModelScope.launch {
+            _loading.value = true
+            val result = emailService.unregisterUser(email.lowercase(), password)
+            _message.value = result.fold(
+                onSuccess = {
+                    _navigateToNextScreen.value = true // Indica que la eliminación fue exitosa y se debe navegar
+                    it
+                },
+                onFailure = {
+                    "Error al eliminar usuario: ${it.message}"
+                }
+            )
+            _loading.value = false
+        }
+
+        firestoreRepository.deleteParent(email)
+
+    }
+
+    fun deleteInstructor(email: String, password: String) {
+
+
+
+        viewModelScope.launch {
+            _loading.value = true
+            val result = emailService.unregisterUser(email.lowercase(), password)
+            _message.value = result.fold(
+                onSuccess = {
+                    _navigateToNextScreen.value = true // Indica que la eliminación fue exitosa y se debe navegar
+                    it
+                },
+                onFailure = {
+                    "Error al eliminar usuario: ${it.message}"
+                }
+            )
+            _loading.value = false
+        }
+
+        firestoreRepository.deleteInstructor(email)
+
+    }
+
+
+
+
+
 
 
     fun signOut() = viewModelScope.launch{

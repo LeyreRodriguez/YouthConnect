@@ -81,6 +81,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import com.example.youthconnect.Model.Constants.TAG
+import com.example.youthconnect.View.BottomNavigationScreens.DecideScreen
 import com.example.youthconnect.ViewModel.NotificationViewModel
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -297,6 +298,10 @@ private fun NavGraphBuilder.secondScreensNavigation(navController: NavHostContro
 
         composable(NavScreen.QuizScreen.name){
             ComposableScreen({ QuizScreen(navController) }, navController)
+        }
+
+        composable("DecideScreen"){
+            ComposableScreen({ DecideScreen(navController) }, navController)
         }
 
         composable(NavScreen.ChatScreen.name){

@@ -26,10 +26,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -65,6 +67,7 @@ import coil.request.ImageRequest
 import coil.transform.RoundedCornersTransformation
 import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.R
+import com.example.youthconnect.View.Components.FloatingButton
 import com.example.youthconnect.View.OverlaysAndMore.AddNews
 import com.example.youthconnect.ViewModel.NewsViewModel
 import com.example.youthconnect.ViewModel.NotificationViewModel
@@ -213,114 +216,7 @@ fun NewsSchedule() {
     )
 }
 
-@Composable
-fun LatestNewsSection(
-    news: List<News?>,
-    navController: NavHostController,
-    documentExists: Boolean,
-    showDialog: Boolean,
-    onShowDialogChange: (Boolean) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp)
-    ) {
-        Text(
-            text = "Últimas noticias",
-            style = TextStyle(
-                fontSize = 40.sp,
-                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                fontWeight = FontWeight(400),
-                color = Color(0xFF000000),
-                letterSpacing = 0.9.sp
-            ),
-            modifier = Modifier.padding(start = 15.dp, top = 10.dp)
-        )
 
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-            RecyclerView(news = news, navController = navController)
-
-            if (documentExists) {
-                FloatingButton(Icons.Outlined.Add, onClick = { onShowDialogChange(true) })
-            }
-
-            if (showDialog) {
-                AddNews(onDismiss = { onShowDialogChange(false) }, navController = navController)
-            }
-        }
-    }
-}
-@Composable
-fun userImage(user: String,
-              navController: NavHostController,
-              documentExists : String){
-
-    val userViewModel : UserViewModel = hiltViewModel()
-
-
-
-    val imageUrlState = remember { mutableStateOf("") }
-    LaunchedEffect(Unit) {
-        userViewModel.getProfileImage(
-            onSuccess = { url ->
-                imageUrlState.value = url
-            },
-            onFailure = { _ ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
-            }
-        )
-    }
-
-    Box(
-        modifier = Modifier
-            .size(50.dp)
-            .clickable {
-                Log.e("USER", user)
-                when (documentExists) {
-                    "0" -> {
-                        navController.navigate("instructor_profile_screen/${user}")
-                    }
-
-                    "1" -> {
-                        navController.navigate("parent_profile_screen/${user}")
-                    }
-
-                    "2" -> {
-                        navController.navigate("child_profile_screen/${user}")
-                    }
-
-                    else -> {
-                        navController.navigate("parent_profile_screen/${user}")
-                    }
-                }
-
-            }
-            .border(
-                BorderStroke(4.dp, remember {
-                    Brush.sweepGradient(
-                        listOf(
-                            Color.Green,
-                            Color.Red // Cambia Green y Red por los colores que prefieras
-                        )
-                    )
-                }),
-                CircleShape
-            )
-            .padding(4.dp)
-            .clip(CircleShape)
-    ) {
-
-
-        AsyncImage(
-            model = imageUrlState.value,
-            contentDescription = "Profile Picture",
-            modifier = Modifier.fillMaxSize()
-                ,
-            contentScale = ContentScale.Crop
-        )
-    }
-}
 
 
 @Composable
@@ -439,14 +335,5 @@ fun RecyclerView(
 }
 
 
-@Composable
-fun FloatingButton( icon : ImageVector,onClick: () -> Unit) {
-    SmallFloatingActionButton(
-        onClick = { onClick() },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.secondary
-    ) {
-        Icon(icon, "Small floating action button.")
-    }
-}
+
 

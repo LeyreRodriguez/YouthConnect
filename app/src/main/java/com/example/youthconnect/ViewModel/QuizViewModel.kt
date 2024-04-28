@@ -2,8 +2,10 @@ package com.example.youthconnect.ViewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
+import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Question
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -82,5 +84,26 @@ class QuizViewModel @Inject constructor(
             return@withContext firestoreRepository.getScore(collection, userID)
         }
         return@withContext ""
+    }
+
+
+    fun updateQuestion( question: Question){
+        try {
+            firestoreRepository.updateQuestion(question)
+
+        } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+
+        }
+    }
+
+    fun deleteQuestion( questionId : String){
+        try {
+            firestoreRepository.deleteQuestion(questionId)
+
+        } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+
+        }
     }
 }

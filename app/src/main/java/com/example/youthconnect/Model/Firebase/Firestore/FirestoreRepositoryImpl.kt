@@ -725,6 +725,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                 .documents
                 .map { document ->
                     Question(
+                        id = document.getString("id") ?: "",
                         answer = document.getString("answer") ?: "",
                         optionA = document.getString("optionA") ?: "",
                         optionB = document.getString("optionB") ?: "",
@@ -741,17 +742,15 @@ class FirestoreRepositoryImpl @Inject constructor(
     }
 
     override fun addNewQuestion(question: Question ) {
-        val quizCollectionRef = firebaseFirestore.collection("Quiz")
+        //val randomDocumentId = UUID.randomUUID().toString()
+        val documentRef: DocumentReference = firebaseFirestore.collection("Quiz").document(question.id)
+        // Realiza la consulta para obtener el documento
+        documentRef.get()
+            .addOnSuccessListener { document ->
 
-        // Agregar un nuevo documento con ID automático
-        quizCollectionRef.add(question)
-            .addOnSuccessListener { documentReference ->
-                // Éxito al agregar el documento
-                println("Documento agregado con ID: ${documentReference.id}")
-            }
-            .addOnFailureListener { e ->
-                // Error al agregar el documento
-                println("Error al agregar documento: $e")
+                firebaseFirestore.collection("Quiz")
+                    .document(question.id)
+                    .set(question)
             }
 
     }
@@ -897,9 +896,43 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     }
 
+    override fun updateQuestion(question: Question){
+
+        val instructorRef = firebaseFirestore.collection("Quiz").document(question.id)
+        instructorRef.update("answer", question.answer)
+        instructorRef.update("optionA", question.optionA)
+        instructorRef.update("optionB", question.optionB)
+        instructorRef.update("optionC", question.optionC)
+        instructorRef.update("optionD", question.optionD)
+
+
+
+    }
+
+
 
     override fun deleteNews(newsId: String) {
         val newsRef = firebaseFirestore.collection("News").document(newsId)
+        newsRef.delete()
+    }
+
+    override fun deleteChild(childId: String) {
+        val newsRef = firebaseFirestore.collection("Child").document(childId)
+        newsRef.delete()
+    }
+
+    override fun deleteParent(parentId: String) {
+        val newsRef = firebaseFirestore.collection("Parents").document(parentId)
+        newsRef.delete()
+    }
+
+    override fun deleteInstructor(instructorId: String) {
+        val newsRef = firebaseFirestore.collection("Instructor").document(instructorId)
+        newsRef.delete()
+    }
+
+    override fun deleteQuestion(questionId: String) {
+        val newsRef = firebaseFirestore.collection("Quiz").document(questionId)
         newsRef.delete()
     }
 

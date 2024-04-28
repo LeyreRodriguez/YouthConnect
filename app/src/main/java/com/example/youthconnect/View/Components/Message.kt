@@ -26,7 +26,7 @@ fun SingleMessage(message: String, isCurrentUser: Boolean) {
 
     Card(
         shape = RoundedCornerShape(16.dp),
-        backgroundColor = if (isCurrentUser) Red50 else Blue50 ,
+        backgroundColor = if (isCurrentUser) Blue50 else Red50 ,
         modifier = Modifier
             .fillMaxWidth()
     ) {

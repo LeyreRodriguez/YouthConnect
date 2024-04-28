@@ -35,6 +35,8 @@ class LoginViewModel: ViewModel() {
 
 
     fun signInWithEmail(email: String, passworld: String, home: () -> Unit) = viewModelScope.launch{
+        println(email)
+        println(passworld)
         try {
             auth.signInWithEmailAndPassword(email, passworld)
                 .addOnCompleteListener {task ->

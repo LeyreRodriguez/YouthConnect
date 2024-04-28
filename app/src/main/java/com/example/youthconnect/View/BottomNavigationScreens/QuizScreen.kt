@@ -1,9 +1,13 @@
 package com.example.youthconnect.View.BottomNavigationScreens
 
+import ModifyQuestion
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,12 +17,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Button
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Plagiarism
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,21 +53,30 @@ import androidx.compose.ui.graphics.Color
 
 
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.youthconnect.Model.Enum.NavScreen
+import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
+import com.example.youthconnect.View.Components.ExtendedFloatingButton
+import com.example.youthconnect.View.Components.FloatingButton
+import com.example.youthconnect.View.OverlaysAndMore.AddNews
 import com.example.youthconnect.View.OverlaysAndMore.AddQuestions
 import com.example.youthconnect.ViewModel.QuizViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -57,6 +84,7 @@ import com.example.youthconnect.ui.theme.Blue
 import com.example.youthconnect.ui.theme.Yellow
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
+import com.google.android.material.internal.ViewUtils.dpToPx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -95,15 +123,360 @@ fun QuizScreen( navController: NavHostController,
         }
     }
 
+    PrincipalQuizView(navController = navController)
+
+
+
+
+
+
+}
+
+
+@Composable
+fun DecideScreen(navController: NavHostController){
+
+    var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
+    val quizViewModel: QuizViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+    var user by remember { mutableStateOf<String?>("") }
+
+    val documentExists = remember { mutableStateOf("-1") }
+    var result by remember { mutableStateOf<String?>("") }
+
+
+    LaunchedEffect(Unit) {
+        try {
+            withContext(Dispatchers.IO) {
+                questions = quizViewModel.getAllQuestions()
+            }
+            user = userViewModel.getCurrentUser()
+            result = user?.let { userViewModel.findDocument(it) }
+
+            if (result != null) {
+                documentExists.value = result.toString()
+            }
+
+        } catch (e: Exception) {
+            e.message?.let { Log.e("Error: ", it) }
+
+        }
+    }
+
+    if(documentExists.value == "0"){
+        InstructorQuizView(navController = navController)
+    }else{
+        PrincipalQuizView(navController = navController)
+    }
+}
+
+@Composable
+fun InstructorQuizView(navController: NavHostController){
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
+        val quizViewModel: QuizViewModel = hiltViewModel()
+        val userViewModel: UserViewModel = hiltViewModel()
+        var user by remember { mutableStateOf<String?>("") }
+        val documentExists = remember { mutableStateOf("-1") }
+        var result by remember { mutableStateOf<String?>("") }
+
+
+        LaunchedEffect(Unit) {
+            try {
+                withContext(Dispatchers.IO) {
+                    questions = quizViewModel.getAllQuestions()
+                }
+                user = userViewModel.getCurrentUser()
+                result = user?.let { userViewModel.findDocument(it) }
+
+                if (result != null) {
+                    documentExists.value = result.toString()
+                }
+
+            } catch (e: Exception) {
+                e.message?.let { Log.e("Error: ", it) }
+
+            }
+        }
+        var showDialog by remember { mutableStateOf(false) }
+
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomEnd
+        ){
+                Column(Modifier.padding(4.dp)) {
+                    FloatingButton(Icons.Outlined.Add) {
+                        showDialog = true
+                    }
+
+                }
+
+            if (showDialog) {
+                AddQuestions(navController, onDismiss = { showDialog = false })
+            }
+
+
+        }
+
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter
+        ){
+            Column(Modifier.padding(4.dp)) {
+                ExtendedFloatingButton(Icons.Outlined.PlayArrow, "Jugar") {
+                    navController.navigate(NavScreen.QuizScreen.name)
+                }
+
+            }
+
+        }
+
+
+
+        val screenHeight = LocalConfiguration.current.screenHeightDp.dp - 150.dp
+
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.height(screenHeight)
+     //       modifier = Modifier.wrapContentSize()
+            ){
+            Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
+
+
+                Text(
+                    text = "Questions list",
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFFFFFFFF),
+                        letterSpacing = 0.3.sp,
+                    ),
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+
+                )
+
+
+
+            if(questions.isNotEmpty()){
+                LazyColumn(modifier = Modifier
+                    .height(screenHeight)
+                ){
+                    items(items = questions){ item ->
+                        if (item != null) {
+                            QuestionItem(question = item, navController = navController)
+                        }
+                    }
+                }
+            } else{
+                Text(
+                    text = "No hay preguntas añadidas aun",
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight(400),
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        color = Color(0xFFFFFFFF),
+                        letterSpacing = 0.3.sp,
+                    ),
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+
+                )
+
+            }
+
+
+        }
+    }
+}
+
+
+
+@Composable
+fun QuestionItem(question: Question, navController: NavHostController) {
+
+    val quizViewModel : QuizViewModel = hiltViewModel()
+
+    var showDialog by remember { mutableStateOf(false) }
+
+
+
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable {
+                showDialog = true
+            }
+            .padding(horizontal = 15.dp, vertical = 4.dp)
+        ,
+         colors = CardDefaults.cardColors(
+              containerColor = Color.Transparent
+          ),
+            shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color.Black),
+    ) {
+
+
+
+        if (showDialog) {
+            ModifyQuestion(item = question, navController = navController) {
+                navController.navigate("DecideScreen")
+
+            }
+        }
+
+        Box(Modifier.fillMaxSize()){
+
+
+
+            Column(Modifier.padding(10.dp)) {
+                Text(
+                    text = question.question,
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFFFFFFFF),
+                        letterSpacing = 0.3.sp,
+                    ),
+                    color = Color.Black,
+                    modifier = Modifier.padding(10.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis // Agrega puntos suspensivos si el texto es demasiado largo
+                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row {
+                        Row(Modifier.weight(1f)) {
+                            Icon(
+                                if (question.answer == "A") Icons.Outlined.Check else Icons.Default.Clear,
+                                contentDescription = if (question.answer == "A") "Check" else "Wrong",
+                                tint = if (question.answer == "A") Green else Red,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = question.optionA,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        Row(Modifier.weight(1f)) {
+                            Icon(
+                                if (question.answer == "B") Icons.Outlined.Check else Icons.Default.Clear,
+                                contentDescription = if (question.answer == "B") "Check" else "Wrong",
+                                tint = if (question.answer == "B") Green else Red,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = question.optionB,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        Row(Modifier.weight(1f)) {
+                            Icon(
+                                if (question.answer == "C") Icons.Outlined.Check else Icons.Default.Clear,
+                                contentDescription = if (question.answer == "C") "Check" else "Wrong",
+                                tint = if (question.answer == "C") Green else Red,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = question.optionC,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        Row(Modifier.weight(1f)) {
+                            Icon(
+                                if (question.answer == "D") Icons.Outlined.Check else Icons.Default.Clear,
+                                contentDescription = if (question.answer == "D") "Check" else "Wrong",
+                                tint = if (question.answer == "D") Green else Red,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = question.optionD,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+
+                Icon(
+                    imageVector = Icons.Default.DeleteOutline,
+                    contentDescription = "Delete",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .align(Alignment.End)
+                        .clickable { quizViewModel.deleteQuestion(question.id);
+                                   navController.navigate("DecideScreen")},
+                    tint = Red
+                )
+
+
+
+
+
+
+            }
+
+
+        }
+
+    }
+
+}
+
+
+@Composable
+fun PrincipalQuizView(navController : NavHostController){
+
+    var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
+    val quizViewModel: QuizViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
+    var user by remember { mutableStateOf<String?>("") }
+    var currentQuestionIndex by remember { mutableStateOf(0) }
+
+
+
+
+    val documentExists = remember { mutableStateOf("-1") }
+    var result by remember { mutableStateOf<String?>("") }
+
+
+    LaunchedEffect(Unit) {
+        try {
+            withContext(Dispatchers.IO) {
+                questions = quizViewModel.getAllQuestions()
+            }
+            user = userViewModel.getCurrentUser()
+            result = user?.let { userViewModel.findDocument(it) }
+
+            if (result != null) {
+                documentExists.value = result.toString()
+            }
+
+        } catch (e: Exception) {
+            e.message?.let { Log.e("Error: ", it) }
+
+        }
+    }
 
     val currentQuestion = questions.getOrNull(currentQuestionIndex)
 
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
 
-        var showDialog by remember { mutableStateOf(false) }
-
-        DialogForQuestions(documentExists.value, showDialog) { showDialog = it }
 
         Column(
             verticalArrangement = Arrangement.Top,
@@ -125,95 +498,112 @@ fun QuizScreen( navController: NavHostController,
 
             )
 
-            Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
+            if(questions.isNotEmpty()){
+                Column(
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
 
-            ) {
-                currentQuestion?.question?.let {
-                    Text(
-                        text = it,
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFFFFFFFF),
-                            letterSpacing = 0.3.sp,
-                        ),
-                        color = Color.Black,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                ) {
+                    currentQuestion?.question?.let {
+                        Text(
+                            text = it,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFFFFFFFF),
+                                letterSpacing = 0.3.sp,
+                            ),
+                            color = Color.Black,
+                            textAlign = TextAlign.Center
+                        )
+                    }
 
-                val colors = listOf(Red, Green, Yellow, Blue).shuffled()
-                Box() {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
+                    val colors = listOf(Red, Green, Yellow, Blue).shuffled()
+                    Box() {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
 
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 10.dp, end = 10.dp)
                         ) {
-
-
-                            OptionButton(
-                                text = currentQuestion?.optionA ?: "",
-                                backgroundColor = colors[0]
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 10.dp, end = 10.dp)
                             ) {
-                                onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"A")
-                                currentQuestionIndex++
+
+
+                                OptionButton(
+                                    text = currentQuestion?.optionA ?: "",
+                                    backgroundColor = colors[0]
+                                ) {
+                                    onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"A")
+                                    currentQuestionIndex++
+                                }
+
+                                OptionButton(
+                                    text = currentQuestion?.optionB ?: "",
+                                    backgroundColor = colors[1]
+                                ) {
+                                    onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController, "B")
+                                    currentQuestionIndex++
+                                }
                             }
 
-                            OptionButton(
-                                text = currentQuestion?.optionB ?: "",
-                                backgroundColor = colors[1]
-                            ) {
-                                onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController, "B")
-                                currentQuestionIndex++
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 10.dp, end = 10.dp)
-                        ) {
-
-
-                            OptionButton(
-                                text = currentQuestion?.optionC ?: "",
-                                backgroundColor = colors[2]
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 10.dp, end = 10.dp)
                             ) {
 
-                                onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"C")
-                                currentQuestionIndex++
-                            }
 
-                            OptionButton(
-                                text = currentQuestion?.optionD ?: "",
-                                backgroundColor = colors[3]
-                            ) {
+                                OptionButton(
+                                    text = currentQuestion?.optionC ?: "",
+                                    backgroundColor = colors[2]
+                                ) {
 
-                                onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"D")
-                                currentQuestionIndex++
+                                    onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"C")
+                                    currentQuestionIndex++
+                                }
+
+                                OptionButton(
+                                    text = currentQuestion?.optionD ?: "",
+                                    backgroundColor = colors[3]
+                                ) {
+
+                                    onClick(currentQuestionIndex, quizViewModel,user.toString(), currentQuestion!!, questions, navController,"D")
+                                    currentQuestionIndex++
+                                }
                             }
                         }
                     }
+
                 }
+            } else{
+                Text(
+                    text = "No hay preguntas añadidas aun",
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight(400),
+                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                        color = Color(0xFFFFFFFF),
+                        letterSpacing = 0.3.sp,
+                    ),
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+
+                )
 
             }
+
+
 
         }
 
     }
-
 }
-
 
 fun onClick(currentQuestionIndex: Int, quizViewModel: QuizViewModel, user:String, currentQuestion: Question, questions: List<Question?>, navController: NavHostController, option :String){
     if (currentQuestionIndex == 0) {
@@ -260,26 +650,6 @@ fun OptionButton(text: String, backgroundColor: Color, onClick: () -> Unit) {
             ),
             textAlign = TextAlign.Center
         )
-    }
-}
-@Composable
-fun DialogForQuestions(documentExists:String, showDialog  : Boolean, onShowDialog :(Boolean) -> Unit){
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp),
-        contentAlignment = Alignment.BottomEnd
-    ) {
-        if (documentExists == "0") {
-
-            FloatingButton(Icons.Outlined.Add, onClick = { onShowDialog(true) })
-
-
-        }
-
-        if (showDialog) {
-            AddQuestions(onDismiss = { onShowDialog(false) })
-        }
     }
 }
 
@@ -405,7 +775,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
         Button(
             onClick = {
                 quizViewModel.resetScore(user.toString())
-                navController.navigate(NavScreen.QuizScreen.name)
+                navController.navigate("DecideScreen")
             },
             modifier = Modifier
                 .fillMaxWidth()

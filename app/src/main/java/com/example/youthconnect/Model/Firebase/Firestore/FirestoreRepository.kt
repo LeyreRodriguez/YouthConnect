@@ -74,7 +74,16 @@ interface FirestoreRepository {
 
     fun updateUser(user : Any)
     fun updateNews(news : News)
+
+    //DELETE SECTION
     fun deleteNews(newsId: String)
+    fun deleteChild(childId: String)
+    fun deleteParent(parentId: String)
+    fun deleteInstructor(instructorId: String)
+
+    fun deleteQuestion(questionId: String)
+
+    fun updateQuestion(question: Question)
 
 
 }

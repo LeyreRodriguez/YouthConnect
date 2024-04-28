@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,9 +55,11 @@ import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
 import com.example.youthconnect.View.Components.EditIcon
+import com.example.youthconnect.View.Components.ExtendedFloatingButton
 import com.example.youthconnect.View.Components.ProfilePicture
 import com.example.youthconnect.View.OverlaysAndMore.AddInstructor
 import com.example.youthconnect.View.OverlaysAndMore.MyChildren
+import com.example.youthconnect.ViewModel.SignUpViewModel
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -70,11 +74,14 @@ fun InstructorProfileScreen(instructorId : String,
 
     val userViewModel : UserViewModel = hiltViewModel()
     var instructor by remember { mutableStateOf<Instructor?>(null) }
+    var currentInstructor by remember { mutableStateOf<Instructor?>(null) }
+
     var currentUser by remember { mutableStateOf<String?>(null) }
     var children by remember { mutableStateOf<List<Child?>>(emptyList()) }
     var editUser by remember { mutableStateOf(false)  }
 
     var currentUserType by remember { mutableStateOf("") }
+    val signUpViewModel : SignUpViewModel = hiltViewModel()
 
 
 
@@ -96,80 +103,51 @@ fun InstructorProfileScreen(instructorId : String,
       //      children = userViewModel.getChildByInstructorIdThatIsInSchool(instructorId)
             currentUser = userViewModel.getCurrentUser()
             currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
+            currentInstructor = currentUser?.let { userViewModel.getCurrentInstructorById(it) }
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching data", e)
         }
     }
 
-            Box(
-                modifier = Modifier.fillMaxSize(),
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+
+            AddInstructorFragment(currentUser, instructor)
+
+
+            Column(
+                modifier = Modifier
+                    .padding(15.dp)
+                    .fillMaxSize()
+                ,
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                AddInstructorFragment(currentUser, instructor)
-
-
-                Column(
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .fillMaxSize()
-                    ,
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    //modifier = Modifier.wrapContentSize()
                 ) {
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        //modifier = Modifier.wrapContentSize()
-                    ) {
-                        val configuration = LocalConfiguration.current
-                        val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
+                    val configuration = LocalConfiguration.current
+                    val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
 
 
-                        ProfilePicture(
-                            userViewModel = userViewModel,
-                            userId = instructorId,
-                            user = instructor,
-                            currentUser = currentUser
-                        )
+                    ProfilePicture(
+                        userViewModel = userViewModel,
+                        userId = instructorId,
+                        user = instructor,
+                        currentUser = currentUser
+                    )
 
-                        Row(verticalAlignment = Alignment.CenterVertically){
-                            instructor?.fullName?.let {
+                    Row(verticalAlignment = Alignment.CenterVertically){
+                        instructor?.fullName?.let {
 
-                                Text(
-                                    text = it,
-                                    style = TextStyle(
-                                        fontSize = 20.sp,
-                                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                                        fontWeight = FontWeight(400),
-                                        color = Color(0xFF000000),
-                                        letterSpacing = 0.9.sp,
-                                        textAlign = TextAlign.Center
-                                    ), modifier = Modifier
-                                        .padding(start = 15.dp, top = 10.dp)
-                                )
-                            }
-
-                            EditIcon(
-                                currentUserType = currentUserType,
-                                user = instructor,
-                                navController = navController
-                            )
-
-
-                        }
-
-
-                    }
-
-
-                    Column (
-                        modifier = Modifier.fillMaxWidth()
-                    ){
-                        if(currentUser == instructor?.id){
                             Text(
-                                text = "Salir",
+                                text = it,
                                 style = TextStyle(
-                                    fontSize = 30.sp,
+                                    fontSize = 20.sp,
                                     fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
                                     fontWeight = FontWeight(400),
                                     color = Color(0xFF000000),
@@ -177,33 +155,68 @@ fun InstructorProfileScreen(instructorId : String,
                                     textAlign = TextAlign.Center
                                 ), modifier = Modifier
                                     .padding(start = 15.dp, top = 10.dp)
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        loginViewModel.signOut()
-                                        navController.navigate("login")
-                                    }
                             )
                         }
 
-
-                        GroupsOfFaith(children = children, navController = navController )
-
+                        EditIcon(
+                            currentUserType = currentUserType,
+                            user = instructor,
+                            navController = navController
+                        )
 
 
                     }
 
-                    FunctionalitiesButtons(
-                        currentUser = currentUser,
-                        instructor = instructor,
-                        navController = navController,
-                        instructorId = instructorId
-                    )
 
                 }
 
 
+                Column (
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    if(currentUser == instructor?.id){
+                        Text(
+                            text = "Salir",
+                            style = TextStyle(
+                                fontSize = 30.sp,
+                                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFF000000),
+                                letterSpacing = 0.9.sp,
+                                textAlign = TextAlign.Center
+                            ), modifier = Modifier
+                                .padding(start = 15.dp, top = 10.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    loginViewModel.signOut()
+                                    navController.navigate("login")
+                                }
+                        )
+                    }
+
+
+                    GroupsOfFaith(children = children, navController = navController )
+
+
+
+                }
+
+                FunctionalitiesButtons(
+                    currentUser = currentUser,
+                    instructor = instructor,
+                    navController = navController,
+                    instructorId = instructorId
+                )
+
             }
+
+
         }
+
+    }
+
+
+
 
 
 @Composable

@@ -27,7 +27,7 @@ sealed class ItemsBottomBar(
         (
         Icons.Outlined.Quiz,
         "Quiz",
-        NavScreen.QuizScreen.name
+        "DecideScreen"
     )
 
     object ChatBottom : ItemsBottomBar
