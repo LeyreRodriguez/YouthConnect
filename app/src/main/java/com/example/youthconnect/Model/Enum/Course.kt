@@ -1,7 +1,6 @@
 package com.example.youthconnect.Model.Enum
 
 enum class Course(val displayName: String) {
-    TerceroEP("3º de Primaria"),
     CuartoEP("4º de Primaria"),
     QuintoEP("5º de Primaria"),
     SextoEP("6º de Primaria"),

@@ -904,6 +904,7 @@ class FirestoreRepositoryImpl @Inject constructor(
         instructorRef.update("optionB", question.optionB)
         instructorRef.update("optionC", question.optionC)
         instructorRef.update("optionD", question.optionD)
+        instructorRef.update("question", question.question)
 
 
 

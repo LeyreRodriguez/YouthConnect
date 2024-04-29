@@ -276,7 +276,7 @@ fun SignUpView( navController: NavController) {
                                 )
                             }
                             item {
-                                CoursesSelectionScreen(Course.TerceroEP){  childCourse = it.name }
+                                CoursesSelectionScreen(Course.CuartoEP){  childCourse = it.name }
 
 
                             }

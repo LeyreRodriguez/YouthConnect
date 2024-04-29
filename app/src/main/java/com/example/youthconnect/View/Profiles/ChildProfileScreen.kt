@@ -223,7 +223,8 @@ fun ChildInfo(childId: String, child: Child?, currentUser: String?, currentUserT
                     color = Color(0xFF000000),
                     letterSpacing = 0.9.sp,
                 ), modifier = Modifier
-                    .padding(start = 15.dp, top = 10.dp)
+                    .padding(start = 15.dp, top = 10.dp),
+                textAlign = TextAlign.Center
             )
         }
 
