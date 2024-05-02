@@ -12,6 +12,7 @@ import com.example.youthconnect.Model.Object.NotificationBody
 import com.example.youthconnect.Model.Object.SendNotificationDto
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
+import io.grpc.android.BuildConfig
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import retrofit2.HttpException
@@ -19,20 +20,33 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 import java.io.IOException
+import java.util.Properties
 
 class NotificationViewModel : ViewModel() {
     var state by mutableStateOf(NotificationState())
         private set
 
-    private val api: FcmApi = Retrofit.Builder()
-        .baseUrl("http://88.25.188.222:5001/")
-        .addConverterFactory(MoshiConverterFactory.create())
-        .build()
-        .create()
+    private lateinit var baseUrl: String
+    private val api: FcmApi by lazy {
+        val properties = Properties()
+        val inputStream = javaClass.classLoader.getResourceAsStream("app.properties")
+        properties.load(inputStream)
+        baseUrl = properties.getProperty("BASE_URL") ?: throw IllegalArgumentException("BASE_URL not set")
+
+        Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
+            .create()
+    }
 
     init {
         viewModelScope.launch {
-            Firebase.messaging.subscribeToTopic("notification").await()
+            try {
+                Firebase.messaging.subscribeToTopic("notification").await()
+            } catch (e: IOException) {
+                state = state.copy(errorMessage = "Error subscribing to topic: ${e.message}")
+            }
         }
     }
 
@@ -54,13 +68,10 @@ class NotificationViewModel : ViewModel() {
         )
     }
 
-    fun sendMessage(isBroadcast: Boolean, item : News) {
-
-
+    fun sendMessage(isBroadcast: Boolean, item: News) {
         viewModelScope.launch {
             val messageDto = SendNotificationDto(
-                to = if(isBroadcast) "/topics/notification" else state.remoteToken,
-
+                to = if (isBroadcast) "/topics/notification" else state.remoteToken,
                 notification = NotificationBody(
                     title = item.title,
                     body = item.description
@@ -69,14 +80,18 @@ class NotificationViewModel : ViewModel() {
 
             try {
                 api.sendMessage(messageDto)
-
                 state = state.copy(
                     messageText = ""
                 )
-            } catch(e: HttpException) {
-                e.printStackTrace()
-            } catch(e: IOException) {
-                e.printStackTrace()
+            } catch (e: HttpException) {
+                val errorMessage = when (e.code()) {
+                    401 -> "Unauthorized"
+                    404 -> "Not found"
+                    else -> "Error: ${e.message()}"
+                }
+                state = state.copy(errorMessage = errorMessage)
+            } catch (e: IOException) {
+                state = state.copy(errorMessage = "Network error: ${e.message}")
             }
         }
     }

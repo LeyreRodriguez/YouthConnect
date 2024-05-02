@@ -13,3 +13,4 @@ data class NotificationBody(
     val title: String,
     val body: String? = ""
 )
+

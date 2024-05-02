@@ -1,5 +1,6 @@
 package com.example.youthconnect.View.Authentication
 
+import SignInState
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -26,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +55,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.libraryapp.model.firebaseAuth.SignInState
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.R
@@ -65,10 +66,12 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
     val mcontext = LocalContext.current
     val focusManager = LocalFocusManager.current
 
+    val state = loginViewModel.state.collectAsState()
 
     var id by remember {mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
 
     var validateUserID by rememberSaveable { mutableStateOf(true) }
     var validateUserPassword by rememberSaveable { mutableStateOf(true) }
@@ -77,14 +80,43 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
 
 
-    LaunchedEffect(key1 = state.signInError){
-        state.signInError?.let { error ->
-            Toast.makeText(
-                mcontext,
-                error,
-                Toast.LENGTH_LONG
-            ).show()
+    LaunchedEffect(key1 = state.value) {
+        when (val signInState = state.value) {
+            is SignInState.Loading -> {
+                Toast.makeText(
+                    context,
+                    "Cargando",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            is SignInState.Success -> {
+                Toast.makeText(
+                    context,
+                    "Sesión correctamente iniciada",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            is SignInState.Error -> {
+                val errorMessage = signInState.error.toString()
+                errorMessage?.let {
+                    Toast.makeText(
+                        context,
+                        it,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            else -> {
+                Toast.makeText(
+                    context,
+                    "Revisa los campos introducidos",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
+
+
     }
 
 

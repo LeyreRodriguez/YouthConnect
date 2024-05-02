@@ -1,5 +1,7 @@
 package com.example.youthconnect
 
+import GoogleAuthUiClient
+import SignInState
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -50,10 +52,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.libraryapp.model.firebaseAuth.SignInState
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
-import com.example.youthconnect.Model.Firebase.Authentication.GoogleAuthUiClient
 import com.example.youthconnect.View.BottomNavigationScreens.ChatScreen
 import com.example.youthconnect.View.OverlaysAndMore.ChildListScreen
 import com.example.youthconnect.View.Profiles.ChildProfileScreen
@@ -81,6 +81,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import com.example.youthconnect.Model.Constants.TAG
+import com.example.youthconnect.Model.Sealed.AuthError
 import com.example.youthconnect.View.BottomNavigationScreens.DecideScreen
 import com.example.youthconnect.ViewModel.NotificationViewModel
 import com.google.android.gms.tasks.OnCompleteListener
@@ -171,7 +172,6 @@ class MainActivity : ComponentActivity() {
 
     public val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
-            context = applicationContext,
             oneTapClient = Identity.getSignInClient(applicationContext)
         )
     }
@@ -187,24 +187,50 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun HandleSuccessfulSignIn(
+    private fun HandleSignInState(
         navController: NavController,
         viewModel: LoginViewModel,
         state: SignInState
     ) {
-        LaunchedEffect(key1 = state.isSignInSuccessful) {
-            if (state.isSignInSuccessful) {
+        when (state) {
+            is SignInState.Loading -> {
+                Toast.makeText(
+                    applicationContext,
+                    "Cargando",
+                    Toast.LENGTH_LONG
+                ).show()            }
+            is SignInState.Success -> {
                 Toast.makeText(
                     applicationContext,
                     "Sesión Iniciada",
                     Toast.LENGTH_LONG
                 ).show()
-
                 navController.navigate("secondScreens")
                 viewModel.resetState()
             }
+            is SignInState.Error -> {
+                val errorMessage = when (state.error) {
+                    AuthError.ConnectionError -> "Error de conexión"
+                    AuthError.InvalidCredentials -> "Credenciales inválidas"
+                    AuthError.Timeout -> "Timeout de conexión"
+                }
+                Toast.makeText(
+                    applicationContext,
+                    errorMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            else -> {
+                Toast.makeText(
+                    applicationContext,
+                    "No se ha podido iniciar sesión",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -225,7 +251,7 @@ class MainActivity : ComponentActivity() {
 
                         CheckIfUserIsSignedInAndNavigate(navController)
 
-                        HandleSuccessfulSignIn(navController, viewModel, state)
+                        HandleSignInState(navController, viewModel, state)
                         LoginView(
                             navController = navController,
                             state = state
