@@ -742,7 +742,6 @@ class FirestoreRepositoryImpl @Inject constructor(
     }
 
     override fun addNewQuestion(question: Question ) {
-        //val randomDocumentId = UUID.randomUUID().toString()
         val documentRef: DocumentReference = firebaseFirestore.collection("Quiz").document(question.id)
         // Realiza la consulta para obtener el documento
         documentRef.get()

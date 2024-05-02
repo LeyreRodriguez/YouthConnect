@@ -20,8 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,7 +53,6 @@ import com.example.youthconnect.Model.Object.Child
 import com.example.youthconnect.Model.Object.Instructor
 import com.example.youthconnect.R
 import com.example.youthconnect.View.Components.EditIcon
-import com.example.youthconnect.View.Components.ExtendedFloatingButton
 import com.example.youthconnect.View.Components.ProfilePicture
 import com.example.youthconnect.View.OverlaysAndMore.AddInstructor
 import com.example.youthconnect.View.OverlaysAndMore.MyChildren
@@ -249,10 +246,9 @@ fun AddInstructorFragment(currentUser : String?, instructor: Instructor?){
                 .clip(CircleShape)
 
         )
-        if (showDialog) {
-            if (instructor != null) {
+        if (showDialog && instructor != null) {
                 AddInstructor(onDismiss = { showDialog = false })
-            }
+
         }
     }
 }

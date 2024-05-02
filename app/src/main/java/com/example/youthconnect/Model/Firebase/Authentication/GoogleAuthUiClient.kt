@@ -3,7 +3,6 @@ import android.content.IntentSender
 import com.example.libraryapp.model.firebaseAuth.SignInResult
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.Model.Sealed.AuthError
-import com.example.youthconnect.Model.Sealed.AuthError.ConnectionError
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.Firebase

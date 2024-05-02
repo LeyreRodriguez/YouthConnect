@@ -105,7 +105,11 @@ val navigationCompose2 = "2.5.3"
 val daggerHilt = "2.48.1"
 val activityCompose2 = "1.5.0"
 val activityKtx= "1.4.0"
-
+val firebaseMessaging = "23.0.6"
+val datastore = "1.0.0"
+val mockk = "1.12.2"
+val jupiter = "5.8.1"
+val retrofit = "2.9.0"
 dependencies {
 
 
@@ -123,8 +127,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-code-scanner:$scanner")
     implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:$barcode")
     implementation("com.google.android.gms:play-services-auth:$playServicesAuth")
-    implementation("com.google.firebase:firebase-messaging-ktx:23.0.6")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("com.google.firebase:firebase-messaging-ktx:$firebaseMessaging")
+    implementation("androidx.datastore:datastore-preferences:$datastore")
 
 
     //Jetpack Compose
@@ -134,12 +138,12 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.wear.compose:compose-material:$composeMaterial")
-    implementation("androidx.compose.material:material-icons-extended:$icons")   //Icons
-    implementation ("androidx.compose.material:material:$composeMaterial2")  //Navigation
+    implementation("androidx.compose.material:material-icons-extended:$icons")
+    implementation ("androidx.compose.material:material:$composeMaterial2")
 
     implementation("androidx.hilt:hilt-navigation-compose:$hilt")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$viewmodelCompose")
-    implementation ("androidx.navigation:navigation-compose:$navigationCompose") // Usa la última versión disponible
+    implementation ("androidx.navigation:navigation-compose:$navigationCompose")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:$viewmodelCompose2")
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:$viewmodelCompose2")
     implementation(platform("androidx.compose:compose-bom:$bom"))
@@ -202,13 +206,18 @@ dependencies {
     implementation ("androidx.activity:activity-ktx:$activityKtx")
     implementation ("androidx.activity:activity-ktx:$activityKtx")
 
+    //Notification
+    implementation("com.squareup.retrofit2:retrofit:$retrofit")
+    implementation("com.squareup.retrofit2:converter-moshi:$retrofit")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+
 
     // Testing
     testImplementation("junit:junit:$jUnit")
     testImplementation("org.mockito:mockito-core:$mockito")
-    testImplementation("io.mockk:mockk:1.12.2")
+    testImplementation("io.mockk:mockk:$mockk")
     testImplementation("org.mockito:mockito-inline:$mockito")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:$jupiter")
     androidTestImplementation("androidx.test.ext:junit:$jUnit2")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espresso")
     androidTestImplementation(platform("androidx.compose:compose-bom:$bom"))
@@ -219,10 +228,7 @@ dependencies {
 
     kapt ("com.google.dagger:hilt-compiler:$daggerHilt")
 
-    //Notification
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
-    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+
 
 
 }

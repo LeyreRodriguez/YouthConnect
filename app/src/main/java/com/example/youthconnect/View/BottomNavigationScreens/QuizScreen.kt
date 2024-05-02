@@ -71,9 +71,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun QuizScreen( navController: NavHostController,
-                modifier : Modifier = Modifier.background(color = Color.White)
-) {
+fun QuizScreen( navController: NavHostController, ) {
     var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
     val quizViewModel: QuizViewModel = hiltViewModel()
     val userViewModel: UserViewModel = hiltViewModel()
@@ -266,7 +264,7 @@ fun ShowQuestionDialog(question: Question, navController: NavHostController) {
 }
 
 @Composable
-fun ShowQuestionContent(question: Question, quizViewModel: QuizViewModel, navController: NavHostController, showDialog: () -> Unit) {
+fun ShowQuestionContent(question: Question, quizViewModel: QuizViewModel, navController: NavHostController) {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.padding(10.dp)) {
             Text(
@@ -389,7 +387,7 @@ fun QuestionItem(question: Question, navController: NavHostController) {
         if (showDialog) {
             ShowQuestionDialog(question = question, navController = navController)
         } else{
-            ShowQuestionContent(question = question, quizViewModel, navController = navController, showDialog = { showDialog = true })
+            ShowQuestionContent(question = question, quizViewModel, navController = navController)
         }
 
 

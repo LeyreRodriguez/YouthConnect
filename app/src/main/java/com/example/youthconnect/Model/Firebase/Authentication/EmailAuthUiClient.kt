@@ -1,6 +1,5 @@
 package com.example.youthconnect.Model.Firebase.Authentication
 
-import com.example.youthconnect.Model.Object.Instructor
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
