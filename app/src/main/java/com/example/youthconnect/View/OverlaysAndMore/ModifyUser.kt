@@ -73,7 +73,6 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
         mutableStateOf((item as? Instructor)?.fullName ?: "")
     }
 
-    //PARENTS
 
     var editedParentsFullName by remember {
         mutableStateOf((item as? Parent)?.fullName ?: "")
@@ -83,7 +82,6 @@ fun ModifyUsers(onDismiss: () -> Unit, item : Any, navController : NavController
         mutableStateOf((item as? Parent)?.phoneNumber ?: "")
     }
 
-    //CHILD
 
     var editedChildFullName by remember {
         mutableStateOf((item as? Child)?.fullName ?: "")

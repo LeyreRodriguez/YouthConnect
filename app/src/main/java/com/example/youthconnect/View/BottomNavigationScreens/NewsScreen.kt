@@ -135,9 +135,6 @@ fun NewsScreen(
                     if (documentExists.value == "0") {
                         Column {
                             FloatingButton(Icons.Outlined.Add) {
-                                // Aquí puedes agregar la lógica que se activará al hacer clic en el botón
-                                // Por ejemplo, puedes navegar a una nueva pantalla
-                                // navController.navigate("addNews")
                                 showDialog = true
                             }
 

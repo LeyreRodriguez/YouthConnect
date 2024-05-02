@@ -52,7 +52,7 @@ fun BottomNavigation(
                                 "Quiz" -> Green
                                 "Chat" -> Yellow
                                 else -> Blue
-                            } // Cambia el color del icono seleccionado
+                            }
                         )
                     },
                     label = {

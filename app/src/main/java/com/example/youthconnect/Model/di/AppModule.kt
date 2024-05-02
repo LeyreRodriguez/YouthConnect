@@ -52,7 +52,6 @@ class AppModule {
     @Provides
     @Singleton
     fun provideUserData(): UserData {
-        // Obtiene los datos del usuario de alguna fuente
         return UserData("userId", "userName", "userEmail")
     }
 

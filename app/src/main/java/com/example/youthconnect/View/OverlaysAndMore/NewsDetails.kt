@@ -74,7 +74,6 @@ fun NewsDetails(
                 imageUrlState.value = url
             },
             onFailure = { _ ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
     }
@@ -124,10 +123,10 @@ fun NewsDetails(
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(1f), // Proporción de aspecto cuadrado, puedes ajustarlo según tus necesidades
+                        .aspectRatio(1f),
                     contentScale = ContentScale.Crop,
                     width = screenWidth,
-                    height = Dp(300.0F) // Altura inicial
+                    height = Dp(300.0F)
                 )
             }
 
@@ -136,7 +135,6 @@ fun NewsDetails(
                     text = it,
                     style = TextStyle(
                         fontSize = 20.sp,
-                  //      fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
                         fontWeight = FontWeight(400),
                         color = Color(0xFF000000),
                         letterSpacing = 0.9.sp,

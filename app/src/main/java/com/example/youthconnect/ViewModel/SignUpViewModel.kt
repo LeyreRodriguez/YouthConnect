@@ -25,7 +25,7 @@ class SignUpViewModel @Inject constructor(
 
     private var _navigateToNextScreen = MutableStateFlow(false)
     var navigateToNextScreen = _navigateToNextScreen.asStateFlow()
-    // Estado para UI
+
     private val _loading = MutableStateFlow(false)
     val loading = _loading.asStateFlow()
 
@@ -44,9 +44,6 @@ class SignUpViewModel @Inject constructor(
 
     fun changeScreen(){
         _showFirstScreen2.value = !_showFirstScreen2.value
-        Log.d("Variable publica: ", "${showFirstScreen2.value}")
-        Log.d("Variable privada: ", "${_showFirstScreen2.value}")
-
     }
 
     fun registerUser(email: String, password: String) {
@@ -56,7 +53,7 @@ class SignUpViewModel @Inject constructor(
             val result = emailService.registerUser(email, password)
             _message.value = result.fold(
                 onSuccess = {
-                    _navigateToNextScreen.value = true // Indica que el registro fue exitoso y se debe navegar
+                    _navigateToNextScreen.value = true
                     it
                 },
                 onFailure = {

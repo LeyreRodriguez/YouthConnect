@@ -192,7 +192,6 @@ fun SignUpView( navController: NavController) {
     LaunchedEffect(shouldNavigate) {
         if (shouldNavigate == true) {
             navController.navigate("login") {
-                // Configuraciones adicionales de navegación si las necesitas
                 popUpTo("secondScreens") { inclusive = true }
             }
         }
@@ -201,7 +200,6 @@ fun SignUpView( navController: NavController) {
     BackHandler {
         if(showFirstScreen){
             navController.navigate("login") {
-                // Configuraciones adicionales de navegación si las necesitas
                 popUpTo("signUp") { inclusive = true }
             }
         }else{
@@ -597,7 +595,6 @@ fun CustomRadioButton(belongsToSchool: Boolean,
 fun CoursesSelectionScreen(selectedCourse: Course, onChildCourseChange : (Course) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember(selectedCourse) { mutableStateOf(selectedCourse) }
-    // Dropdown menu
     OutlinedTextField(
         value = selectedText.displayName,
         onValueChange = {},
@@ -616,12 +613,12 @@ fun CoursesSelectionScreen(selectedCourse: Course, onChildCourseChange : (Course
         onDismissRequest = { expanded = false },
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp)) // Asegura que el DropdownMenu ocupe el ancho máximo disponible
+            .clip(RoundedCornerShape(20.dp))
     ) {
         Course.values().forEach { course ->
             DropdownMenuItem(
                 modifier = Modifier
-                    .fillMaxWidth(), // Hace que el DropdownMenuItem ocupe el ancho máximo disponible
+                    .fillMaxWidth(),
                 text = { Text(text = course.displayName) },
                 onClick = {
                     selectedText = course

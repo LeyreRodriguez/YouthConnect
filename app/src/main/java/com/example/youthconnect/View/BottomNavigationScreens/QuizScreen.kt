@@ -152,7 +152,6 @@ fun DecideScreen(navController: NavHostController){
 @Composable
 fun InstructorQuizView(navController: NavHostController) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // State initialization
         val (questions, setQuestions) = remember { mutableStateOf<List<Question?>>(emptyList()) }
         val quizViewModel: QuizViewModel = hiltViewModel()
         val userViewModel: UserViewModel = hiltViewModel()
@@ -161,7 +160,6 @@ fun InstructorQuizView(navController: NavHostController) {
         val (result, setResult) = remember { mutableStateOf<String?>(null) }
         val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
 
-        // Fetching data
         LaunchedEffect(Unit) {
             try {
                 withContext(Dispatchers.IO) {
@@ -178,7 +176,6 @@ fun InstructorQuizView(navController: NavHostController) {
             }
         }
 
-        // Floating buttons
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd
@@ -204,7 +201,6 @@ fun InstructorQuizView(navController: NavHostController) {
             }
         }
 
-        // Questions list
         QuestionsList(questions, navController)
     }
 }
@@ -284,7 +280,6 @@ fun ShowQuestionContent(question: Question, quizViewModel: QuizViewModel, navCon
 
             Box(modifier = Modifier
                 .align(Alignment.End)
-                // .fillMaxSize()
                 .padding(4.dp), contentAlignment = Alignment.BottomEnd){
                 DeleteButton(question = question, quizViewModel, navController = navController)
             }
@@ -350,7 +345,6 @@ fun DeleteButton(question: Question, quizViewModel: QuizViewModel, navController
         contentDescription = "Delete",
         modifier = Modifier
             .size(30.dp)
-            // .align(Alignment.End)
             .clickable {
                 quizViewModel.deleteQuestion(question.id)
                 navController.navigate("DecideScreen")
@@ -441,7 +435,7 @@ fun PrincipalQuizView(navController : NavHostController){
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "AJ MAJO QUIZ",
                 style = TextStyle(
@@ -644,7 +638,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
             .fillMaxSize()
             .padding(20.dp)
     ) {
-        Spacer(modifier = Modifier.height(26.dp)) // Espaciador vertical
+        Spacer(modifier = Modifier.height(26.dp))
 
         Text(
             text = "Puntuación",
@@ -682,7 +676,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
         val porcentajeAciertos = if (divisor != 0f) {
             puntuacion.toFloat() / divisor
         } else {
-            0f // O cualquier otro valor predeterminado que desees en caso de división por cero
+            0f
         }
 
 
@@ -740,10 +734,10 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
                 .height(100.dp)
                 .background(
                     color = Blue,
-                    shape = RoundedCornerShape(10.dp) // Puedes ajustar el radio del borde aquí
+                    shape = RoundedCornerShape(10.dp)
                 ),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Blue, // Set the background color as per your requirement
+                backgroundColor = Blue,
 
             )
 

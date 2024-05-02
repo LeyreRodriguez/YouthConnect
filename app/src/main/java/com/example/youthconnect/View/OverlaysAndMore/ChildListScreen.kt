@@ -252,7 +252,6 @@ fun MyChildren(navController: NavController, child: Child) {
                 imageUrlState.value = url
             },
             onFailure = { _ ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
     }
@@ -361,7 +360,6 @@ fun EachChild(navController : NavController, child : Child, modifier: Modifier =
                     imageUrlState.value = url
                 },
                 onFailure = { _ ->
-                    // Manejar el error, por ejemplo, mostrar un mensaje
                 }
             )
         } catch (e: Exception) {

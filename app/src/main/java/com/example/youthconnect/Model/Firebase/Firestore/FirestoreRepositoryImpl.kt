@@ -214,7 +214,7 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun getAllNews(): List<News?> {
         return try {
             val querySnapshot = firebaseFirestore.collection("News")
-                .orderBy("date", Query.Direction.DESCENDING) // Ordena por el campo "Date"
+                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .await()
 
@@ -224,7 +224,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                     title = document.getString("title") ?: "",
                     description = document.getString("description") ?: "",
                     image = document.getString("image") ?: "",
-                    date = document.getString("date") ?: "" // Obtén el valor del campo "Date"
+                    date = document.getString("date") ?: ""
                 )
             }
         } catch (e: Exception) {
@@ -240,7 +240,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 
             querySnapshot.documents
                 .filter { document ->
-                    document.getString("id") != "00000000A" // Filtrar el instructor con ID "00000000A"
+                    document.getString("id") != "00000000A"
                 }
                 .map { document ->
                     Instructor(
@@ -267,7 +267,6 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun addNews(news: News) {
         val randomDocumentId = UUID.randomUUID().toString()
         val documentRef: DocumentReference = firebaseFirestore.collection("News").document(randomDocumentId)
-        // Realiza la consulta para obtener el documento
         documentRef.get()
             .addOnSuccessListener { document ->
 
@@ -295,12 +294,10 @@ class FirestoreRepositoryImpl @Inject constructor(
                     return@withContext "0"
                 }
 
-                // Si no se encuentra en ninguna colección
-                return@withContext "-1" // Puedes usar otro valor representativo si prefieres
+                return@withContext "-1"
             } catch (e: Exception) {
-                // Manejar cualquier error que pueda ocurrir al buscar el documento
                 e.printStackTrace()
-                return@withContext "-1" // Puedes usar otro valor representativo si prefieres
+                return@withContext "-1"
             }
         }
     }
@@ -381,7 +378,6 @@ class FirestoreRepositoryImpl @Inject constructor(
     override suspend fun addChild(child: Child) {
         val documentRef: DocumentReference = firebaseFirestore.collection("Child").document(child.id)
 
-        // Realiza la consulta para obtener el documento
         documentRef.get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
@@ -414,7 +410,6 @@ class FirestoreRepositoryImpl @Inject constructor(
 
         val documentRef: DocumentReference = firebaseFirestore.collection("Parents").document(parent.id)
 
-        // Realiza la consulta para obtener el documento
         documentRef.get()
             .addOnSuccessListener { document ->
                 if (!document.exists()) {
@@ -473,12 +468,10 @@ class FirestoreRepositoryImpl @Inject constructor(
 
                     val updates = hashMapOf<String, Any>(
                         "rollCall" to newrollCallList
-                        // Puedes agregar más campos según sea necesario
                     )
 
                     documentRef.update(updates)
                         .addOnSuccessListener {
-                            // La actualización fue exitosa
                         }
                         .addOnFailureListener { e ->
                             e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
@@ -508,7 +501,6 @@ class FirestoreRepositoryImpl @Inject constructor(
 
                     documentRef.update(updates)
                         .addOnSuccessListener {
-                            // La actualización fue exitosa
                         }
                         .addOnFailureListener { e ->
                             e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
@@ -517,7 +509,6 @@ class FirestoreRepositoryImpl @Inject constructor(
 
                     val data = document.data
                 } else {
-                    // Documento no encontrado
                 }
             }
     }
@@ -547,7 +538,6 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override suspend fun removeInstructorFromChild(child: Child, instructorID: String) {
         val childDocument = firebaseFirestore.collection("Child").document(child.id)
-        // Actualizar el valor de instructorId en el documento
         childDocument.update("instructorId", "")
     }
 
@@ -624,7 +614,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     UserData(
                         userId = userId,
                         userName = document.getString("fullName") ?: ""
-                        // profilePictureUrl = photoUrl?.toString()
                     )
                 } else {
                     null
@@ -637,7 +626,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     UserData(
                         userId = userId,
                         userName = document.getString("fullName") ?: ""
-                        // profilePictureUrl = photoUrl?.toString()
                     )
                 } else {
                     null
@@ -650,7 +638,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     UserData(
                         userId = userId,
                         userName = document.getString("fullName") ?: ""
-                        // profilePictureUrl = photoUrl?.toString()
                     )
                 } else {
                     null
@@ -678,17 +665,16 @@ class FirestoreRepositoryImpl @Inject constructor(
                     val querySnapshot = firebaseFirestore.collection(coleccion).get().await()
                     allUsers.addAll(querySnapshot.documents.mapNotNull { document ->
                         val userId = document.getString("id") ?: ""
-                        if (userId != "00000000A" && userId != getCurrentUser()) { // Verifica si el ID no es Admin
+                        if (userId != "00000000A" && userId != getCurrentUser()) {
                             UserData(
                                 userId = userId,
                                 userName = document.getString("fullName") ?: ""
                             )
                         } else {
-                            null // Retorna null si es la cuenta que deseas excluir
+                            null
                         }
                     })
                 } catch (e: FirebaseFirestoreException) {
-                    // Manejar excepciones si es necesario
                 }
             }
         } catch (e: Exception) {
@@ -710,7 +696,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                 }
             }
 
-            // Si no se encuentra el campo chatID en ningún documento
             return null
         } catch (e: Exception) {
             null
@@ -743,7 +728,6 @@ class FirestoreRepositoryImpl @Inject constructor(
 
     override fun addNewQuestion(question: Question ) {
         val documentRef: DocumentReference = firebaseFirestore.collection("Quiz").document(question.id)
-        // Realiza la consulta para obtener el documento
         documentRef.get()
             .addOnSuccessListener { document ->
 
@@ -763,24 +747,18 @@ class FirestoreRepositoryImpl @Inject constructor(
 
         docRef.get().addOnSuccessListener { documentSnapshot ->
             if (documentSnapshot.exists()) {
-                // Obtener el valor actual de Score
                 val scoreActual = documentSnapshot.getLong("score") ?: 0
 
-                // Incrementar el valor de Score
                 val nuevoScore = scoreActual + 1
 
-                // Actualizar el documento con el nuevo valor de Score
                 docRef.update("score", nuevoScore)
                     .addOnSuccessListener {
-                        // Éxito al actualizar el documento
                         println("Score incrementado con éxito a $nuevoScore en la colección $collection con ID $documentId")
                     }
                     .addOnFailureListener { e ->
-                        // Manejar cualquier error al actualizar el documento
                         println("Error al incrementar el Score en la colección $collection con ID $documentId: $e")
                     }
             } else {
-                // Manejar el caso en que el documento no exista
                 println("El documento con ID $documentId no existe en la colección $collection")
             }
         }
@@ -793,11 +771,9 @@ class FirestoreRepositoryImpl @Inject constructor(
 
         docRef.update("score", 0)
             .addOnSuccessListener {
-                // Éxito al actualizar el documento
                 println("Score reset successfully to 0 in collection $collection with ID $documentId")
             }
             .addOnFailureListener { e ->
-                // Manejar cualquier error al actualizar el documento
                 println("Error resetting score in collection $collection with ID $documentId: $e")
             }
     }
@@ -816,7 +792,6 @@ class FirestoreRepositoryImpl @Inject constructor(
                     return coleccion
                 }
             } catch (e: FirebaseFirestoreException) {
-                // Manejar excepciones si es necesario
                 e.printStackTrace()
             }
         }
@@ -833,14 +808,12 @@ class FirestoreRepositoryImpl @Inject constructor(
         val docRef = firebaseFirestore.collection(coleccion).document(idDocumento)
 
         try {
-            // Obtener el documento de manera sincrónica
             val document = Tasks.await(docRef.get())
 
             if (document.exists()) {
-                // Obtener el valor del campo "score" como entero
                 val score = document.getLong("score")
                 if (score != null) {
-                    return score.toString() // Convertir el score a String
+                    return score.toString()
                 } else {
                     throw NullPointerException("El campo 'score' no existe o es nulo.")
                 }
@@ -848,10 +821,8 @@ class FirestoreRepositoryImpl @Inject constructor(
                 throw IllegalStateException("El documento no existe.")
             }
         } catch (e: ExecutionException) {
-            // Manejar excepciones
             throw e.cause ?: Exception("Error desconocido al obtener el documento.")
         } catch (e: InterruptedException) {
-            // Manejar excepciones
             throw Exception("Interrupción mientras se esperaba el resultado.")
         }
     }
@@ -877,7 +848,6 @@ class FirestoreRepositoryImpl @Inject constructor(
 
             } is Instructor -> {
                 val instructorRef = firebaseFirestore.collection("Instructor").document(user.id)
-                println( user.fullName)
                 instructorRef.update("fullName", user.fullName)
                 instructorRef.update("password", user.password)
             }

@@ -57,13 +57,9 @@ class FirebaseStorageImpl @Inject constructor(
 
             when (exception.errorCode) {
                 StorageException.ERROR_OBJECT_NOT_FOUND -> {
-                    // Handle object not found error
-                    // For example, return a default profile picture URL
                     Constants.IMAGE
                 }
                 else -> {
-                    // Handle other types of errors
-                    // For example, log the error and return a generic error message
                     Log.e("StorageError", "Error fetching profile picture: ${exception.message}")
                     "generic_error_url"
                 }

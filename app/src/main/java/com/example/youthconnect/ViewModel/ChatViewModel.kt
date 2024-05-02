@@ -23,7 +23,6 @@ class ChatViewModel @Inject constructor(
 
     init {
         recipientUserId.observeForever { userId ->
-            Log.e("recipientUserId", userId)
             val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase()
                 ?: ""
             val chatId = generateChatId(currentUserId, userId)
@@ -69,7 +68,6 @@ class ChatViewModel @Inject constructor(
             val currentUserId = Firebase.auth.currentUser?.email?.substringBefore('@')?.uppercase() ?: ""
             val chatId = generateChatId(currentUserId, recipientUserId)
 
-            // Establecer seen como false para el mensaje enviado
             val messageData = hashMapOf(
                 Constants.MESSAGE to message,
                 Constants.SENT_BY to currentUserId,
@@ -127,14 +125,11 @@ class ChatViewModel @Inject constructor(
      * Marcar un mensaje como visto
      */
     fun markMessagesAsSeen(chatId: String) {
-        // Obtener una referencia a la colección de mensajes para la conversación específica
         val messagesCollection = Firebase.firestore.collection(Constants.MESSAGES)
 
-        // Marcar todos los mensajes en la conversación como vistos
         messagesCollection.whereEqualTo("chatId", chatId).get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    // Actualizar el estado "seen" del mensaje a true
                     messagesCollection.document(document.id).update("seen", true)
                 }
             }
@@ -189,7 +184,7 @@ class ChatViewModel @Inject constructor(
                     }
                 }
 
-                unseenSentByLiveData.value = unseenSentBy.distinct() // Para eliminar duplicados si es necesario
+                unseenSentByLiveData.value = unseenSentBy.distinct()
             }
 
         return unseenSentByLiveData

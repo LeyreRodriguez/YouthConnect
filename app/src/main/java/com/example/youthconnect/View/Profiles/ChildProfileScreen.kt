@@ -109,7 +109,6 @@ fun ChildProfileScreen(
 
 
         Box(
-           // modifier = modifier.fillMaxSize(),
             ) {
 
             ChildInfo(

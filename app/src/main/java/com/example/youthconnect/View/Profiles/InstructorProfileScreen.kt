@@ -86,8 +86,6 @@ fun InstructorProfileScreen(instructorId : String,
         try {
             instructor = userViewModel.getCurrentInstructorById(instructorId)
             children = userViewModel.getChildByInstructorIdThatIsInSchool(instructorId)
-   //         currentUser = userViewModel.getCurrentUser()
-    //        currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
 
         } catch (e: Exception) {
             Log.e("Firestore", "Error fetching data", e)
@@ -96,9 +94,7 @@ fun InstructorProfileScreen(instructorId : String,
 
     LaunchedEffect(userViewModel) {
         try {
-      //      instructor = userViewModel.getCurrentInstructorById(instructorId)
-      //      children = userViewModel.getChildByInstructorIdThatIsInSchool(instructorId)
-            currentUser = userViewModel.getCurrentUser()
+          currentUser = userViewModel.getCurrentUser()
             currentUserType = currentUser?.let { userViewModel.getUserType(it).toString() }.toString()
             currentInstructor = currentUser?.let { userViewModel.getCurrentInstructorById(it) }
 
@@ -125,7 +121,6 @@ fun InstructorProfileScreen(instructorId : String,
             ) {
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally,
-                    //modifier = Modifier.wrapContentSize()
                 ) {
                     val configuration = LocalConfiguration.current
                     val screenWidth = with(LocalDensity.current) { configuration.screenWidthDp.dp }
@@ -283,7 +278,7 @@ fun FunctionalitiesButtons(currentUser : String?, instructor: Instructor?, navCo
     if(currentUser == instructor?.id) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly, // Distribuye las imágenes equitativamente
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
 

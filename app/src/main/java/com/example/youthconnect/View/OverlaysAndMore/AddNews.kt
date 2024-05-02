@@ -62,8 +62,8 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
 
     val galleryLauncher = rememberLauncherForActivityResult(contract = GetContent()) { selectedUri ->
         selectedUri?.let {
-            imageUri = it // Actualizar la URI de la imagen seleccionada
-            newsViewModel.addNewsToStorage(selectedUri, id) // Podrías mover esta llamada al ViewModel si es necesario
+            imageUri = it
+            newsViewModel.addNewsToStorage(selectedUri, id)
         }
     }
 
@@ -113,7 +113,6 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
                             Text("Seleccionar imagen")
                         }
 
-                        // Mostrar la imagen seleccionada
                         imageUri?.let { uri ->
                             Image(
                                 painter = rememberImagePainter(uri),
@@ -139,11 +138,9 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
 
                     newsViewModel.getNewsImageFromDatabase()
 
-                    // Check if the image upload was successful
                     if (newsViewModel.addImageToStorageResponse is Response.Success) {
                         val imageUrl = (newsViewModel.addImageToStorageResponse as Response.Success).data.toString()
 
-                        // Invoke addNewsToDatabase with imageUrl as String
                         newsViewModel.addNewsToDatabase(Uri.parse(imageUrl), news)
                         Toast.makeText(mcontext, "Noticia agregada correctamente", Toast.LENGTH_SHORT).show()
                     }
@@ -162,7 +159,6 @@ fun AddNews(onDismiss: () -> Unit , navController: NavController) {
                     description = ""
 
                     navController.navigate(NavScreen.NewsScreen.name)
-                    //onDismiss()
                 }
             ) {
                 Text("Confirmar")

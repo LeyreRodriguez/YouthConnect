@@ -22,8 +22,6 @@ import com.example.youthconnect.ui.theme.Red50
 
 @Composable
 fun SingleMessage(message: String, isCurrentUser: Boolean) {
-    val alignment = if (isCurrentUser) Alignment.End else Alignment.Start
-
     Card(
         shape = RoundedCornerShape(16.dp),
         backgroundColor = if (isCurrentUser) Blue50 else Red50 ,

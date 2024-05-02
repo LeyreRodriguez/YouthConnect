@@ -48,7 +48,6 @@ fun ProfilePicture(userViewModel : UserViewModel, userId: String, user: Any?, cu
 
     val takePictureLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
-            // Aquí manejas la imagen capturada usando imageUri
             imageUri?.let { uri ->
                 userViewModel.uploadProfileImage(uri, onSuccess = { _ ->
                     userViewModel.getProfileImage(
@@ -105,14 +104,12 @@ fun ProfilePicture(userViewModel : UserViewModel, userId: String, user: Any?, cu
 
                     when (PackageManager.PERMISSION_GRANTED) {
                         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
-                            // Permiso ya concedido, proceder con la acción
                             imageUri = userViewModel.createImageUri(context)
                             imageUri?.let { uri ->
                                 takePictureLauncher.launch(uri)
                             }
                         }
                         else -> {
-                            // Solicitar permiso
                             permissionLauncher.launch(Manifest.permission.CAMERA)
                         }
                     }
@@ -150,7 +147,6 @@ fun ProfilePicture(userViewModel : UserViewModel, userId: String, user: Any?, cu
                 contentScale = ContentScale.Crop
             )
         } else -> {
-        // Profile Image
         AsyncImage(
             model = imageUrlState.value,
             contentDescription = "Profile Picture",
@@ -223,7 +219,6 @@ fun loadProfileImage(
                 imageUrlState.value = url
             },
             onFailure = { _ ->
-                // Handle error
             }
         )
     }

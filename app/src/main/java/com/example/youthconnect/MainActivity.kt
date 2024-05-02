@@ -96,7 +96,6 @@ class MainActivity : ComponentActivity() {
         }
     }
     private fun showButtonAfterScan() {
-        // Actualiza el estado para mostrar el botón
         isButtonVisible = true
     }
 
@@ -268,15 +267,6 @@ class MainActivity : ComponentActivity() {
                             navController.navigate("child_profile_screen/${textResult.value}")
                         }
 
-
-/*
-                        LaunchedEffect(textResult.value) {
-                            if (textResult.value.isEmpty()) {
-                                navController.navigate("child_profile_screen/${textResult.value}
-                            }
-                        }
-
- */
 
 
                     }

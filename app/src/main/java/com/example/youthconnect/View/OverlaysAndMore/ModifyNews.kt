@@ -86,14 +86,11 @@ fun ModifyNews(item : News, navController : NavController, onDismiss: () -> Unit
             TextButton(
                 onClick = {
 
-
                     newsViewModel.updateNews(
                         item.copy(title= editedTitle, description = editedDescription, image = item.image)
                     )
 
-
                     navController.navigate("news_details_screen/${item.id}")
-                 //onDismiss()
                 }
             ) {
                 Text("Confirmar")

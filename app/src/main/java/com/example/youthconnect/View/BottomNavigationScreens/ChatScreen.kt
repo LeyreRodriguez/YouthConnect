@@ -218,7 +218,7 @@ fun UserEachRow(
 
 
                 val userName = person.userName ?: ""
-                val maxWordsPerLine = 3 // Máximo de palabras por línea
+                val maxWordsPerLine = 3
 
                 val lines = mutableListOf<String>()
                 var currentLine = ""
@@ -266,8 +266,7 @@ private fun UserTypeIcon(userType: String, currentUserType: String) {
                 tint = Color.Black,
                 modifier = Modifier
                     .size(20.dp)
-                //    .align(CenterVertically)
-                  //  .padding(4.dp)
+
             )
         }
     }
@@ -287,7 +286,7 @@ private fun ProfileImage(url: String) {
 
 @Composable
 private fun DisplayName(userName: String) {
-    val maxWordsPerLine = 3 // Máximo de palabras por línea
+    val maxWordsPerLine = 3
     val lines = userName.split(" ").chunked(maxWordsPerLine) { it.joinToString(" ") }
 
     if(lines.size < 1){
@@ -355,17 +354,14 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
 
     Box(
         modifier = Modifier.fillMaxSize(),
-      //  contentAlignment = Alignment.TopCenter, // Alinea el texto en la parte superior y central
     ) {
 
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-          //  verticalArrangement = Arrangement.Bottom
         ) {
 
             Box(
-                //modifier = Modifier.fillMaxSize()
                 contentAlignment = Alignment.TopCenter
             ) {
                 userState.value?.let { Recipient(userData = it, navController = navHostController) }
@@ -390,7 +386,6 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
 
             }
             Box(
-               // modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 OutlinedTextField(
@@ -407,7 +402,6 @@ fun ChatScreen(recipientUserId: String, navHostController: NavController, chatVi
                     modifier = Modifier
                         .padding(horizontal = 15.dp, vertical = 1.dp)
                         .fillMaxWidth(),
-                       // .weight(weight = 0.09f, fill = true),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text
                     ),
@@ -452,7 +446,6 @@ fun Recipient(userData: UserData, navController : NavController){
                 imageUrlState.value = url
             },
             onFailure = { _ ->
-                // Manejar el error, por ejemplo, mostrar un mensaje
             }
         )
     }
@@ -514,7 +507,7 @@ fun Recipient(userData: UserData, navController : NavController){
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    color = Color.Black // Establece el color en rojo si el mensaje está marcado como visto
+                    color = Color.Black
                 ),
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp)

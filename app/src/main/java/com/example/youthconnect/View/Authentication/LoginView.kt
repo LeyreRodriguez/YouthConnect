@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PermIdentity
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,7 +58,6 @@ import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavController, state : SignInState) {
 
@@ -150,7 +148,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
         ))
     Box(
 
-        contentAlignment = Alignment.BottomCenter, // Alinea los elementos en la parte inferior
+        contentAlignment = Alignment.BottomCenter,
     ) {
 
 
@@ -173,7 +171,7 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter, // Alinea el texto en la parte superior y central
+                contentAlignment = Alignment.TopCenter,
             ) {
                 Spacer(
                     modifier = Modifier
@@ -182,10 +180,10 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
                         .background(
                             color = Color(0xFFFFFFFF),
                             shape = RoundedCornerShape(
-                                topStart = 31.dp, // Radio superior izquierdo
-                                topEnd = 31.dp,   // Radio superior derecho
-                                bottomStart = 0.dp, // Radio inferior izquierdo (0 para esquina recta)
-                                bottomEnd = 0.dp   // Radio inferior derecho (0 para esquina recta)
+                                topStart = 31.dp,
+                                topEnd = 31.dp,
+                                bottomStart = 0.dp,
+                                bottomEnd = 0.dp
                             )
                         )
                 )

@@ -46,7 +46,6 @@ class NewsViewModel @Inject constructor(
 
             News = firestoreRepository.getNewsById(newsId)
 
-            //searchedNews = allNews
             return News
 
         } catch (e: Exception) {
