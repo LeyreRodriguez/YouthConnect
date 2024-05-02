@@ -66,17 +66,34 @@ class NewsViewModel @Inject constructor(
 
     fun addNewsToStorage(imageUri : Uri, id : String) = viewModelScope.launch {
         addImageToStorageResponse = Response.Loading
-        addImageToStorageResponse = repo.addNewsImageToFirebaseStorage(imageUri, id)
-    }
+        try {
+            val result = repo.addNewsImageToFirebaseStorage(imageUri, id)
+            addImageToStorageResponse = Response.Success(imageUri)
+        } catch (e: Exception) {
+            addImageToStorageResponse = Response.Failure(e)
+            Log.e("NewsViewModel", "Error adding news image to storage", e)
+        }    }
 
-    fun addNewsToDatabase(downloadUrl : Uri, news : News) = viewModelScope.launch {
-        addImageToStorageResponse = Response.Loading
-        addImageToDatabaseResponse = repo.addNewsImageUrlToFirestore(downloadUrl.toString(), news)
+    fun addNewsToDatabase(downloadUrl: Uri, news: News) = viewModelScope.launch {
+        addImageToDatabaseResponse = Response.Loading
+        try {
+            val result = repo.addNewsImageUrlToFirestore(downloadUrl.toString(), news)
+            addImageToDatabaseResponse = Response.Success(true)
+        } catch (e: Exception) {
+            addImageToDatabaseResponse = Response.Failure(e)
+            Log.e("NewsViewModel", "Error adding news image URL to Firestore", e)
+        }
     }
 
     fun getNewsImageFromDatabase() = viewModelScope.launch {
         getImageFromDatabaseResponse = Response.Loading
-        getImageFromDatabaseResponse = repo.getNewsImageUrlFromFirestore()
+        try {
+            val result = repo.getNewsImageUrlFromFirestore()
+            getImageFromDatabaseResponse = Response.Success(result.toString())
+        } catch (e: Exception) {
+            getImageFromDatabaseResponse = Response.Failure(e)
+            Log.e("NewsViewModel", "Error getting news image URL from Firestore", e)
+        }
     }
 
     fun updateNews( news : News){

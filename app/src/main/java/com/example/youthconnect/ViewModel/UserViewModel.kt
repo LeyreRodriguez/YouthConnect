@@ -27,14 +27,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val firestoreRepository : FirestoreRepository,
+    private val firestoreRepository: FirestoreRepository,
     private val firebaseStorage: FirebaseStorageRepository
 ) : ViewModel() {
     private var document: String? = null
 
     private var allChild: List<Child?> = emptyList()
-    private var searchedChild : List<Child?> = emptyList()
-    private var child : Child? = null
+    private var searchedChild: List<Child?> = emptyList()
+    private var child: Child? = null
 
     private var allParents: List<Parent?> = emptyList()
     private var parent: Parent? = null
@@ -42,29 +42,24 @@ class UserViewModel @Inject constructor(
     private var instructor: Instructor? = null
     private var user: UserData? = null
 
-
-
     private var _userData = MutableStateFlow<UserData?>(null)
     val userData = _userData.asStateFlow()
 
-
     private var _logoutCompleted = MutableStateFlow(false)
     var logoutCompleted = _logoutCompleted.asStateFlow()
-
 
     init {
         viewModelScope.launch {
             _userData.value = firestoreRepository.getUser()
         }
-
     }
 
-    suspend fun getCurrentUser() : String? {
-        try {
+    suspend fun getCurrentUser(): String? {
+        return try {
             document = firestoreRepository.getCurrentUser()
-            return document
+            document
         } catch (e: Exception) {
-            return null
+            null
         }
     }
 
@@ -77,155 +72,127 @@ class UserViewModel @Inject constructor(
         }
     }
 
-
-
-    suspend fun findDocument(userId : String) : String?{
-
-        try {
-
+    suspend fun findDocument(userId: String): String? {
+        return try {
             document = firestoreRepository.findDocument(userId)
-            return document
+            document
         } catch (e: Exception) {
-            return null
+            null
         }
     }
 
     suspend fun getAllChildren(): List<Child?> {
-        try {
-
-            if (allChild.isEmpty()){
+        return try {
+            if (allChild.isEmpty()) {
                 allChild = firestoreRepository.getAllChildren()
             }
             searchedChild = allChild
-            return searchedChild
-
+            searchedChild
         } catch (e: Exception) {
-            return emptyList()
+            emptyList()
         }
     }
 
     suspend fun getAllInstructors(): List<Instructor?> {
-        try {
-
-            if (allInstructor.isEmpty()){
+        return try {
+            if (allInstructor.isEmpty()) {
                 allInstructor = firestoreRepository.getAllInstructors()
             }
-
-            return allInstructor
-
+            allInstructor
         } catch (e: Exception) {
-            return emptyList()
+            emptyList()
         }
     }
 
     suspend fun getChildByInstructorId(instructorId: String): List<Child?> {
-        try {
-
-
+        return try {
             allChild = firestoreRepository.getChildByInstructorId(instructorId)
-
-            return allChild
-
+            allChild
         } catch (e: Exception) {
-            return emptyList()
+            emptyList()
         }
     }
 
     suspend fun getChildByInstructorIdThatIsInSchool(instructorId: String): List<Child?> {
-        try {
-
+        return try {
             allChild = firestoreRepository.getChildByInstructorIdThatIsInSchool(instructorId)
-
-            return allChild
-
+            allChild
         } catch (e: Exception) {
-            return emptyList()
+            emptyList()
         }
     }
-
 
     suspend fun getInstructorByChildId(childId: String): Instructor? {
-        try {
-
-
+        return try {
             instructor = firestoreRepository.getInstructorByChildId(childId)
-
-            return instructor
-
+            instructor
         } catch (e: Exception) {
-            return null
+            null
         }
     }
-
 
     suspend fun getChildByParentsId(parentID: String): List<Child?> {
-        try {
-
-            if (allChild.isEmpty()){
+        return try {
+            if (allChild.isEmpty()) {
                 allChild = firestoreRepository.getChildByParentsId(parentID)
             }
-            // searchedChild = allChild
-            return allChild
-
+            allChild
         } catch (e: Exception) {
-            return emptyList()
+            emptyList()
         }
     }
 
-
-    suspend fun getCurrentChildById(childId : String) : Child?{
-        try {
+    suspend fun getCurrentChildById(childId: String): Child? {
+        return try {
             child = firestoreRepository.getCurrentChildById(childId)
-            return child
+            child
         } catch (e: Exception) {
-            return null
+            null
         }
     }
 
-    suspend fun getCurrentUserById(parentID : String) : Parent?{
-        try {
+    suspend fun getCurrentUserById(parentID: String): Parent? {
+        return try {
             parent = firestoreRepository.getCurrentUserById(parentID)
-            return parent
+            parent
         } catch (e: Exception) {
-            return null
+            null
         }
     }
-
 
     suspend fun getParentsByParentsID(parentsID: List<String>): List<Parent?> {
-        try {
-
-            if (allParents.isEmpty()){
+        return try {
+            if (allParents.isEmpty()) {
                 allParents = firestoreRepository.getParentsByParentsID(parentsID)
             }
-            return allParents
-
+            allParents
         } catch (e: Exception) {
-            return emptyList()
+            emptyList()
         }
     }
 
     suspend fun getCurrentInstructorById(instructorID: String): Instructor? {
         return try {
             instructor = firestoreRepository.getCurrentInstructorById(instructorID)
-            return  instructor
+            instructor
         } catch (e: Exception) {
             null
         }
     }
 
-
-    suspend fun changeState(childId : String) {
+    suspend fun changeState(childId: String) {
         try {
             firestoreRepository.changeState(childId)
-
         } catch (e: Exception) {
             e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
         }
     }
 
-
-    fun uploadProfileImage(imageUri: Uri, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+    fun uploadProfileImage(
+        imageUri: Uri,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 firebaseStorage.uploadImageToFirebase(imageUri, onSuccess, onFailure)
@@ -235,7 +202,10 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun getProfileImage(onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+    fun getProfileImage(
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         viewModelScope.launch {
             val userId = firebaseStorage.authConection?.currentUser?.email
             if (userId != null) {
@@ -250,9 +220,12 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun getProfileEspecificImage(email: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+    fun getProfileEspecificImage(
+        email: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         viewModelScope.launch {
-
             val userId = email
             if (userId != null) {
                 try {
@@ -264,18 +237,57 @@ class UserViewModel @Inject constructor(
         }
     }
 
-
     fun createImageUri(context: Context): Uri? {
+        val fileName = FileUtil.createUniqueImageFileName()
+        return FileUtil.createImageUri(context, fileName)
+    }
+
+    suspend fun getAllUsers(): List<UserData?>? {
+        return try {
+            firestoreRepository.getAllUser()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun getUserType(userID: String): String? {
+        return firestoreRepository.findUserType(userID)
+    }
+
+    suspend fun getRollState(childId: String): List<String>? {
+        return firestoreRepository.getRollCall(childId)
+    }
+
+    fun changeInstructor(child: Child, instructorID: String) {
+        viewModelScope.launch {
+            firestoreRepository.addInstructorToChild(child, instructorID)
+        }
+    }
+
+    fun updateUser(user: Any) {
+        try {
+            firestoreRepository.updateUser(user)
+        } catch (e: Exception) {
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
+        }
+    }
+}
+
+object FileUtil {
+    fun createUniqueImageFileName(): String {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        return "JPEG_${timeStamp}_"
+    }
+
+    fun createImageUri(context: Context, fileName: String): Uri? {
         val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return try {
             val file = File.createTempFile(
-                "JPEG_${timeStamp}_", /* prefix */
+                fileName, /* prefix */
                 ".jpg", /* suffix */
                 storageDir /* directory */
             )
 
-            // Para compatibilidad con Android N y posteriores, usas FileProvider
             val authority = "${context.packageName}.provider"
             FileProvider.getUriForFile(context, authority, file)
         } catch (e: IOException) {
@@ -283,45 +295,4 @@ class UserViewModel @Inject constructor(
             null
         }
     }
-
-    suspend fun getAllUsers() : List<UserData?>? {
-        try {
-            return firestoreRepository.getAllUser()
-        } catch (e: Exception) {
-            return null
-        }
-    }
-
-
-    suspend fun getUserType(userID: String): String? {
-        val collection = firestoreRepository.findUserType(userID)
-        return collection
-    }
-
-
-    suspend fun getRollState(childId :String) : List<String>?{
-        val collection = firestoreRepository.getRollCall(childId)
-        return collection
-    }
-
-
-    fun changeInstructor(child :Child, instructorID: String){
-
-        viewModelScope.launch {
-                firestoreRepository.addInstructorToChild(child, instructorID)
-
-        }
-    }
-
-    fun updateUser( user : Any){
-        try {
-            firestoreRepository.updateUser(user)
-
-        } catch (e: Exception) {
-            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
-
-        }
-    }
-
-
 }

@@ -2,108 +2,101 @@ package com.example.youthconnect.ViewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Firebase.Firestore.FirestoreRepository
 import com.example.youthconnect.Model.Firebase.Storage.FirebaseStorageRepository
-import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Question
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
-    private val firestoreRepository: FirestoreRepository, private val repo: FirebaseStorageRepository
-
-): ViewModel() {
+    private val firestoreRepository: FirestoreRepository,
+    private val repo: FirebaseStorageRepository
+) : ViewModel() {
 
     private var allQuestions: List<Question?> = emptyList()
-    private var searchedQuestion : List<Question?> = emptyList()
+    private var searchedQuestion: List<Question?> = emptyList()
 
-    private var Question : Question? = null
     suspend fun getAllQuestions(): List<Question?> {
-        try {
-            if (allQuestions.isEmpty()){
+        return try {
+            if (allQuestions.isEmpty()) {
                 allQuestions = firestoreRepository.getQuestions()
             }
             searchedQuestion = allQuestions.shuffled()
-            return searchedQuestion
-
+            searchedQuestion
         } catch (e: Exception) {
             Log.e("Firestore", "Error en getBooksStringMatch", e)
-            return emptyList()
+            emptyList()
         }
     }
 
-     fun addNewQuestion(question: Question) {
-        try {
-            firestoreRepository.addNewQuestion(question)
-
-        } catch (e: Exception) {
-            // Maneja cualquier excepción aquí, por ejemplo, registrándola o lanzándola
+    fun addNewQuestion(question: Question) {
+        viewModelScope.launch {
+            try {
+                firestoreRepository.addNewQuestion(question)
+            } catch (e: Exception) {
+                Log.e(Constants.ERROR_LOG_TAG, "Error adding question: ${e.message}")
+            }
         }
-
     }
 
-
-
-     fun updateScore(userID: String){
-
-             val collection = runBlocking {
-                 firestoreRepository.findUserType(userID)
-             }
-
-             if (collection != null) {
-
-                 firestoreRepository.updateScore(collection, userID)
-             }
-
-
+    fun updateScore(userID: String) {
+        viewModelScope.launch {
+            try {
+                val collection = firestoreRepository.findUserType(userID)
+                if (collection != null) {
+                    firestoreRepository.updateScore(collection, userID)
+                }
+            } catch (e: Exception) {
+                Log.e(Constants.ERROR_LOG_TAG, "Error updating score: ${e.message}")
+            }
+        }
     }
 
-
-    fun resetScore(userID: String){
-
-        val collection = runBlocking {
-            firestoreRepository.findUserType(userID)
+    fun resetScore(userID: String) {
+        viewModelScope.launch {
+            try {
+                val collection = firestoreRepository.findUserType(userID)
+                if (collection != null) {
+                    firestoreRepository.resetScore(collection, userID)
+                }
+            } catch (e: Exception) {
+                Log.e(Constants.ERROR_LOG_TAG, "Error resetting score: ${e.message}")
+            }
         }
-
-        if (collection != null) {
-
-            firestoreRepository.resetScore(collection, userID)
-        }
-
-
     }
 
     suspend fun getScore(userID: String): String? = withContext(Dispatchers.IO) {
         val collection = firestoreRepository.findUserType(userID)
         if (collection != null) {
-            return@withContext firestoreRepository.getScore(collection, userID)
-        }
-        return@withContext ""
-    }
-
-
-    fun updateQuestion( question: Question){
-        try {
-            firestoreRepository.updateQuestion(question)
-
-        } catch (e: Exception) {
-            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
-
+            firestoreRepository.getScore(collection, userID)
+        } else {
+            ""
         }
     }
 
-    fun deleteQuestion( questionId : String){
-        try {
-            firestoreRepository.deleteQuestion(questionId)
+    fun updateQuestion(question: Question) {
+        viewModelScope.launch {
+            try {
+                firestoreRepository.updateQuestion(question)
+            } catch (e: Exception) {
+                Log.e(Constants.ERROR_LOG_TAG, "Error updating question: ${e.message}")
+            }
+        }
+    }
 
-        } catch (e: Exception) {
-            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
-
+    fun deleteQuestion(questionId: String) {
+        viewModelScope.launch {
+            try {
+                firestoreRepository.deleteQuestion(questionId)
+            } catch (e: Exception) {
+                Log.e(Constants.ERROR_LOG_TAG, "Error deleting question: ${e.message}")
+            }
         }
     }
 }
