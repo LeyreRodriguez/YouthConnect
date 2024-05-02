@@ -16,5 +16,7 @@ object Constants {
     const val IS_CURRENT_USER = "is_current_user"
     const val IMAGE = "https://i.imgur.com/w3UEu8o.jpeg"
     const val  ERROR_LOG_TAG = "Error: "
-    const val NO_HAY_MAJO = "MAJO ha sido suspendido"
+    const val  EMAIL = "Login Email"
+
+    const val ROUTE = "@youthconnect.com"
 }

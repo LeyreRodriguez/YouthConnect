@@ -86,6 +86,7 @@ fun HomeScreen(
     var userType by remember { mutableStateOf<String>("") }
     val userViewModel : UserViewModel = hiltViewModel()
 
+
     LaunchedEffect(Unit) {
         try {
             val currentUser = userViewModel.getCurrentUser().toString()
@@ -164,7 +165,7 @@ fun UserEachRow(
         userType = userViewModel.getUserType(person.userId).toString()
         currentUserType = userViewModel.getCurrentUser()
             ?.let { userViewModel.getUserType(it).toString() }.toString()
-        userViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(person.userId.lowercase() + Constants.ROUTE,
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -176,7 +177,7 @@ fun UserEachRow(
 
 
     LaunchedEffect(Unit) {
-        userViewModel.getProfileEspecificImage(person.userId.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(person.userId.lowercase() + Constants.ROUTE,
             onSuccess = { url ->
                 imageUrlState.value = url
             },
@@ -451,7 +452,7 @@ fun Recipient(userData: UserData, navController : NavController){
 
     val imageUrlState = remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        userViewModel.getProfileEspecificImage(userData.userId.lowercase() + "@youthconnect.com",
+        userViewModel.getProfileEspecificImage(userData.userId.lowercase() + Constants.ROUTE,
             onSuccess = { url ->
                 imageUrlState.value = url
             },

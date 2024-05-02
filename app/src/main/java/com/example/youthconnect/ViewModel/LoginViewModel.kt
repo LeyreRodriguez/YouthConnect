@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.libraryapp.model.firebaseAuth.SignInResult
+import com.example.youthconnect.Model.Constants
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -40,14 +41,14 @@ class LoginViewModel : ViewModel() {
             if (authResult != null) {
                 home()
             } else {
-                Log.d("Login Email", "Authentication failed.")
+                Log.d(Constants.EMAIL, "Authentication failed.")
             }
         } catch (e: FirebaseAuthInvalidCredentialsException) {
-            Log.d("Login Email", "Invalid credentials: ${e.message}")
+            Log.d(Constants.EMAIL, "Invalid credentials: ${e.message}")
         } catch (e: FirebaseException) {
-            Log.d("Login Email", "Firebase error: ${e.message}")
+            Log.d(Constants.EMAIL, "Firebase error: ${e.message}")
         } catch (e: Exception) {
-            Log.d("Login Email", "Error: ${e.message}")
+            Log.d(Constants.EMAIL, "Error: ${e.message}")
         }
     }
 
@@ -55,7 +56,7 @@ class LoginViewModel : ViewModel() {
         try {
             auth.signOut()
         } catch (e: Exception) {
-            Log.d("Login Email", "Sign out error: ${e.message}")
+            Log.d(Constants.EMAIL, "Sign out error: ${e.message}")
         }
     }
 }

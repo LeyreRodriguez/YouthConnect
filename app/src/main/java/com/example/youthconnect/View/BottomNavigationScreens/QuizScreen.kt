@@ -3,10 +3,8 @@ package com.example.youthconnect.View.BottomNavigationScreens
 import ModifyQuestion
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,20 +17,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Button
-import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Plagiarism
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,16 +40,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-
-
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -63,20 +49,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.youthconnect.Model.Constants
 import com.example.youthconnect.Model.Enum.NavScreen
-import com.example.youthconnect.Model.Object.News
 import com.example.youthconnect.Model.Object.Question
 import com.example.youthconnect.Model.Object.UserData
 import com.example.youthconnect.R
 import com.example.youthconnect.View.Components.ExtendedFloatingButton
 import com.example.youthconnect.View.Components.FloatingButton
-import com.example.youthconnect.View.OverlaysAndMore.AddNews
 import com.example.youthconnect.View.OverlaysAndMore.AddQuestions
 import com.example.youthconnect.ViewModel.QuizViewModel
 import com.example.youthconnect.ViewModel.UserViewModel
@@ -84,7 +67,6 @@ import com.example.youthconnect.ui.theme.Blue
 import com.example.youthconnect.ui.theme.Yellow
 import com.example.youthconnect.ui.theme.Green
 import com.example.youthconnect.ui.theme.Red
-import com.google.android.material.internal.ViewUtils.dpToPx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -118,7 +100,7 @@ fun QuizScreen( navController: NavHostController,
             }
 
         } catch (e: Exception) {
-            e.message?.let { Log.e("Error: ", it) }
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
 
         }
     }
@@ -158,7 +140,7 @@ fun DecideScreen(navController: NavHostController){
             }
 
         } catch (e: Exception) {
-            e.message?.let { Log.e("Error: ", it) }
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
 
         }
     }
@@ -169,135 +151,215 @@ fun DecideScreen(navController: NavHostController){
         PrincipalQuizView(navController = navController)
     }
 }
-
 @Composable
-fun InstructorQuizView(navController: NavHostController){
+fun InstructorQuizView(navController: NavHostController) {
     Box(modifier = Modifier.fillMaxSize()) {
-
-        var questions by remember { mutableStateOf<List<Question?>>(emptyList()) }
+        // State initialization
+        val (questions, setQuestions) = remember { mutableStateOf<List<Question?>>(emptyList()) }
         val quizViewModel: QuizViewModel = hiltViewModel()
         val userViewModel: UserViewModel = hiltViewModel()
-        var user by remember { mutableStateOf<String?>("") }
+        val (user, setUser) = remember { mutableStateOf<String?>(null) }
         val documentExists = remember { mutableStateOf("-1") }
-        var result by remember { mutableStateOf<String?>("") }
+        val (result, setResult) = remember { mutableStateOf<String?>(null) }
+        val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
 
-
+        // Fetching data
         LaunchedEffect(Unit) {
             try {
                 withContext(Dispatchers.IO) {
-                    questions = quizViewModel.getAllQuestions()
+                    setQuestions(quizViewModel.getAllQuestions())
                 }
-                user = userViewModel.getCurrentUser()
-                result = user?.let { userViewModel.findDocument(it) }
+                setUser(userViewModel.getCurrentUser())
+                setResult(user?.let { userViewModel.findDocument(it) })
 
                 if (result != null) {
                     documentExists.value = result.toString()
                 }
-
             } catch (e: Exception) {
-                e.message?.let { Log.e("Error: ", it) }
-
+                e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
             }
         }
-        var showDialog by remember { mutableStateOf(false) }
 
-
+        // Floating buttons
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd
-        ){
-                Column(Modifier.padding(4.dp)) {
-                    FloatingButton(Icons.Outlined.Add) {
-                        showDialog = true
-                    }
-
+        ) {
+            Column(Modifier.padding(4.dp)) {
+                FloatingButton(Icons.Outlined.Add) {
+                    setShowDialog(true)
                 }
-
-            if (showDialog) {
-                AddQuestions(navController, onDismiss = { showDialog = false })
             }
-
-
+            if (showDialog) {
+                AddQuestions(navController, onDismiss = { setShowDialog(false) })
+            }
         }
-
 
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
-        ){
+        ) {
             Column(Modifier.padding(4.dp)) {
                 ExtendedFloatingButton(Icons.Outlined.PlayArrow, "Jugar") {
                     navController.navigate(NavScreen.QuizScreen.name)
                 }
-
             }
-
         }
 
+        // Questions list
+        QuestionsList(questions, navController)
+    }
+}
 
+@Composable
+fun QuestionsList(questions: List<Question?>, navController: NavHostController){
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp - 150.dp
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.height(screenHeight)
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Questions list",
+            style = TextStyle(
+                fontSize = 20.sp,
+                fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                fontWeight = FontWeight(400),
+                color = Color(0xFFFFFFFF),
+                letterSpacing = 0.3.sp,
+            ),
+            color = Color.Black,
+            textAlign = TextAlign.Center
+        )
 
-        val screenHeight = LocalConfiguration.current.screenHeightDp.dp - 150.dp
-
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.height(screenHeight)
-     //       modifier = Modifier.wrapContentSize()
-            ){
-            Spacer(modifier = Modifier.height(16.dp)) // Espaciador vertical
-
-
-                Text(
-                    text = "Questions list",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFFFFFFFF),
-                        letterSpacing = 0.3.sp,
-                    ),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-
-                )
-
-
-
-            if(questions.isNotEmpty()){
-                LazyColumn(modifier = Modifier
-                    .height(screenHeight)
-                ){
-                    items(items = questions){ item ->
-                        if (item != null) {
-                            QuestionItem(question = item, navController = navController)
-                        }
+        if (questions.isNotEmpty()) {
+            LazyColumn(modifier = Modifier.height(screenHeight)) {
+                items(items = questions) { item ->
+                    if (item != null) {
+                        QuestionItem(question = item, navController = navController)
                     }
                 }
-            } else{
-                Text(
-                    text = "No hay preguntas añadidas aun",
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight(400),
-                        fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
-                        color = Color(0xFFFFFFFF),
-                        letterSpacing = 0.3.sp,
-                    ),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-
-                )
-
             }
-
-
+        } else {
+            Text(
+                text = "No hay preguntas añadidas aun",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight(400),
+                    fontFamily = FontFamily(Font(R.font.annie_use_your_telescope)),
+                    color = Color(0xFFFFFFFF),
+                    letterSpacing = 0.3.sp,
+                ),
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
 
+@Composable
+fun ShowQuestionDialog(question: Question, navController: NavHostController) {
+    ModifyQuestion(item = question, navController = navController) {
+        navController.navigate("DecideScreen")
+    }
+}
+
+@Composable
+fun ShowQuestionContent(question: Question, quizViewModel: QuizViewModel, navController: NavHostController, showDialog: () -> Unit) {
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.padding(10.dp)) {
+            Text(
+                text = question.question,
+                style = TextStyle(
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFFFFFFFF),
+                    letterSpacing = 0.3.sp,
+                ),
+                color = Color.Black,
+                modifier = Modifier.padding(10.dp),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            ShowOptions(question)
+
+            Box(modifier = Modifier
+                .align(Alignment.End)
+                // .fillMaxSize()
+                .padding(4.dp), contentAlignment = Alignment.BottomEnd){
+                DeleteButton(question = question, quizViewModel, navController = navController)
+            }
+        }
+    }
+}
+
+@Composable
+fun ShowOptions(question : Question){
+    Box(Modifier.fillMaxSize()){
 
 
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Row {
+                    Row(Modifier.weight(1f)) {
+                        Option(answer = question.answer, option = question.optionA, possibleAnswer = "A")
+
+                    }
+                    Row(Modifier.weight(1f)) {
+                        Option(answer = question.answer, option = question.optionB, possibleAnswer = "B")
+
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.Center) {
+                    Row(Modifier.weight(1f)) {
+                        Option(answer = question.answer, option = question.optionC, possibleAnswer = "C")
+
+                    }
+                    Row(Modifier.weight(1f)) {
+                        Option(answer = question.answer, option = question.optionD, possibleAnswer = "D")
+                    }
+                }
+            }
+
+
+
+
+        }
+
+
+
+}
+
+@Composable
+fun Option(answer : String, option: String, possibleAnswer : String){
+    Icon(
+        if (answer == possibleAnswer) Icons.Outlined.Check else Icons.Default.Clear,
+        contentDescription = if (answer == possibleAnswer) "Check" else "Wrong",
+        tint = if (answer == possibleAnswer) Green else Red,
+        modifier = Modifier.size(24.dp)
+    )
+    Text(
+        text = option,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center
+    )
+}
+@Composable
+fun DeleteButton(question: Question, quizViewModel: QuizViewModel, navController: NavHostController) {
+    Icon(
+        imageVector = Icons.Default.DeleteOutline,
+        contentDescription = "Delete",
+        modifier = Modifier
+            .size(30.dp)
+            // .align(Alignment.End)
+            .clickable {
+                quizViewModel.deleteQuestion(question.id)
+                navController.navigate("DecideScreen")
+            },
+        tint = Red
+    )
+}
 @Composable
 fun QuestionItem(question: Question, navController: NavHostController) {
 
@@ -315,128 +377,26 @@ fun QuestionItem(question: Question, navController: NavHostController) {
             }
             .padding(horizontal = 15.dp, vertical = 4.dp)
         ,
-         colors = CardDefaults.cardColors(
-              containerColor = Color.Transparent
-          ),
-            shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent
+        ),
+        shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, Color.Black),
     ) {
 
 
 
         if (showDialog) {
-            ModifyQuestion(item = question, navController = navController) {
-                navController.navigate("DecideScreen")
-
-            }
+            ShowQuestionDialog(question = question, navController = navController)
+        } else{
+            ShowQuestionContent(question = question, quizViewModel, navController = navController, showDialog = { showDialog = true })
         }
 
-        Box(Modifier.fillMaxSize()){
 
-
-
-            Column(Modifier.padding(10.dp)) {
-                Text(
-                    text = question.question,
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFFFFFFFF),
-                        letterSpacing = 0.3.sp,
-                    ),
-                    color = Color.Black,
-                    modifier = Modifier.padding(10.dp),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis // Agrega puntos suspensivos si el texto es demasiado largo
-                )
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row {
-                        Row(Modifier.weight(1f)) {
-                            Icon(
-                                if (question.answer == "A") Icons.Outlined.Check else Icons.Default.Clear,
-                                contentDescription = if (question.answer == "A") "Check" else "Wrong",
-                                tint = if (question.answer == "A") Green else Red,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = question.optionA,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                        Row(Modifier.weight(1f)) {
-                            Icon(
-                                if (question.answer == "B") Icons.Outlined.Check else Icons.Default.Clear,
-                                contentDescription = if (question.answer == "B") "Check" else "Wrong",
-                                tint = if (question.answer == "B") Green else Red,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = question.optionB,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                    Row(horizontalArrangement = Arrangement.Center) {
-                        Row(Modifier.weight(1f)) {
-                            Icon(
-                                if (question.answer == "C") Icons.Outlined.Check else Icons.Default.Clear,
-                                contentDescription = if (question.answer == "C") "Check" else "Wrong",
-                                tint = if (question.answer == "C") Green else Red,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = question.optionC,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                        Row(Modifier.weight(1f)) {
-                            Icon(
-                                if (question.answer == "D") Icons.Outlined.Check else Icons.Default.Clear,
-                                contentDescription = if (question.answer == "D") "Check" else "Wrong",
-                                tint = if (question.answer == "D") Green else Red,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = question.optionD,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-
-                Icon(
-                    imageVector = Icons.Default.DeleteOutline,
-                    contentDescription = "Delete",
-                    modifier = Modifier
-                        .size(30.dp)
-                        .align(Alignment.End)
-                        .clickable { quizViewModel.deleteQuestion(question.id);
-                                   navController.navigate("DecideScreen")},
-                    tint = Red
-                )
-
-
-
-
-
-
-            }
-
-
-        }
 
     }
 
 }
-
 
 @Composable
 fun PrincipalQuizView(navController : NavHostController){
@@ -467,7 +427,7 @@ fun PrincipalQuizView(navController : NavHostController){
             }
 
         } catch (e: Exception) {
-            e.message?.let { Log.e("Error: ", it) }
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
 
         }
     }
@@ -673,7 +633,7 @@ fun Scores( navController: NavHostController,modifier : Modifier = Modifier.back
             allUsers = userViewModel.getAllUsers()!!
             score = quizViewModel.getScore(user.toString()).toString()
         } catch (e: Exception) {
-            e.message?.let { Log.e("Error: ", it) }
+            e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
 
         }
     }

@@ -35,49 +35,12 @@ import com.example.youthconnect.ViewModel.QuizViewModel
 fun ModifyQuestion(item : Question, navController : NavController, onDismiss: () -> Unit) {
     val quizViewModel: QuizViewModel = hiltViewModel()
 
-    var question by remember { mutableStateOf("") }
-    var optionA by remember { mutableStateOf("") }
-    var optionB by remember { mutableStateOf("") }
-    var optionC by remember { mutableStateOf("") }
-    var optionD by remember { mutableStateOf("") }
-    var selected by remember { mutableStateOf("") }
-
-
-
-
-    question = item.question
-    optionA = item.optionA
-    optionB = item.optionB
-    optionC = item.optionC
-    optionD = item.optionD
-    selected = item.answer
-
-    var editedQuestion by remember {
-        mutableStateOf((item as? Question)?.question ?: "")
-    }
-    var editedOptionA by remember {
-        mutableStateOf((item as? Question)?.optionA ?: "")
-    }
-    var editedOptionB by remember {
-        mutableStateOf((item as? Question)?.optionB ?: "")
-    }
-
-    var editedOptionC by remember {
-        mutableStateOf((item as? Question)?.optionC ?: "")
-    }
-
-    var editedOptionD by remember {
-        mutableStateOf((item as? Question)?.optionD ?: "")
-    }
-
-    var editedAnswer by remember {
-        mutableStateOf((item as? Question)?.answer ?: "")
-    }
-
-
-
-    val listState = rememberLazyListState()
-    val mcontext = LocalContext.current
+    var editedQuestion by remember { mutableStateOf(item.question) }
+    var editedOptionA by remember { mutableStateOf(item.optionA) }
+    var editedOptionB by remember { mutableStateOf(item.optionB) }
+    var editedOptionC by remember { mutableStateOf(item.optionC) }
+    var editedOptionD by remember { mutableStateOf(item.optionD) }
+    var editedAnswer by remember { mutableStateOf(item.answer) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -85,62 +48,37 @@ fun ModifyQuestion(item : Question, navController : NavController, onDismiss: ()
         title = { Text(text = "Inserte una nueva noticia") },
         text = {
 
-            LazyColumn {
-                item {
-                    Text("Escriba primero la pregunta y seguidamente las posibles respuestas, no olvide marcar cual es la respuesta correcta")
-                    CustomOutlinedTextField(
-                        value = editedQuestion,
-                        onValueChange = {editedQuestion = it },
-                        label = "Pregunta",
-                        leadingIconImageVector = Icons.Default.QuestionMark
-                    )
-                    val options = listOf("A", "B", "C", "D")
-                    options.forEachIndexed { _, option ->
-                        Row {
-                            Checkbox(
-                                checked = editedAnswer == option,
-                                onCheckedChange = { isChecked ->
-                                    if (isChecked) {
-                                        editedAnswer = option
-                                    } else {
-                                        editedAnswer = ""
-                                    }
-                                }
-                            )
-                            CustomOutlinedTextField(
-                                value = when (option) {
-                                    "A" -> editedOptionA
-                                    "B" -> editedOptionB
-                                    "C" -> editedOptionC
-                                    "D" -> editedOptionD
-                                    else -> ""
-                                },
-                                onValueChange = {
-                                    when (option) {
-                                        "A" -> editedOptionA = it
-                                        "B" -> editedOptionB= it
-                                        "C" -> editedOptionC = it
-                                        "D" -> editedOptionD = it
-                                    }
-                                },
-                                label = "Opción ${option} ",
-                                leadingIconImageVector = Icons.Default.QuestionAnswer
-                            )
-                        }
-                    }
-                }
-            }
+            ModifyQuestionContent(
+                editedQuestion = editedQuestion,
+                editedOptions = listOf(editedOptionA, editedOptionB, editedOptionC, editedOptionD),
+                editedAnswer = editedAnswer,
+                onQuestionChange = { editedQuestion = it },
+                onOptionChange = { index, value -> when (index) {
+                    0 -> editedOptionA = value
+                    1 -> editedOptionB = value
+                    2 -> editedOptionC = value
+                    3 -> editedOptionD = value
+                    else -> throw IllegalArgumentException("Invalid index")
+                }},
+                onAnswerChange = { editedAnswer = it }
+            )
 
         },
         confirmButton = {
             TextButton(
                 onClick = {
-
-                    quizViewModel.updateQuestion(item.copy(id = item.id,answer = editedAnswer, optionA = editedOptionA, optionB = editedOptionB, optionC = editedOptionC, optionD = editedOptionD, question = editedQuestion))
-
-
+                    quizViewModel.updateQuestion(
+                        item.copy(
+                            id = item.id,
+                            answer = editedAnswer,
+                            optionA = editedOptionA,
+                            optionB = editedOptionB,
+                            optionC = editedOptionC,
+                            optionD = editedOptionD,
+                            question = editedQuestion
+                        )
+                    )
                     navController.navigate("DecideScreen")
-                    //onDismiss()
                 }
             ) {
                 Text("Confirmar")
@@ -154,4 +92,48 @@ fun ModifyQuestion(item : Question, navController : NavController, onDismiss: ()
             }
         }
     )
+}
+
+
+@Composable
+private fun ModifyQuestionContent(
+    editedQuestion: String,
+    editedOptions: List<String>,
+    editedAnswer: String,
+    onQuestionChange: (String) -> Unit,
+    onOptionChange: (Int, String) -> Unit,
+    onAnswerChange: (String) -> Unit
+) {
+    LazyColumn {
+        item {
+            Text("Escriba primero la pregunta y seguidamente las posibles respuestas, no olvide marcar cual es la respuesta correcta")
+            CustomOutlinedTextField(
+                value = editedQuestion,
+                onValueChange = onQuestionChange,
+                label = "Pregunta",
+                leadingIconImageVector = Icons.Default.QuestionMark
+            )
+            val options = listOf("A", "B", "C", "D")
+            options.forEachIndexed { index, option ->
+                Row {
+                    Checkbox(
+                        checked = editedAnswer == option,
+                        onCheckedChange = { isChecked ->
+                            if (isChecked) {
+                                onAnswerChange(option)
+                            } else {
+                                onAnswerChange("")
+                            }
+                        }
+                    )
+                    CustomOutlinedTextField(
+                        value = editedOptions[index],
+                        onValueChange = { onOptionChange(index, it) },
+                        label = "Opción $option",
+                        leadingIconImageVector = Icons.Default.QuestionAnswer
+                    )
+                }
+            }
+        }
+    }
 }
