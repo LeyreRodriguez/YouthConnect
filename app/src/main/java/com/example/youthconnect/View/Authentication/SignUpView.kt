@@ -208,6 +208,9 @@ fun SignUpView( navController: NavController) {
 
     }
 
+    var isPolicy by remember { mutableStateOf(true) }
+
+
     val brush = Brush.horizontalGradient(
         listOf(
             Color(0xFFE15554),
@@ -224,6 +227,13 @@ fun SignUpView( navController: NavController) {
                 drawRect(brush)
             }
         )
+
+        if(isPolicy){
+            Policy(){
+                isPolicy = false
+            }
+        }
+
         Column(modifier = Modifier.fillMaxSize()){
             Box(modifier = Modifier.wrapContentSize(),
                 contentAlignment = Alignment.TopCenter ){
