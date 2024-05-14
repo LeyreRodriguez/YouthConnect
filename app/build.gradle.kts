@@ -214,9 +214,12 @@ dependencies {
 
     // Testing
     testImplementation("junit:junit:$jUnit")
-    testImplementation("org.mockito:mockito-core:$mockito")
-    testImplementation("io.mockk:mockk:$mockk")
-    testImplementation("org.mockito:mockito-inline:$mockito")
+    testImplementation("org.mockito:mockito-android:3.12.4")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    implementation("androidx.arch.core:core-testing:2.1.0")
+    implementation("org.mockito:mockito-core:3.12.4")
+
+    implementation("org.mockito:mockito-android:5.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter:$jupiter")
     androidTestImplementation("androidx.test.ext:junit:$jUnit2")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espresso")
@@ -227,8 +230,7 @@ dependencies {
 
 
     kapt ("com.google.dagger:hilt-compiler:$daggerHilt")
-
-
+    implementation(kotlin("test"))
 
 
 }
