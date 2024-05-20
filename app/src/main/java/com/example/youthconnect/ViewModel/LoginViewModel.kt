@@ -20,7 +20,7 @@ class LoginViewModel : ViewModel() {
     private val _state = MutableStateFlow<SignInState>(SignInState.Loading)
     val state = _state.asStateFlow()
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     fun onSignInResult(result: SignInResult) {
         _state.update {

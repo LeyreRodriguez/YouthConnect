@@ -4,4 +4,6 @@ sealed class AuthError {
     object ConnectionError : AuthError()
     object InvalidCredentials : AuthError()
     object Timeout : AuthError()
+
+
 }

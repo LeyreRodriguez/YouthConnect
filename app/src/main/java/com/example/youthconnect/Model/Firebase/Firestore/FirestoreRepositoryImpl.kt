@@ -509,6 +509,7 @@ class FirestoreRepositoryImpl @Inject constructor(
 
                     val data = document.data
                 } else {
+                    Log.e("Error:" , "There is no t roll call")
                 }
             }
     }
@@ -675,6 +676,7 @@ class FirestoreRepositoryImpl @Inject constructor(
                         }
                     })
                 } catch (e: FirebaseFirestoreException) {
+                    e.message?.let { Log.e(Constants.ERROR_LOG_TAG, it) }
                 }
             }
         } catch (e: Exception) {

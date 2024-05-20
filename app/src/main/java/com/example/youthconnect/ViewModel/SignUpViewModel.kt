@@ -21,7 +21,7 @@ class SignUpViewModel @Inject constructor(
     private val firestoreRepository: FirestoreRepository
 ): ViewModel(){
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private var _navigateToNextScreen = MutableStateFlow(false)
     var navigateToNextScreen = _navigateToNextScreen.asStateFlow()

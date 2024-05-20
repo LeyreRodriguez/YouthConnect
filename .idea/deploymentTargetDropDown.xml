@@ -2,9 +2,6 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="QuizViewModelTest">
-        <State />
-      </entry>
       <entry key="app">
         <State>
           <runningDeviceTargetsSelectedWithDialog>
@@ -39,9 +36,6 @@
             </Target>
           </targetsSelectedWithDialog>
         </State>
-      </entry>
-      <entry key="getAllQuestionsTest()">
-        <State />
       </entry>
     </value>
   </component>

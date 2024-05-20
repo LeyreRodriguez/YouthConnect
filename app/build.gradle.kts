@@ -110,6 +110,16 @@ val datastore = "1.0.0"
 val mockk = "1.12.2"
 val jupiter = "5.8.1"
 val retrofit = "2.9.0"
+val mockitoAndroid = "3.12.4"
+val testing = "2.1.0"
+val mockitoAndroid2 = "5.12.0"
+
+val mockitoVersion = "4.5.1"
+
+val espressoCoreVersion = "3.5.1"
+val junitVersion = "1.1.5"
+val jupiterVersion = "5.8.1"
+
 dependencies {
 
 
@@ -213,24 +223,54 @@ dependencies {
 
 
     // Testing
-    testImplementation("junit:junit:$jUnit")
-    testImplementation("org.mockito:mockito-android:3.12.4")
-    testImplementation("androidx.arch.core:core-testing:2.1.0")
-    implementation("androidx.arch.core:core-testing:2.1.0")
-    implementation("org.mockito:mockito-core:3.12.4")
+    //implementation(kotlin("test"))
+//
+    //implementation("androidx.arch.core:core-testing:$testing")
+    //implementation("org.mockito:mockito-core:$mockitoAndroid")
+    //implementation("org.mockito:mockito-android:$mockitoAndroid2")
+//
+    //testImplementation("junit:junit:$jUnit")
+    //testImplementation("org.mockito:mockito-android:$mockitoAndroid")
+    //testImplementation("androidx.arch.core:core-testing:$testing")
+    //testImplementation("io.mockk:mockk:1.12.0")
+//
+    //testImplementation ("org.mockito:mockito-core:3.11.2")
+    //testImplementation ("androidx.arch.core:core-testing:2.1.0")
+    //testImplementation ("io.mockk:mockk:1.12.0")
+//
+    //testImplementation("org.junit.jupiter:junit-jupiter:$jupiter")
+//
+//
+    //androidTestImplementation("androidx.test.ext:junit:$jUnit2")
+    //androidTestImplementation("androidx.test.espresso:espresso-core:$espresso")
+    //androidTestImplementation(platform("androidx.compose:compose-bom:$bom"))
+    //androidTestImplementation("org.testng:testng:$testng")
+    //androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+//
 
-    implementation("org.mockito:mockito-android:5.12.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:$jupiter")
-    androidTestImplementation("androidx.test.ext:junit:$jUnit2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:$espresso")
-    androidTestImplementation(platform("androidx.compose:compose-bom:$bom"))
-    androidTestImplementation("org.testng:testng:$testng")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-
-
+  //  implementation("androidx.test.sespresso:espresso-core:3.5.1")
 
     kapt ("com.google.dagger:hilt-compiler:$daggerHilt")
-    implementation(kotlin("test"))
+
+
+//    testImplementation("io.mockk:mockk:$mockitoVersion")
+    // Regular tests
+//    testImplementation("io.mockk:mockk:$mockitoVersion")
+    testImplementation("org.mockito:mockito-core:3.12.4")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("io.mockk:mockk:1.12.0")
+
+    // Android instrumentation tests
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:$junitVersion")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:${rootProject.extra["compose_version"]}")
+    androidTestImplementation("androidx.arch.core:core-testing:2.1.0")
+
+
+
+    debugImplementation("androidx.compose.ui:ui-test-manifest:${rootProject.extra["compose_version"]}")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    debugImplementation("androidx.compose.ui:ui-tooling")
 
 
 }
