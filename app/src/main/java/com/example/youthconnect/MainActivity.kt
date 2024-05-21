@@ -180,13 +180,13 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(
                     applicationContext,
                     "Cargando",
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()            }
             is SignInState.Success -> {
                 Toast.makeText(
                     applicationContext,
                     "Sesión Iniciada",
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
                 navController.navigate("secondScreens")
                 viewModel.resetState()
@@ -200,7 +200,7 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(
                     applicationContext,
                     errorMessage,
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
 
@@ -208,7 +208,7 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(
                     applicationContext,
                     "No se ha podido iniciar sesión",
-                    Toast.LENGTH_LONG
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         }

@@ -229,7 +229,7 @@ fun SignUpView( navController: NavController) {
         )
 
         if(isPolicy){
-            Policy(){
+            Policy(navController){
                 isPolicy = false
             }
         }

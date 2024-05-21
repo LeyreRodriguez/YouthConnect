@@ -1,6 +1,7 @@
 package com.example.youthconnect.View.Authentication
 
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,16 +20,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.youthconnect.ViewModel.SignUpViewModel
 
 
 @Composable
-fun Policy(onConfirm: () -> Unit) {
+fun Policy(navController: NavController,onConfirm: () -> Unit) {
     // Estado para controlar la visibilidad del botón de confirmación
     var isButtonEnabled by remember { mutableStateOf(false) }
 
     // Observador del scroll para determinar si se ha llegado al final del contenido
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+
+    val signUpViewModel : SignUpViewModel = hiltViewModel()
+
+
+    val shouldNavigate by signUpViewModel.navigateToNextScreen.collectAsState()
+    val showFirstScreen by signUpViewModel.showFirstScreen2.collectAsState()
 
     AlertDialog(
         onDismissRequest = {},
@@ -53,6 +64,23 @@ fun Policy(onConfirm: () -> Unit) {
                 enabled = isButtonEnabled // Habilitar el botón según el estado
             ) {
                 Text("Aceptar y confirmar")
+            }
+        },
+        dismissButton ={
+            TextButton(
+                onClick = {
+                        if(showFirstScreen){
+                            navController.navigate("login") {
+                                popUpTo("signUp") { inclusive = true }
+                            }
+                        }else{
+                            signUpViewModel.changeScreen()
+                        }
+
+
+                },
+            ) {
+                Text("Cancelar")
             }
         }
     )
