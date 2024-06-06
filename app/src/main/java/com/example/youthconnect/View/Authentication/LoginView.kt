@@ -52,11 +52,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.libraryapp.viewModel.LoginViewModel
 import com.example.youthconnect.Model.Enum.NavScreen
 import com.example.youthconnect.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavController, state : SignInState) {
@@ -130,13 +133,23 @@ fun LoginView(loginViewModel: LoginViewModel = viewModel(), navController: NavCo
 
     fun register(id : String, password : String){
         if (validate(id, password) or (id == "00000000A" && password == "admin")){
-            loginViewModel.signInWithEmail(id + "@youthconnect.com", password) {
+            loginViewModel.signInWithEmail("$id@youthconnect.com", password) {
                 navController.navigate(NavScreen.NewsScreen.name)
             }
         }else{
-
             Toast.makeText(mcontext,"Por favor, revise los campos", Toast.LENGTH_SHORT).show()
         }
+
+
+        loginViewModel.viewModelScope.launch {
+            loginViewModel.errorState.collect { errorMessage ->
+                // Mostrar el mensaje de error en la pantalla (por ejemplo, usando Toast)
+                errorMessage?.let { showError ->
+                    Toast.makeText(mcontext, showError, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
     }
 
     val brush = Brush.horizontalGradient(

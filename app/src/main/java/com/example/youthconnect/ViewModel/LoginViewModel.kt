@@ -22,7 +22,15 @@ class LoginViewModel : ViewModel() {
     private val _state = MutableStateFlow<SignInState>(SignInState.Loading)
     val state = _state.asStateFlow()
 
+    private val _errorState = MutableStateFlow<String?>(null)
+    val errorState = _errorState.asStateFlow()
+
     var auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    private fun handleError(errorMessage: String?) {
+        _errorState.value = errorMessage
+    }
+
 
     fun onSignInResult(result: SignInResult) {
         _state.update {
@@ -44,13 +52,18 @@ class LoginViewModel : ViewModel() {
                 home()
             } else {
                 Log.d(Constants.EMAIL, "Authentication failed.")
+                handleError("Falló la autenticación.")
             }
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             Log.d(Constants.EMAIL, "Invalid credentials: ${e.message}")
+            handleError("Credenciales inválidas.")
+
         } catch (e: FirebaseException) {
             Log.d(Constants.EMAIL, "Firebase error: ${e.message}")
+            handleError("Error de Firebase.")
         } catch (e: Exception) {
             Log.d(Constants.EMAIL, "Error: ${e.message}")
+            handleError("Error desconocido.")
         }
     }
 
@@ -69,17 +82,21 @@ class LoginViewModel : ViewModel() {
                                 successCallback()
                             } else {
                                 errorCallback("Error al cambiar la contraseña: ${updatePasswordTask.exception?.message}")
+                                handleError("Error al cambiar la contraseña.")
                             }
                         }
                     } else {
                         errorCallback("Error de autenticación: ${reauthTask.exception?.message}")
+                        handleError("Error de autenticación.")
                     }
                 }
             } else {
                 errorCallback("No hay usuario autenticado.")
+                handleError("No hay usuario autenticado.")
             }
         } catch (e: Exception) {
             errorCallback("Error: ${e.message}")
+            handleError("Error desconocido.")
         }
     }
 
