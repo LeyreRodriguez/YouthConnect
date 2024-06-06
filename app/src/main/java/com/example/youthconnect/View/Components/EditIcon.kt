@@ -22,7 +22,6 @@ import com.example.youthconnect.View.OverlaysAndMore.ModifyUsers
 fun EditIcon(currentUserType: String?, user: Any?, navController: NavController){
     var editUser by remember { mutableStateOf(false)  }
 
-    if(currentUserType == "Instructor"){
         Icon(
             imageVector = Icons.Outlined.Edit ,
             contentDescription = "Edit",
@@ -33,7 +32,7 @@ fun EditIcon(currentUserType: String?, user: Any?, navController: NavController)
                     editUser = true
                 }
         )
-    }
+
 
     if (editUser) {
         user?.let {

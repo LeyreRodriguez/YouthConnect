@@ -39,4 +39,23 @@ class EmailAuthUiClient (
             Result.failure(Exception("Error al eliminar el usuario: ${e.message}"))
         }
     }
+
+    suspend fun changePassword(email: String, currentPassword: String, newPassword: String): Result<String> {
+        return try {
+            val credentials = EmailAuthProvider.getCredential("$email@youthconnect.com", currentPassword)
+            auth.signInWithCredential(credentials).await()
+            auth.currentUser?.updatePassword(newPassword)?.await()
+            Result.success("Contraseña cambiada exitosamente")
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            Result.failure(Exception("Credenciales inválidas. Por favor, revise su correo electrónico y contraseña."))
+        } catch (e: FirebaseAuthRecentLoginRequiredException) {
+            Result.failure(Exception("Se requiere una nueva autenticación. Por favor, inicie sesión nuevamente."))
+        } catch (e: FirebaseAuthWeakPasswordException) {
+            Result.failure(Exception("La contraseña es demasiado débil. Por favor, elija una contraseña más segura."))
+        } catch (e: Exception) {
+            Result.failure(Exception("Error al cambiar la contraseña: ${e.message}"))
+        }
+    }
+
+
 }

@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.libraryapp.model.firebaseAuth.SignInResult
 import com.example.youthconnect.Model.Constants
+import com.example.youthconnect.Model.Firebase.Authentication.EmailAuthUiClient
 import com.google.firebase.FirebaseException
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +51,35 @@ class LoginViewModel : ViewModel() {
             Log.d(Constants.EMAIL, "Firebase error: ${e.message}")
         } catch (e: Exception) {
             Log.d(Constants.EMAIL, "Error: ${e.message}")
+        }
+    }
+
+    fun changePassword(currentPassword: String, newPassword: String, successCallback: () -> Unit, errorCallback: (String) -> Unit) = viewModelScope.launch {
+        try {
+            val user = auth.currentUser
+            if (user != null) {
+                println(user.email)
+                println(currentPassword)
+
+                val credential = EmailAuthProvider.getCredential(user.email!!, currentPassword)
+                user.reauthenticate(credential).addOnCompleteListener { reauthTask ->
+                    if (reauthTask.isSuccessful) {
+                        user.updatePassword(newPassword).addOnCompleteListener { updatePasswordTask ->
+                            if (updatePasswordTask.isSuccessful) {
+                                successCallback()
+                            } else {
+                                errorCallback("Error al cambiar la contraseña: ${updatePasswordTask.exception?.message}")
+                            }
+                        }
+                    } else {
+                        errorCallback("Error de autenticación: ${reauthTask.exception?.message}")
+                    }
+                }
+            } else {
+                errorCallback("No hay usuario autenticado.")
+            }
+        } catch (e: Exception) {
+            errorCallback("Error: ${e.message}")
         }
     }
 

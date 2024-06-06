@@ -178,14 +178,14 @@ fun ChildInfo(childId: String, child: Child?, currentUser: String?, currentUserT
             if (child?.state ?: "" == false){
                 Icon(
                     imageVector = Icons.Outlined.Park ,
-                    contentDescription = "Recieved",
+                    contentDescription = "Outside",
                     tint = Color.Black,
                     modifier = Modifier.size(30.dp)
                 )
             }else{
                 Icon(
                     imageVector = Icons.Outlined.Home ,
-                    contentDescription = "Recieved",
+                    contentDescription = "Inside",
                     tint =  Color.Black,
                     modifier = Modifier.size(30.dp)
                 )
