@@ -11,10 +11,14 @@
 8. [Perfil de animadores](#7-perfil-de-animadores)
 
 ## Introducción
+
+Este proyecto forma parte de mi trabajo de fin de grado, este se centra en el desarrollo de una aplicación móvil para la asociación juvenil MAJO, afiliada a las Salesianas de Las Palmas de Gran Canaria. Su propósito es mejorar la organización de la labor de los animadores dentro de la asociación y mantener a los padres y niños informados sobre las últimas novedades. Además de estas funciones principales, la aplicación incluye otras características como un quiz interactivo para actividades educativas y un chat que facilita la comunicación directa de los animadores con padres y niños. Estos elementos no solo enriquecen la experiencia de usuario, sino que también promueven una mayor participación e interacción dentro de la comunidad de la asociación.
+
+
 En este README se describen las distintas funcionalidades que se pueden realizar en la aplicación.
-
+  
 Para comenzar a utilizar la aplicación en un smartphone con sistema operativo Android, una vez descargado el archivo APK, se deberá proceder con su instalación ejecutando el archivo. Es posible que en la primera ejecución aparezca un aviso indicando que el desarrollador no está identificado o que el origen es desconocido, dependiendo del dispositivo. En este caso, se deberá permitir la instalación desde fuentes desconocidas en la configuración del dispositivo.
-
+  
 Una vez instalada, el usuario podrá acceder a la aplicación y disfrutar de todas sus funcionalidades. El manual de usuario proporcionará una guía detallada sobre el uso de todas estas funcionalidades, para que el usuario pueda sacar el máximo provecho de la aplicación y disfrutar de una experiencia enriquecedora.
 
 ## 1. Registro e inicio de sesión
